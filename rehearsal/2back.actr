@@ -1,0 +1,1501 @@
+(set-task "actr.tasks.driving.Driving")
+
+(sgp
+    :iu 10
+    :bll 0.5
+    :digit-detect-delay .050
+    :digit-recode-delay .250
+    :visual-onset-span 500.0
+    :visual-finst-span 3.0
+    :emma t
+    :v t
+    ;---
+    :rt -100
+    :ans 0.3
+    :mp 6
+    :lf 0.3
+    ;---
+    ;:act t
+    ;:brain-imaging t
+    ;:bout t
+    :qs 1.0)
+
+(add-dm    
+    (goal1 isa nback status start)
+    (goal2 isa drive follow far sl 2)
+)
+(set-all-base-levels 10000)
+
+(p start
+        ;;create an empty imaginal chunk
+    =goal>
+        isa nback
+        status start
+    ?imaginal>
+        state free
+==>
+    =goal>
+        status notice
+        num 0
+        nr 0
+        rehearsal f
+    +imaginal>
+        isa nback-state
+        nbackspeed 60
+        1back 0
+    +temporal>
+        isa time
+        ticks clear
+        ;-visual-location>
+)
+
+;----------------- DRIVING -----------------
+
+(p drive*attend-near
+    =goal>
+        isa drive
+        na nil
+        - follow undecided
+        
+    ?visual-location> 
+        ;state free
+        buffer empty
+        - buffer requested
+        
+    ?visual>
+        state free
+        buffer empty
+==>
+    =goal>
+        isa drive
+        safe nil
+    +visual-location>
+        isa visual-location
+        kind near
+)
+
+(p drive*eval-safety-safe
+    =goal>
+        isa drive
+        safe nil
+        - follow undecided
+        ;- na nil
+        ;- na2 nil
+    =visual-location>
+        isa visual-location
+        kind near
+        screen-x =nx
+        screen-y =ny
+        distance =nd
+    ?visual>
+        state free
+        buffer empty
+    !eval! (safe-zone)
+    =imaginal>
+        nbackspeed =nbackspeed
+==>
+    !eval! (keep-limit =nbackspeed)
+    =goal>
+        isa drive
+        safe t
+        ;-visual-location>
+    =imaginal>
+)
+
+(p drive*eval-safety-unsafe*
+    =goal>
+        isa drive
+        - follow undecided
+    =visual-location>
+        isa visual-location
+        kind near
+        screen-x =nx
+        screen-y =ny
+        distance =nd
+    ?visual>
+        state free
+        buffer empty
+    !eval! (not-safe-zone)
+    !eval! (do-reset)
+==>
+    =goal>
+        isa control
+        safe f
+        na nil
+        fa nil
+        na2 nil
+        fa2 nil
+        fkind2 nil
+        time2 nil    
+    =visual-location>
+)
+
+(p drive*eval-safety-unsafe
+    =goal>
+        isa drive
+        - follow undecided
+    =visual-location>
+        isa visual-location
+        kind near
+        screen-x =nx
+        screen-y =ny
+        distance =nd
+    ?visual>
+        state free
+        buffer empty
+    !eval! (not-safe-zone)
+    !eval! (do-not-reset)
+==>
+    =goal>
+        isa control
+        safe f
+    =visual-location>
+)
+
+(p drive*process-near-attend-far
+    =goal>
+        isa control
+        na nil
+        follow far
+    =visual-location>
+        isa visual-location
+        kind near
+        screen-x =nx
+        screen-y =ny
+        distance =nd
+    ?visual>
+        state free
+        buffer empty
+==>
+    !bind! =na (image->angle =nx =nd)
+    =goal>
+        isa control
+        na =na
+    +visual-location>
+        isa visual-location
+        kind far
+)
+
+(p drive*process-near-attend-car
+    =goal>
+        isa control
+        na nil
+        follow car
+        safe f
+    =visual-location>
+        isa visual-location
+        kind near
+        screen-x =nx
+        screen-y =ny
+        distance =nd
+    ?visual>
+        state free
+        buffer empty
+==>
+    !bind! =na (image->angle =nx =nd)
+    =goal>
+        isa control
+        na =na
+    +visual-location>
+        isa visual-location
+        kind car
+)
+
+(p drive*process-far
+    =goal>
+        isa control
+        na =na
+        fa nil
+        na2    =na2
+        fa2    =fa2
+        fkind2 =fkind
+        fthw2  =fthw2
+        time2  =time2
+    =visual-location>
+        isa visual-location
+        kind far 
+        kind =fkind
+        screen-x =fx
+        distance =fd
+    ?visual>
+        state free
+        buffer empty
+    =imaginal>
+        nbackspeed =nbackspeed
+==>
+    !bind! =fa (image->angle =fx =fd)
+    !bind! =time (mp-time)
+    !bind! =dna (- =na =na2)
+    !bind! =dfa (- =fa =fa2)
+    !bind! =dt (- =time =time2)
+    !bind! =vna (my/ =dna =dt)
+    !bind! =vfa (my/ =dfa =dt)
+    !bind! =v (get-velocity)
+    !bind! =fthw (get-thw =fd =v)
+    !bind! =dthw (- =fthw =fthw2)
+    !eval! (do-steer =na =dna =dfa =dt)
+    !eval! (keep-limit =nbackspeed)
+    =goal>
+        fkind =fkind
+        fa =fa
+        fd =fd
+        vna =vna
+        vfa =vfa
+        time =time
+        fthw =fthw
+        dthw =dthw
+        v =v
+        done t
+    =imaginal>
+    +visual>
+        isa move-attention
+        screen-pos =visual-location
+)
+
+(p drive*process-car
+    =goal>
+        isa control
+        na =na
+        fa nil
+        na2    =na2
+        fa2    =fa2
+        fkind2 =fkind
+        fthw2  =fthw2
+        time2  =time2
+    =visual-location>
+        isa visual-location
+        kind car 
+        kind =fkind
+        screen-x =fx
+        distance =fd
+    ?visual>
+        state free
+        buffer empty
+    =imaginal>
+        nbackspeed =nbackspeed
+==>
+    !bind! =fa (image->angle =fx =fd)
+    !bind! =time (mp-time)
+    !bind! =dna (- =na =na2)
+    !bind! =dfa (- =fa =fa2)
+    !bind! =dt (- =time =time2)
+    !bind! =vna (my/ =dna =dt)
+    !bind! =vfa (my/ =dfa =dt)
+    !bind! =v (get-velocity)
+    !bind! =fthw (get-thw =fd =v)
+    !bind! =dthw (- =fthw =fthw2)
+    !eval! (do-steer =na =dna =dfa =dt)
+        ;!eval! (keep-lane =na =dna =dfa =dt)
+    !eval! (keep-limit =nbackspeed)
+    =goal>
+        fkind =fkind
+        fa =fa
+        fd =fd
+        vna =vna
+        vfa =vfa
+        time =time
+        fthw =fthw
+        dthw =dthw
+        v =v
+        done t
+    =imaginal>
+    +visual>
+        isa move-attention
+        screen-pos =visual-location
+)
+
+(p drive*process-without-old
+    =goal>
+        isa control
+        na =na
+        fa nil
+    =visual-location>
+        isa visual-location
+        kind =fkind
+        screen-x =fx
+        distance =fd
+    ?visual>
+        state free
+        buffer empty
+==>
+    !bind! =fa (image->angle =fx =fd)
+    !bind! =v (get-velocity)
+    !bind! =fthw (get-thw =fd =v)
+    !bind! =time (mp-time)
+    =goal>
+        isa drive
+        na nil
+        fa nil
+        na2 =na
+        fa2 =fa
+        fd2 =fd
+        fkind2 =fkind
+        fthw2 =fthw
+        time2 =time
+    +visual-location>
+        isa visual-location
+        kind near
+)
+(spp drive*process-without-old :u 7)
+
+(p drive*loop-stable-far
+    =goal>
+        isa control
+        na =na
+        fa =fa
+        vna =vna
+        vfa =vfa
+        fd =fd
+        fkind =fkind
+        time =time
+    =visual>
+        isa far
+    !eval! (is-car-stable =na =vna =vfa)
+==>
+    =goal>
+        isa drive
+        na nil
+        fa nil
+        na2 =na
+        fa2 =fa
+        fd2 =fd
+        fkind2 =fkind
+        time2 =time
+    +visual-location>
+        isa visual-location
+        kind car
+        >= screen-x 0 ;annoying...
+)
+
+(p drive*loop-monitor-car-left*
+        ;first time
+    =goal>
+        isa drive
+        follow far
+        sl =sl
+        na nil
+        fa nil
+        na2 =na
+        fa2 =fa
+        ;fd2 =fd
+        fkind2 =fkind
+        time2 =time
+        cthw nil
+        cthw2 nil
+    =visual-location>
+        isa visual-location
+        kind car
+        distance =fd
+        >= screen-x 0
+        screen-x =fx
+    !eval! (autocar-left =sl =fd =fx)
+==>
+    !bind! =v (get-velocity)
+    !bind! =cthw (get-thw =fd =v)
+    !bind! =dcthw (- =cthw =cthw2)
+    =goal>
+        isa drive
+        ctwh2 =cthw
+        cthw =cthw
+        dcthw =dcthw
+        fd =fd
+)
+
+(p drive*loop-monitor-car-left
+    =goal>
+        isa drive
+        follow far
+        sl =sl
+        na nil
+        fa nil
+        cthw =cthw2
+        dcthw =dcthw2
+    =visual-location>
+        isa visual-location
+        kind car
+        distance =fd
+        >= screen-x 0
+        screen-x =fx
+    !eval! (autocar-left =sl =fd =fx)
+    !eval! (car-not-too-close =fd =cthw2 =dcthw2)   
+==>
+    !bind! =v (get-velocity)
+    !bind! =cthw (get-thw =fd =v)
+    !bind! =dcthw (- =cthw =cthw2)
+    =goal>
+        isa drive
+        ctwh2 =cthw2
+        cthw =cthw
+        dcthw =dcthw
+        fd =fd
+    -visual-location>
+)
+
+(p drive*loop-monitor-car-right
+    =goal>
+        isa drive
+        follow far
+        sl =sl
+        na nil
+        fa nil
+    =visual-location>
+        isa visual-location
+        kind car
+        distance =fd
+        >= screen-x 0
+        screen-x =fx
+    !eval! (autocar-not-ahead =sl =fd =fx)
+    !eval! (autocar-right =sl =fd =fx)
+==>
+    =goal>
+        isa drive
+)
+
+(p drive*notice-construction
+    =goal>
+        isa drive
+        ;- construction t
+    =visual-location>
+        isa visual-location
+        kind construction
+        :attended nil
+    ?visual>
+        state free
+        buffer empty
+==>
+    =goal>
+        isa drive
+    +visual>
+        isa move-attention
+        screen-pos =visual-location
+    =visual-location>
+)
+
+(p drive*process-construction-start
+    =goal>
+        isa drive
+    =visual>
+        isa construction
+        value start
+==>
+    =goal>
+        isa drive
+        construction t
+    -visual-location>
+)
+
+(p drive*process-construction-end
+    =goal>
+        isa drive
+    =visual>
+        isa construction
+        value end
+==>
+    =goal>
+        isa drive
+        construction nil
+    -visual-location>
+)
+
+(p drive*loop-stable-car
+    =goal>
+        isa control
+        na =na
+        fa =fa
+        vna =vna
+        vfa =vfa
+        fd =fd
+        fkind =fkind
+        time =time
+        fthw =fthw
+        dthw =dthw
+        follow car
+        sl =sl
+    =visual>
+        isa car
+        value =cl
+    !eval! (is-car-stable =na =vna =vfa)
+    !eval! (car-not-too-close =fd =fthw =dthw)
+    !eval! (same-lane =sl =cl)
+==>
+    =goal>
+        isa drive
+        na nil
+        fa nil
+        na2 =na
+        fa2 =fa
+        fd2 =fd
+        fkind2 =fkind
+        fthw2 =fthw
+        time2 =time
+)
+
+(p drive*loop-stable-car-change-point
+    =goal>
+        isa control
+        na =na
+        fa =fa
+        vna =vna
+        vfa =vfa
+        fd =fd
+        fkind =fkind
+        time =time
+        fthw =fthw
+        dthw =dthw
+        follow car
+        sl =sl
+    =visual>
+        isa car
+        value =cl
+    !eval! (is-car-stable =na =vna =vfa)
+    !eval! (car-not-too-close =fd =fthw =dthw)
+    !eval! (not-same-lane =sl =cl)
+==>
+    =goal>
+        isa drive
+        na nil
+        fa nil
+        na2 =na
+        fa2 =fa
+        fd2 =fd
+        fkind2 =fkind
+        time2 =time
+        follow far
+)
+
+(p drive*loop-stable-far-change-point
+    =goal>
+        isa drive
+        follow far
+        sl =sl
+    =visual-location>
+        isa visual-location
+        kind car
+        >= screen-x 0
+        screen-x =fx
+        distance =fd
+    !eval! (autocar-ahead =sl =fd =fx) ;peripheral vision
+==>
+    =goal>
+        isa drive
+        follow car
+    +visual-location>
+        isa visual-location
+        kind near
+)
+
+(p drive*init-overtake-attend-left-mirror
+    =goal>
+        isa control
+        follow car
+        na =na
+        fa =fa
+        vna =vna
+        vfa =vfa
+        fd =fd
+        fkind =fkind
+        time =time
+        fd =fd
+        fthw =fthw
+        dthw =dthw
+        sl =sl
+        > sl 1
+    =visual>
+        isa car
+        value =cl
+    !eval! (car-too-close =fd =fthw =dthw)
+    !eval! (dont-tailgate)
+==>
+    =goal>
+        isa overtake
+        na nil
+        fa nil
+        na2 =na
+        fa2 =fa
+        fd2 =fd
+        fkind2 =fkind
+        time2 =time
+    +visual-location>
+        isa visual-location
+        kind left-mirror
+)
+
+(p drive*avoid-construction
+    =goal>
+        isa drive
+        sl 1
+        construction =t ; needs to exist
+        construction t
+    ?visual-location>
+        state free
+        buffer empty
+==>
+    =goal>
+        isa drive
+    +visual-location>
+        isa visual-location>
+        kind right-mirror
+)
+
+(p drive*tailgate
+    =goal>
+        isa control
+        follow car
+        na =na
+        fa =fa
+        vna =vna
+        vfa =vfa
+        fd =fd
+        fkind =fkind
+        time =time
+        fd =fd
+        fthw =fthw
+        dthw =dthw
+        sl =sl
+        sl 2
+    =visual>
+        isa car
+        value =cl
+    !eval! (car-too-close =fd =fthw =dthw)
+    !eval! (tailgate)
+==>
+    =goal>
+        isa drive
+        follow far
+        na nil
+        fa nil
+        na2 =na
+        fa2 =fa
+        fd2 =fd
+        fkind2 =fkind
+        time2 =time
+    +visual-location>
+        isa visual-location
+        kind near
+    +temporal>
+        isa time
+        ticks clear
+)
+
+(p drive*init-overtake-attend-left-mirror-far
+    =goal>
+        isa drive
+        follow far
+        sl =sl
+        > sl 1
+        na nil
+        fa nil
+        na2 =na
+        fa2 =fa
+        ;fd2 =fd
+        fkind2 =fkind
+        time2 =time
+        cthw =cthw2
+        dcthw =dcthw2
+    =visual-location>
+        isa visual-location
+        kind car
+        distance =fd
+        >= screen-x 0
+        screen-x =fx
+    !eval! (autocar-left =sl =fd =fx)
+    !eval! (car-too-close =fd =cthw2 =dcthw2)   
+==>
+    =goal>
+        isa overtake
+    +visual-location>
+        isa visual-location
+        kind left-mirror
+)
+
+(p drive*loop-process-left-mirror
+    =goal>
+        isa overtake
+    ?visual>
+        buffer empty
+        - state requested
+    =visual-location>
+        isa visual-location
+        kind left-mirror
+==>
+    =goal>
+        isa overtake
+    +visual>
+        isa move-attention
+        screen-pos =visual-location
+    =visual-location> ;sign won't be noticed
+)
+
+(p drive*loop-process-right-mirror
+    =goal>
+        isa drive
+    ?visual>
+        buffer empty
+        - state requested
+    =visual-location>
+        isa visual-location
+        kind right-mirror
+    ?visual>
+        buffer empty
+        state free
+==>
+    =goal>
+        isa overtake
+        
+    +visual>
+        isa move-attention
+        screen-pos =visual-location
+    =visual-location> ;sign won't be noticed
+)
+
+
+(p drive*slow-down
+    =goal>
+        isa overtake
+    =visual>
+        isa =isa
+        value =value
+    !eval! (overtaking-not-safe =value)
+    !eval! (merging)
+==>
+    !eval! (keep-limit 60)
+    =goal>
+        isa drive
+        na nil
+    +visual-location>
+        isa visual-location
+        kind right-mirror
+)
+
+(p drive*abort-changing-lane
+    =goal>
+        isa overtake
+    =visual>
+        isa =isa
+        value =value
+    !eval! (overtaking-not-safe =value)
+    !eval! (not-merging)
+==>
+    =goal>
+        isa drive
+        na nil
+    +temporal>
+        isa time
+        time clear
+    +visual-location>
+        isa visual-location
+        kind near
+)
+
+(p drive*attend-left-lane
+    =goal>
+        isa overtake
+    =visual>
+        isa left-mirror
+        value clear
+==>
+    =goal>
+        isa overtake
+    +visual-location>
+        isa visual-location
+        kind left-lane
+)
+
+(p drive*attend-right-lane
+    =goal>
+        isa overtake
+    =visual>
+        isa right-mirror
+        value clear
+==>
+    =goal>
+        isa overtake
+    +visual-location>
+        isa visual-location
+        kind right-lane        
+)
+
+(p drive*process-right-lane
+    =goal>
+        isa overtake
+    ?visual>
+        buffer empty
+        - state requested
+    =visual-location>
+        isa visual-location
+        kind right-lane
+==>
+    =goal>
+        isa overtake
+    +visual>
+        isa move-attention
+        screen-pos =visual-location
+    =visual-location>
+)
+
+(p drive*process-left-lane
+    =goal>
+        isa overtake
+    ?visual>
+        buffer empty
+        - state requested
+    =visual-location>
+        isa visual-location
+        kind left-lane
+==>
+    =goal>
+        isa overtake
+    +visual>
+        isa move-attention
+        screen-pos =visual-location
+    =visual-location>
+)
+
+(p drive*loop-turn-left
+    =goal>
+        isa overtake
+        sl =sl
+        > sl 1
+    =visual>
+        isa left-lane
+        value clear
+==>
+    !eval! (change-lane-left)
+    !bind! =sl (simcar-lane)
+    =goal>
+        isa drive
+        follow undecided
+        sl =sl
+        na nil 
+        na2 nil
+        fa nil
+        fa2 nil
+    +temporal>
+        isa time
+        ticks clear
+    +visual-location>
+        isa visual-location
+        kind car
+)
+
+(p drive*loop-turn-right
+    =goal>
+        isa overtake
+        sl =sl
+        < sl 3
+    =visual>
+        isa right-lane
+        value clear
+==>
+    !eval! (change-lane-right)
+    !bind! =sl (simcar-lane)
+    =goal>
+        isa drive
+        sl =sl
+        na nil 
+        na2 nil
+        fa nil
+        fa2 nil
+        cthw nil
+        cthw2 nil
+        dthw nil
+        follow undecided
+        ;+temporal>
+        ;isa time
+        ;ticks clear
+    +visual-location>
+        isa visual-location
+        kind car
+        >= screen-x 320 ;right-side of environment
+)
+
+(p drive*merge-at-construction
+    =goal>
+        isa overtake
+        sl 1
+        construction t
+    =visual>
+        isa right-lane
+        value clear
+    !eval! (merging)
+==>
+    !eval! (change-lane-right)
+    !bind! =sl (simcar-lane)
+    =goal>
+        isa drive
+        sl =sl
+        cthw nil
+        cthw2 nil
+        dthw nil
+        follow undecided
+    +visual-location>
+        isa visual-location
+        kind car
+        ;>= screen-x 320 ;right-side of environment
+)
+
+(p drive*follow-far
+    =goal>
+        isa drive
+        - follow far
+    ?visual-location>        
+        state error
+==>
+    =goal>
+        isa drive
+        follow far
+        na nil
+        fa nil
+        na2 nil
+        fa2 nil
+        fkind2 nil
+        time2 nil
+    +visual-location>
+        isa visual-location
+        kind near
+)
+
+(p drive*follow-far2
+    =goal>
+        isa drive
+        sl =sl
+        follow undecided
+    =visual>
+        isa car
+        value =cl
+    !eval! (not-same-lane =sl =cl)
+==>
+    =goal>
+        isa drive
+        follow far        
+        na nil
+        fa nil
+        na2 nil
+        fa2 nil
+        fkind2 nil
+        time2 nil
+    +visual-location>
+        isa visual-location
+        kind near
+)
+
+(p drive*follow-far3
+    =goal>
+        isa control
+        - follow far
+    ?visual-location>        
+        state error
+==>
+    =goal>
+        isa drive
+        follow far
+        na nil
+        fa nil
+        na2 nil
+        fa2 nil
+        fkind2 nil
+        time2 nil
+    +visual-location>
+        isa visual-location
+        kind near
+)
+
+(p drive*decide-follow
+    =goal>
+        isa drive
+        follow undecided
+    =visual-location>
+        isa visual-location
+        kind car
+==>
+    !bind! =sl (simcar-lane)
+    =goal>
+        isa drive
+        sl =sl
+    +visual>
+        isa move-attention
+        screen-pos =visual-location
+)
+
+(p drive*follow-car
+    =goal>
+        isa drive
+        sl =sl
+        follow undecided
+    =visual>
+        isa car
+        value =cl
+    !eval! (same-lane =sl =cl)
+==>
+    =goal>
+        isa drive
+        follow car
+        na nil
+        fa nil
+        na2 nil
+        fa2 nil
+        fkind2 nil
+        time2 nil
+    +visual-location>
+        isa visual-location
+        kind near
+)
+
+(p drive*glance-mirror-far
+    =goal>
+        isa drive
+        follow far
+        < sl 3
+    =temporal>
+        isa time
+        > ticks 50
+==>
+    =goal>
+        isa drive
+    +visual-location>
+        isa visual-location
+        kind right-mirror
+    +temporal>
+        isa time
+        ticks clear
+)
+
+(p drive*glance-mirror-car
+    =goal>
+        isa drive
+        follow car
+        < sl 3
+        fthw =fthw
+        >= fthw 4
+        dthw =dthw
+        > dthw 0
+    =temporal>
+        isa time
+        > ticks 50
+==>
+    =goal>
+        isa drive
+    +visual-location>
+        isa visual-location
+        kind right-mirror
+    +temporal>
+        isa time
+        ticks clear
+)
+
+(p drive*loop-not-stable-far
+    =goal>
+        isa control
+        na =na
+        fa =fa
+        vna =vna
+        vfa =vfa
+        fd =fd
+        fkind =fkind
+        time =time
+    =visual>
+        isa far
+    !eval! (is-car-not-stable =na =vna =vfa)
+==>
+    =goal>
+        isa drive
+        na nil
+        fa nil
+        na2 =na
+        fa2 =fa
+        fd2 =fd
+        fkind2 =fkind
+        time2 =time
+)
+
+(p drive*loop-not-stable-car
+    =goal>
+        isa control
+        na =na
+        fa =fa
+        vna =vna
+        vfa =vfa
+        fd =fd
+        fkind =fkind
+        time =time
+        follow car
+    =visual>
+        isa car
+    !eval! (is-car-not-stable =na =vna =vfa)
+==>
+    =goal>
+        isa drive
+        na nil
+        fa nil
+        na2 =na
+        fa2 =fa
+        fd2 =fd
+        fkind2 =fkind
+        time2 =time
+)
+
+(p drive*reset
+    =goal>
+        isa drive
+        - follow undecided
+    ?visual-location>
+        state free
+        buffer empty
+        - buffer requested
+    ?visual>
+        state free
+        buffer empty
+==>
+    =goal>
+        na nil
+        fa nil
+        na2 nil
+        fa2 nil
+        fkind2 nil
+        time2 nil
+        safe nil
+    +visual-location>
+        isa visual-location
+        kind near
+        :attended new
+)
+(spp :u 1)
+
+(p drive*reset2
+    =goal>
+        isa drive
+        follow undecided
+    ?visual-location>
+        state free
+        - buffer requested
+    ?visual>
+        state free
+        buffer empty
+==>
+    =goal>
+        isa drive
+    +visual-location>
+        isa visual-location
+        kind car
+)
+
+;;----------------- Lane-change -----------------
+
+(p drive*notice-car
+    =goal>
+        isa drive
+        follow car
+    ?visual>
+        state free
+        buffer empty
+    =visual-location>
+        isa visual-location
+        kind car
+        :attended new
+==>
+    !bind! =cl (autocar-lane)
+    !bind! =sl (simcar-lane)
+    =goal>
+        isa drive
+        cl =cl
+        sl =sl
+        follow undecided
+    +visual>
+        isa move-attention
+        screen-pos =visual-location
+)
+
+;----------------- NBACK general-----------------
+
+(p notice-sign
+    =goal>
+        isa nback
+    =visual-location>
+        isa visual-location
+        kind speedsign
+    ?visual>
+        state free
+        buffer empty
+==>
+    =goal>
+        isa nback
+        status read-nback
+    +visual>
+        isa move-attention
+        screen-pos =visual-location
+)
+
+(spp :u 1000)
+
+;----------------- NBACK -----------------
+
+;nback and rehearsal are split in two parts:
+;part 1 (*): build list until n speed signs have been passed
+;part 2: perform n-back task
+
+(p nback-memorise-sign*
+        ;building the initial list
+    =goal>
+        isa nback
+        num =placeholder
+        < num 2
+    =visual>
+        isa speedsign
+        value =slimit
+    ?retrieval>
+        buffer empty
+==>
+    !bind! =cid (get-chunk-id)
+    !bind! =num (get-num-sign)
+    !bind! =nr (reset-rehearsal)
+    =goal>
+        isa nback
+        status notice
+        nr =nr
+        num =num
+        rehearsal t
+    =imaginal>
+        isa nback-state
+        id =cid
+        slimit =slimit
+    -imaginal>
+    +imaginal>
+        isa nback-state
+        1back =cid
+        nbackspeed =slimit ;perform 0-back until enough signs have been passed
+)
+
+(p nback-memorise-sign
+    =goal>
+        isa nback
+        status read-nback
+        >= num 2
+    =visual>
+        isa speedsign
+        value =slimit
+    =imaginal>
+        isa nback-state
+        1back =1back
+==>
+    !bind! =cid (get-chunk-id)
+    !bind! =nr (reset-rehearsal)
+    !bind! =num (get-num-sign)
+    =goal>
+        status remember1
+        nr =nr
+        num =num
+    =imaginal>
+        id =cid
+        slimit =slimit
+    +retrieval>
+        isa nback-state
+        id =1back
+)
+
+(p nback-remember-sign-1back
+    =goal>
+        isa nback
+        status remember1
+    =retrieval>
+        isa nback-state
+        1back =1back
+==>
+    =goal>
+        status remember2
+    +retrieval>
+        isa nback-state
+        id =1back
+)
+
+(p nback-remember-sign-2back
+    =goal>
+        isa nback
+        status remember2
+    =retrieval>
+        isa nback-state
+        slimit =nbackspeed
+    =imaginal>
+        id =1back
+==>
+    =goal>
+        status notice
+        rehearsal t
+    -imaginal>
+    +imaginal>
+        isa nback-state
+        1back =1back
+        nbackspeed =nbackspeed
+)
+
+(p nback-retrieval-failure
+    =goal>
+        isa nback
+        - status notice
+        - status read-nback
+    ?retrieval>
+        state error
+==>
+    =goal>
+        status notice
+        rehearsal f
+)
+
+;----------------- REHEARSAL* -----------------
+
+(p nback-rehearse-sign0*
+    =goal>
+        isa nback
+        status rehearse0
+        <= num 1
+    =retrieval>
+        isa nback-state
+        1back =1back
+    ?visual-location>
+        - state error
+        - buffer requested
+        buffer empty
+==>
+    =goal>
+        status notice
+    =retrieval>
+    -retrieval>
+)
+
+(p nback-rehearse-sign1*
+    =goal>
+        isa nback
+        status rehearse1
+        <= num 2
+    =retrieval>
+        isa nback-state
+        1back =1back
+    ?visual-location>
+        - state error
+        - buffer requested
+        buffer empty
+==>
+    =goal>
+        status notice
+    =retrieval>
+    -retrieval>
+)
+
+;----------------- REHEARSAL -----------------
+
+(p nback-start-rehearsal
+    =goal>
+        isa nback
+        status notice
+        rehearsal t
+        < nr 3
+        >= num 1
+    =imaginal>
+        isa nback-state
+        1back =1back
+    ?visual-location>
+        - state error
+        - buffer requested
+        buffer empty
+==>
+    !bind! =nr (get-num-rehearsal)
+    =goal>
+        status rehearse0
+        nr =nr
+    =imaginal>
+    +retrieval>
+        isa nback-state
+        id =1back
+)
+
+(p nback-rehearse-sign0
+    =goal>
+        isa nback
+        status rehearse0
+        > num 1
+    =retrieval>
+        isa nback-state
+        1back =1back
+    ?visual-location>
+        - state error
+        - buffer requested
+        buffer empty
+==>
+    =goal>
+        status rehearse1
+    +retrieval>
+        isa nback-state
+        id =1back    
+)
+
+(p nback-rehearse-sign1
+    =goal>
+        isa nback
+        status rehearse1
+        > num 2
+    =retrieval>
+        isa nback-state
+        1back =1back
+    ?visual-location>
+        - state error
+        - buffer requested
+        buffer empty
+==>
+    =goal>
+        status rehearse2
+    +retrieval>
+        isa nback-state
+        id =1back
+)
+
+(p nback-rehearse-sign2
+    =goal>
+        isa nback
+        status rehearse2
+        >= num 3
+    =retrieval>
+        isa nback-state
+        1back =1back
+    ?visual-location>
+        - state error
+        - buffer requested
+        buffer empty
+==>
+    =goal>
+        status notice
+    =retrieval>
+    -retrieval>
+)
+
+(p nback-interrupt-rehearsing-notice-sign
+    =goal>
+        isa nback
+        - status notice  
+    =visual-location>
+        isa visual-location
+        kind speedsign
+        :attended t
+==>
+    =goal>
+        status read-nback   
+        rehearsal f
+    -visual-location>
+    +visual>
+        isa move-attention
+        screen-pos =visual-location
+)
+
+(set-similarities
+    
+    (20 20 0) (20 40 -0.1) (20 60 -0.2) (20 80 -0.4) (20 100 -0.8) 
+    (40 20 -0.1) (40 40 0) (40 60 -0.1) (40 80 -0.2) (40 100 -0.4) (40 120 -0.8) 
+    (60 20 -0.2) (60 40 -0.1) (60 60 0) (60 80 -0.1) (60 100 -0.2) (60 120 -0.4) (60 140 -0.8)
+    (80 20 -0.4) (80 40 -0.2) (80 60 -0.1) (80 80 0) (80 100 -0.1) (80 120 -0.2) (80 140 -0.4) (80 160 -0.8)
+    (100 20 -0.8) (100 40 -0.4) (100 60 -0.2) (100 80 -0.1) (100 100 0) (100 120 -0.1) (100 140 -0.2) (100 160 -0.4) (100 180 -0.8)
+    (120 40 -0.8) (120 60 -0.4) (120 80 -0.2) (120 100 -0.1) (120 120 0) (120 140 -0.1) (120 160 -0.2) (120 180 -0.4) 
+    (140 60 -0.8) (140 80 -0.4) (140 100 -0.2) (140 120 -0.1) (140 140 0) (140 160 -0.1) (140 180 -0.2)
+    (160 80 -0.8) (160 100 -0.4) (160 120 -0.2) (160 140 -0.1) (160 160 0) (160 180 -0.1)
+    (180 100 -0.8) (180 120 -0.4) (180 140 -0.2) (180 160 -0.1) (180 180 0) 
+)
+
+(goal-focus goal1)
+(goal-focus goal2)
