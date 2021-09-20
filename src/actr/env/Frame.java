@@ -8,6 +8,7 @@ import javax.swing.*;
 
 import actr.model.Model;
 import actr.task.*;
+import actr.tasks.driving.KeyHandler;
 
 /**
  * The class that defines a graphical frame (window) for editing and running an
@@ -84,6 +85,7 @@ public class Frame extends JFrame {
 				update();
 			}
 		});
+		outputArea.addKeyListener(new KeyHandler());
 
 		JScrollPane outputScroll = new JScrollPane(outputArea);
 		outputScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);

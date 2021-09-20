@@ -333,6 +333,8 @@ public class Driving extends actr.task.Task {
 			simcar.steerAngle += dsteer;
 		} else
 			simcar.steerAngle = 0;
+
+		simcar.steerAngle = KeyHandler.getSteerAngle();
 	}
 
 	void keepLane(double na, double dna, double dfa, double dt) {
@@ -354,6 +356,8 @@ public class Driving extends actr.task.Task {
 			env.simcar.steerAngle += dsteer;
 		} else
 			env.simcar.steerAngle = 0;
+
+		env.simcar.steerAngle = 0;
 	}
 
 	void doAccelerate(double fthw, double dthw, double dt) {
@@ -368,6 +372,8 @@ public class Driving extends actr.task.Task {
 		}
 		simcar.accelerator = (accelBrake >= 0) ? accelBrake : 0;
 		simcar.brake = (accelBrake < 0) ? -accelBrake : 0;
+		simcar.accelerator = 0.5;
+		simcar.brake = 0;
 	}
 
 	void keepLimit(double tlimit) {
@@ -400,6 +406,9 @@ public class Driving extends actr.task.Task {
 		}
 		simcar.accelerator = (accelBrake >= 0) ? accelBrake : 0;
 		simcar.brake = (accelBrake < 0) ? -accelBrake : 0;
+
+		simcar.accelerator = 0.5;
+		simcar.brake = 0;
 	}
 
 	boolean isCarStable(double na, double nva, double fva) {
