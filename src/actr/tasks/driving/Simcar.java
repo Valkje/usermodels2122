@@ -1,10 +1,6 @@
 package actr.tasks.driving;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 
 /**
@@ -38,6 +34,8 @@ public class Simcar extends Vehicle {
 		speed = 0;
 		lane = 2;
 	}
+
+	Hud hud = new Hud(this);
 
 	int order = 6;
 	int max_order = 10;
@@ -262,6 +260,8 @@ public class Simcar extends Vehicle {
 		g.fillRoundRect(Env.envWidth - 65, Env.envHeight - dashHeight - 30, 60, 30, 40, 20);
 		g.setColor(Color.LIGHT_GRAY);
 		g.fillRoundRect(Env.envWidth - 60, Env.envHeight - dashHeight - 25, 50, 20, 40, 20);
+
+		hud.draw(g, env);
 	}
 
 	double devscale = .0015;
