@@ -28,7 +28,7 @@ public class Hud {
     int hudWidth = 140;
     int hudX = 200;
     int hudY = Env.envHeight-dashHeight-hudHeight;
-    Color hudColor = new Color(204, 204, 204, 255); // semi-transparent Color.lightgray
+    Color hudColor = new Color(204, 204, 204, 80); // semi-transparent Color.lightgray
 
     void draw(Graphics g, Env env) {
         // Head-Up Display (HUD)
