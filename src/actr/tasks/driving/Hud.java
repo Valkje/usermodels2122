@@ -16,6 +16,7 @@ import java.awt.*;
 public class Hud {
 
     Simcar car;
+    String aaLevelText;
 
     public Hud (Simcar simcar){
         this.car = simcar;
@@ -24,7 +25,7 @@ public class Hud {
     int dashHeight = 90; // default: 80, from Simcar.draw()
 
     int hudHeight = 40;
-    int hudWidth = 120;
+    int hudWidth = 140;
     int hudX = 200;
     int hudY = Env.envHeight-dashHeight-hudHeight;
     Color hudColor = new Color(204, 204, 204, 255); // semi-transparent Color.lightgray
@@ -47,8 +48,8 @@ public class Hud {
         // location and sizing
         int r = (int) Math.round((hudHeight * 0.75) / 2); // red circle radius
         int wr = (int) Math.round(0.8 * r); // white circle radius
-        int cx = (int) Math.round(hudX + hudWidth - (hudHeight/2));
-        int cy = (int) Math.round(hudY + (hudHeight/2));
+        int cx = (int) Math.round(hudX + hudWidth - ((float) hudHeight/2));
+        int cy = (int) Math.round(hudY + ((float) hudHeight/2));
 
         // red circle
         int x = cx - r;
@@ -71,12 +72,24 @@ public class Hud {
     }
 
     private void drawAutomationLevel(Graphics g, Env env) {
-        int cx = (int) Math.round(hudX + (hudWidth - hudHeight)/2);
-        int cy1 = (int) Math.round(hudY + (hudHeight / 3));
-        int cy2 = cy1 + Math.round(hudHeight / 3);
+        int cx = Math.round(hudX + (float) (hudWidth - hudHeight)/2);
+        int cy1 = Math.round(hudY + (float) hudHeight / 3);
+        int cy2 = cy1 + Math.round((float) hudHeight / 3);
 
-        String levelText1 = "CRUISE";
-        String levelText2 = "CONTROL";
+        switch (KeyHandler.getAaLevel()) {
+            case "none":
+                aaLevelText = " \n ";
+                break;
+            case "partial":
+                aaLevelText = "CRUISE\nCONTROL";
+                break;
+            case "full":
+                aaLevelText = "PASSENGER\nMODE";
+        }
+
+        String[] levelText = aaLevelText.split("\n");
+        String levelText1 = levelText[0];
+        String levelText2 = levelText[1];
 
         Font myFont = new Font("Helvetica", Font.PLAIN, 14);
         g.setFont(myFont);
