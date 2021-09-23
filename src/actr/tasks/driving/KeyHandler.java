@@ -4,10 +4,16 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.security.Key;
 
+enum AaLevel {
+    none,
+    partial,
+    full
+}
+
 public class KeyHandler implements KeyListener {
     private static double steerAngle = 0;
     private static double accelBrake = 0;
-    private static String aaLevel = "none";
+    private static AaLevel aaLevel = AaLevel.none;
 
     @Override
     public void keyTyped(KeyEvent e) {
@@ -26,13 +32,13 @@ public class KeyHandler implements KeyListener {
                 KeyHandler.steerAngle = 0.5;
                 break;
             case 49:
-                KeyHandler.aaLevel = "none";
+                KeyHandler.aaLevel = AaLevel.none;
                 break;
             case 50:
-                KeyHandler.aaLevel = "partial";
+                KeyHandler.aaLevel = AaLevel.partial;
                 break;
             case 51:
-                KeyHandler.aaLevel = "full";
+                KeyHandler.aaLevel = AaLevel.full;
                 break;
         }
     }
@@ -53,5 +59,5 @@ public class KeyHandler implements KeyListener {
         return KeyHandler.steerAngle;
     }
 
-    public static String getAaLevel() { return KeyHandler.aaLevel; }
+    public static AaLevel getAaLevel() { return KeyHandler.aaLevel; }
 }

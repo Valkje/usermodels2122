@@ -77,13 +77,13 @@ public class Hud {
         int cy2 = cy1 + Math.round((float) hudHeight / 3);
 
         switch (KeyHandler.getAaLevel()) {
-            case "none":
+            case none:
                 aaLevelText = " \n ";
                 break;
-            case "partial":
+            case partial:
                 aaLevelText = "CRUISE\nCONTROL";
                 break;
-            case "full":
+            case full:
                 aaLevelText = "PASSENGER\nMODE";
         }
 
