@@ -326,18 +326,25 @@ public class Driving extends actr.task.Task {
 
 	void doSteer(double na, double dna, double dfa, double dt) {
 		Simcar simcar = simulation.env.simcar;
-		if (simcar.speed >= 10.0) {
-			double dsteer = (dna * steerFactor_dna) + (dfa * steerFactor_dfa)
-					+ (minSigned(na, steerNaMax) * steerFactor_na * dt);
-			dsteer *= simulation.driver.steeringFactor;
-			simcar.steerAngle += dsteer;
-		} else
-			simcar.steerAngle = 0;
 
-		simcar.steerAngle = KeyHandler.getSteerAngle();
+
+		if (simulation.env.aas.getAaLevel() != AaLevel.full) { // full driver control or cruise control
+			simcar.steerAngle = KeyHandler.getSteerAngle();
+		} else { // passenger mode
+			if (simcar.speed >= 0.0) { //10.0
+				double dsteer = (dna * steerFactor_dna) + (dfa * steerFactor_dfa)
+						+ (minSigned(na, steerNaMax) * steerFactor_na * dt);
+				dsteer *= simulation.driver.steeringFactor;
+				simcar.steerAngle += dsteer;
+			} else
+				simcar.steerAngle = 0;
+		}
+
+		System.out.println("model update 'do-steer'");
+
 	}
 
-	void keepLane(double na, double dna, double dfa, double dt) {
+	void keepLane(double na, double dna, double dfa, double dt) { /** REDUNDANT */
 		Env env = simulation.env;
 		double dist = env.simcar.dist_to_nearest_lane; // positive: smallest diff is to the left
 		if (env.simcar.speed >= 10.0) {
@@ -358,9 +365,12 @@ public class Driving extends actr.task.Task {
 			env.simcar.steerAngle = 0;
 
 		env.simcar.steerAngle = 0;
+
+		System.out.println("model update 'keep-lane'");
+
 	}
 
-	void doAccelerate(double fthw, double dthw, double dt) {
+	void doAccelerate(double fthw, double dthw, double dt) { /** REDUNDANT */
 		Simcar simcar = simulation.env.simcar;
 		if (simcar.speed >= 10.0) {
 			double dacc = (dthw * accelFactor_dthw) + (dt * (fthw - thwFollow) * accelFactor_thw);
@@ -404,11 +414,16 @@ public class Driving extends actr.task.Task {
 			othw = thw;
 			st = env.time;
 		}
+
+		System.out.println("model update 'keep-limit'");
+
+		if (simulation.env.aas.getAaLevel() == AaLevel.none) { // full driver control
+			accelBrake = KeyHandler.getAccelBrake();
+		}
+
 		simcar.accelerator = (accelBrake >= 0) ? accelBrake : 0;
 		simcar.brake = (accelBrake < 0) ? -accelBrake : 0;
 
-		simcar.accelerator = 0.5;
-		simcar.brake = 0;
 	}
 
 	boolean isCarStable(double na, double nva, double fva) {

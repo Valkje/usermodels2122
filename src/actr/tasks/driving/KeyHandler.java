@@ -2,18 +2,13 @@ package actr.tasks.driving;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.security.Key;
 
-enum AaLevel {
-    none,
-    partial,
-    full
-}
 
 public class KeyHandler implements KeyListener {
     private static double steerAngle = 0;
-    private static double accelBrake = 0;
-    private static AaLevel aaLevel = AaLevel.none;
+    private static double accelBrake = 0.2;
+    private static AaLevel aaLevel = AaLevel.full;
+
 
     @Override
     public void keyTyped(KeyEvent e) {
@@ -28,16 +23,22 @@ public class KeyHandler implements KeyListener {
             case 37: // left
                 KeyHandler.steerAngle = -0.5;
                 break;
+            case 38: // up
+                KeyHandler.accelBrake += 0.1;
+                break;
             case 39: // right
                 KeyHandler.steerAngle = 0.5;
                 break;
-            case 49:
+            case 40: // down
+                KeyHandler.accelBrake -= 0.1;
+                break;
+            case 49: // 1
                 KeyHandler.aaLevel = AaLevel.none;
                 break;
-            case 50:
-                KeyHandler.aaLevel = AaLevel.partial;
+            case 50: // 2
+                KeyHandler.aaLevel = AaLevel.cruise;
                 break;
-            case 51:
+            case 51: //3
                 KeyHandler.aaLevel = AaLevel.full;
                 break;
         }
@@ -60,4 +61,6 @@ public class KeyHandler implements KeyListener {
     }
 
     public static AaLevel getAaLevel() { return KeyHandler.aaLevel; }
+
+    public static double getAccelBrake() { return accelBrake; }
 }

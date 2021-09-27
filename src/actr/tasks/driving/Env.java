@@ -12,6 +12,7 @@ import java.awt.Graphics;
 public class Env {
 	static Scenario scenario = null;
 
+	AdaptiveAutomationSystem aas;
 	Simcar simcar;
 	Road road;
 	Autocar autocar;
@@ -46,14 +47,19 @@ public class Env {
 
 		construction = new Construction();
 
+		aas = new AdaptiveAutomationSystem(simcar, this);
+
 		done = false;
 	}
 
 	void update() {
 		speedsign.update(this);
-		simcar.update(this);
+
+		aas.update(this); // This replaces "simcar.update(this);"
+
 		autocar.update(this);
 		construction.update(this);
+
 	}
 
 	void draw(Graphics g) {

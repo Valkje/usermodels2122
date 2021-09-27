@@ -36,12 +36,12 @@ public class Hud {
         g.fillRoundRect(hudX, hudY, hudWidth, hudHeight, 5, 5);
 
         int speed = (int) Utilities.mph2kph(Utilities.mps2mph(car.speed));
-        int speedLimit = Integer.parseInt(env.speedsign.speedlimit);
+        int speedLimit = Integer.parseInt(Driving.imaginedSpeedlimit);
 
         if ( Math.abs(speed-speedLimit) > 0.1*speedLimit ) { //deviation from limit by more than 10%
             drawSpeedWarning(g, env);
         }
-        drawAutomationLevel(g, env); // TODO: draw only when applicable
+        drawAutomationLevel(g, env);
     }
 
     private void drawSpeedWarning(Graphics g, Env env) {
@@ -64,7 +64,7 @@ public class Hud {
         g.fillOval(x, y, wr * 2, wr * 2);
 
         // text
-        String speed = env.speedsign.speedlimit; // TODO: this should be dependent on the model perception
+        String speed = Driving.imaginedSpeedlimit; // This value is dependent on the speed lmit as perceived by the model
         Font myFont = new Font("Helvetica", Font.BOLD, 14);
         g.setFont(myFont);
         g.setColor(Color.black);
@@ -80,7 +80,7 @@ public class Hud {
             case none:
                 aaLevelText = " \n ";
                 break;
-            case partial:
+            case cruise:
                 aaLevelText = "CRUISE\nCONTROL";
                 break;
             case full:
