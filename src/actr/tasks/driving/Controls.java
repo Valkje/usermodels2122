@@ -4,7 +4,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 
-public class KeyHandler implements KeyListener {
+public class Controls implements KeyListener {
     private static double steerAngle = 0;
     private static double accelBrake = 0.2;
     private static AaLevel aaLevel = AaLevel.full;
@@ -21,25 +21,25 @@ public class KeyHandler implements KeyListener {
 
         switch (e.getKeyCode()) {
             case 37: // left
-                KeyHandler.steerAngle = -0.5;
+                Controls.steerAngle = -0.5;
                 break;
             case 38: // up
-                KeyHandler.accelBrake += 0.1;
+                Controls.accelBrake += 0.1;
                 break;
             case 39: // right
-                KeyHandler.steerAngle = 0.5;
+                Controls.steerAngle = 0.5;
                 break;
             case 40: // down
-                KeyHandler.accelBrake -= 0.1;
+                Controls.accelBrake -= 0.1;
                 break;
             case 49: // 1
-                KeyHandler.aaLevel = AaLevel.none;
+                Controls.aaLevel = AaLevel.none;
                 break;
             case 50: // 2
-                KeyHandler.aaLevel = AaLevel.cruise;
+                Controls.aaLevel = AaLevel.cruise;
                 break;
             case 51: //3
-                KeyHandler.aaLevel = AaLevel.full;
+                Controls.aaLevel = AaLevel.full;
                 break;
         }
     }
@@ -48,19 +48,31 @@ public class KeyHandler implements KeyListener {
     public void keyReleased(KeyEvent e) {
         switch (e.getKeyCode()) {
             case 37: // left
-                KeyHandler.steerAngle = 0;
+                Controls.steerAngle = 0;
                 break;
             case 39: // right
-                KeyHandler.steerAngle = 0;
+                Controls.steerAngle = 0;
                 break;
         }
     }
 
-    public static double getSteerAngle() {
-        return KeyHandler.steerAngle;
+    public static void setSteerAngle(double steerAngle) {
+        Controls.steerAngle = steerAngle;
     }
 
-    public static AaLevel getAaLevel() { return KeyHandler.aaLevel; }
+    public static double getSteerAngle() {
+        return Controls.steerAngle;
+    }
+
+    public static void setAaLevel(AaLevel aaLevel) {
+        Controls.aaLevel = aaLevel;
+    }
+
+    public static AaLevel getAaLevel() { return Controls.aaLevel; }
+
+    public static void setAccelBrake(double accelBrake) {
+        Controls.accelBrake = accelBrake;
+    }
 
     public static double getAccelBrake() { return accelBrake; }
 }

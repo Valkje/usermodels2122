@@ -8,7 +8,9 @@ import javax.swing.*;
 
 import actr.model.Model;
 import actr.task.*;
-import actr.tasks.driving.KeyHandler;
+import actr.tasks.driving.Controls;
+import actr.tasks.driving.Env;
+import actr.tasks.driving.actions.*;
 
 /**
  * The class that defines a graphical frame (window) for editing and running an
@@ -72,6 +74,9 @@ public class Frame extends JFrame {
 		modelPanel.add(modelSubPanel, BorderLayout.CENTER);
 		modelPanel.add(navigator, BorderLayout.SOUTH);
 
+		// Hide editor
+		modelPanel.setVisible(false);
+
 		outputArea = new JTextArea();
 		outputArea.setFont(new Font("Consolas", Font.PLAIN, 12)); // "Monaco"
 		outputArea.setLineWrap(false);
@@ -85,11 +90,14 @@ public class Frame extends JFrame {
 				update();
 			}
 		});
-		outputArea.addKeyListener(new KeyHandler());
+
+		outputArea.addKeyListener(new Controls());
 
 		JScrollPane outputScroll = new JScrollPane(outputArea);
 		outputScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		outputScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+		outputScroll.setVisible(false);
 
 		outputFind = new FindPanel(this, false);
 		outputFind.setVisible(false);
@@ -99,18 +107,54 @@ public class Frame extends JFrame {
 		outputPanel.add(outputScroll, BorderLayout.CENTER);
 		outputPanel.add(outputFind, BorderLayout.SOUTH);
 
-		taskSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new Task(), outputPanel);
+		Task gPanel = new Task();
+		taskSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, gPanel, outputPanel);
 		taskSplitPane.setBorder(BorderFactory.createEmptyBorder());
 		taskSplitPane.setOneTouchExpandable(true);
 		// taskSplitPane.setOpaque (true);
+
+		// Hide bottom panel where ACT-R output would have been
+		taskSplitPane.setDividerSize(0);
+		taskSplitPane.getBottomComponent().setVisible(false);
 
 		splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, modelPanel, taskSplitPane);
 		splitPane.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6)); // 12,12,12,12));
 		splitPane.setOneTouchExpandable(true);
 		// splitPane.setOpaque(true);
 
+		splitPane.setDividerSize(0);
+
 		getContentPane().setLayout(new BorderLayout());
 		getContentPane().add(splitPane, BorderLayout.CENTER);
+
+		// Bind actions to the split pane
+		splitPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+				.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "increaseSpeed");
+		splitPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+				.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "decreaseSpeed");
+		splitPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+				.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), "steerRight");
+		splitPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+				.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), "steerLeft");
+		splitPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+				.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, true), "steerNeutral");
+		splitPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+				.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, true), "steerNeutral");
+		splitPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+				.put(KeyStroke.getKeyStroke(KeyEvent.VK_1, 0), "noAutomation");
+		splitPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+				.put(KeyStroke.getKeyStroke(KeyEvent.VK_2, 0), "partialAutomation");
+		splitPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+				.put(KeyStroke.getKeyStroke(KeyEvent.VK_3, 0), "fullAutomation");
+
+		splitPane.getActionMap().put("increaseSpeed", new IncreaseSpeedAction());
+		splitPane.getActionMap().put("decreaseSpeed", new DecreaseSpeedAction());
+		splitPane.getActionMap().put("steerRight", new SteerRightAction());
+		splitPane.getActionMap().put("steerLeft", new SteerLeftAction());
+		splitPane.getActionMap().put("steerNeutral", new SteerNeutralAction());
+		splitPane.getActionMap().put("noAutomation", new NoAutomationAction());
+		splitPane.getActionMap().put("partialAutomation", new PartialAutomationAction());
+		splitPane.getActionMap().put("fullAutomation", new FullAutomationAction());
 
 		brainPanel = new Brain(this);
 		brainPanel.setVisible(false);
@@ -146,6 +190,10 @@ public class Frame extends JFrame {
 			public void componentResized(ComponentEvent e) {
 				core.getPreferences().frameWidth = frame.getWidth();
 				core.getPreferences().frameHeight = frame.getHeight();
+
+				// Resize the graphics (with a crude correction for bars and borders)
+				Env.envWidth = frame.getWidth() - 10;
+				Env.envHeight = frame.getHeight() - 100;
 			}
 		});
 
@@ -157,6 +205,9 @@ public class Frame extends JFrame {
 
 		splitPane.setDividerLocation(core.getPreferences().editorPaneSplit);
 		taskSplitPane.setDividerLocation(core.getPreferences().taskPaneSplit);
+
+		gPanel.requestFocusInWindow();
+
 		repaint();
 
 		setVisible(true);

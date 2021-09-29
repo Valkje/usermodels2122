@@ -24,8 +24,8 @@ public class Env {
 	double time = 0;
 	static final double sampleTime = .050;
 
-	static final int envWidth = 640;
-	static final int envHeight = 360; // 444; // 360;
+	public static int envWidth = 640;
+	public static int envHeight = 360; // 444; // 360;
 	static final int heightAdjust = 50;
 
 	static final int simWidth = 640; // 1440; // 640;

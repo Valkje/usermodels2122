@@ -215,13 +215,13 @@ public class Simcar extends Vehicle {
 	}
 
 	void draw(Graphics g, Env env) {
-		int dashHeight = 90; // default: 80
+		int dashHeight = Env.envHeight / 3; // default: 80
 		g.setColor(Color.black);
 		g.fillRect(0, Env.envHeight - dashHeight, Env.envWidth, dashHeight);
 
-		int steerX = 160;
-		int steerY = Env.envHeight - 20;
-		int steerR = 50;
+		int steerX = Env.envWidth / 4;
+		int steerY = (int) (Env.envHeight * (2.6 / 3)); // Just under the middle of the dashboard
+		int steerR = Env.envHeight / 6;
 		g.setColor(Color.darkGray);
 		Graphics2D g2d = (Graphics2D) g;
 		AffineTransform saved = g2d.getTransform();
@@ -235,11 +235,13 @@ public class Simcar extends Vehicle {
 
 		// mh - speedometer
 		double speedNum = speed;
+		int speedoX = (Env.envWidth / 4 - steerR) / 2; // In-between the left border and the steering wheel
+		int speedoY = (int) (Env.envHeight * (2.6 / 3)); // Just under the middle of the dashboard
 		String speed = Integer.toString((int) Utilities.mph2kph(Utilities.mps2mph(speedNum)));
-		Font myFont = new Font("Helvetica", Font.BOLD, 18);
+		Font myFont = new Font("Helvetica", Font.BOLD, 24);
 		g.setFont(myFont);
 		g.setColor(Color.WHITE);
-		g.drawString(speed, 260, 300);
+		g.drawString(speed, speedoX, speedoY);
 
 		// top - mirror
 		g.setColor(Color.black);

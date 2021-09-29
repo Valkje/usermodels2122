@@ -22,10 +22,10 @@ public class Hud {
         this.car = simcar;
     }
 
-    int dashHeight = 90; // default: 80, from Simcar.draw()
+    int dashHeight = Env.envHeight / 3; // default: 80, from Simcar.draw()
 
-    int hudHeight = 40;
-    int hudWidth = 140;
+    int hudWidth = Env.envWidth / 6;
+    int hudHeight = hudWidth / 4;
     int hudX = 200;
     int hudY = Env.envHeight-dashHeight-hudHeight;
     Color hudColor = new Color(204, 204, 204, 80); // semi-transparent Color.lightgray
@@ -76,7 +76,7 @@ public class Hud {
         int cy1 = Math.round(hudY + (float) hudHeight / 3);
         int cy2 = cy1 + Math.round((float) hudHeight / 3);
 
-        switch (KeyHandler.getAaLevel()) {
+        switch (Controls.getAaLevel()) {
             case none:
                 aaLevelText = " \n ";
                 break;
@@ -91,7 +91,7 @@ public class Hud {
         String levelText1 = levelText[0];
         String levelText2 = levelText[1];
 
-        Font myFont = new Font("Helvetica", Font.PLAIN, 14);
+        Font myFont = new Font("Helvetica", Font.PLAIN, 20);
         g.setFont(myFont);
         g.setColor(Color.black);
         drawCenteredText(cx,cy1,g,levelText1);

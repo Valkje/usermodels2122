@@ -65,6 +65,8 @@ public class Driving extends actr.task.Task {
 	boolean previousSafe = false;
 	double switch_to_safe = 0;
 
+	static boolean VERBOSE = false;
+
 	public Driving() {
 		super();
 		nearLabel = new JLabel(".");
@@ -329,7 +331,7 @@ public class Driving extends actr.task.Task {
 
 
 		if (simulation.env.aas.getAaLevel() != AaLevel.full) { // full driver control or cruise control
-			simcar.steerAngle = KeyHandler.getSteerAngle();
+			simcar.steerAngle = Controls.getSteerAngle();
 		} else { // passenger mode
 			if (simcar.speed >= 0.0) { //10.0
 				double dsteer = (dna * steerFactor_dna) + (dfa * steerFactor_dfa)
@@ -340,7 +342,8 @@ public class Driving extends actr.task.Task {
 				simcar.steerAngle = 0;
 		}
 
-		System.out.println("model update 'do-steer'");
+		if (VERBOSE)
+			System.out.println("model update 'do-steer'");
 
 	}
 
@@ -366,7 +369,8 @@ public class Driving extends actr.task.Task {
 
 		env.simcar.steerAngle = 0;
 
-		System.out.println("model update 'keep-lane'");
+		if (VERBOSE)
+			System.out.println("model update 'keep-lane'");
 
 	}
 
@@ -415,10 +419,11 @@ public class Driving extends actr.task.Task {
 			st = env.time;
 		}
 
-		System.out.println("model update 'keep-limit'");
+		if (VERBOSE)
+			System.out.println("model update 'keep-limit'");
 
 		if (simulation.env.aas.getAaLevel() == AaLevel.none) { // full driver control
-			accelBrake = KeyHandler.getAccelBrake();
+			accelBrake = Controls.getAccelBrake();
 		}
 
 		simcar.accelerator = (accelBrake >= 0) ? accelBrake : 0;
