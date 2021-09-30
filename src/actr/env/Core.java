@@ -6,6 +6,7 @@ import java.util.Vector;
 import javax.swing.*;
 
 import actr.model.Model;
+import actr.tasks.driving.Controls;
 
 /**
  * The core class for managing the entire application. This class keeps track of
@@ -30,6 +31,9 @@ public class Core {
 		frames = new Vector<Frame>();
 		prefs = Preferences.load(this);
 		prefDialog = new PrefDialog(this);
+
+		// Initialise steering wheel controls, if there are any
+		Controls.startUp();
 	}
 
 	void startup() {

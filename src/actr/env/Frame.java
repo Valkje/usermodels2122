@@ -91,8 +91,6 @@ public class Frame extends JFrame {
 			}
 		});
 
-		outputArea.addKeyListener(new Controls());
-
 		JScrollPane outputScroll = new JScrollPane(outputArea);
 		outputScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		outputScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -107,8 +105,7 @@ public class Frame extends JFrame {
 		outputPanel.add(outputScroll, BorderLayout.CENTER);
 		outputPanel.add(outputFind, BorderLayout.SOUTH);
 
-		Task gPanel = new Task();
-		taskSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, gPanel, outputPanel);
+		taskSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new Task(), outputPanel);
 		taskSplitPane.setBorder(BorderFactory.createEmptyBorder());
 		taskSplitPane.setOneTouchExpandable(true);
 		// taskSplitPane.setOpaque (true);
@@ -205,8 +202,6 @@ public class Frame extends JFrame {
 
 		splitPane.setDividerLocation(core.getPreferences().editorPaneSplit);
 		taskSplitPane.setDividerLocation(core.getPreferences().taskPaneSplit);
-
-		gPanel.requestFocusInWindow();
 
 		repaint();
 
