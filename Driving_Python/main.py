@@ -151,12 +151,11 @@ def query(target):
 	# Nestor for details on the methods below.
 	tracker = pylink.getEYELINK()
 	sample = tracker.getNewestSample()
-	if sample.isLeftSample():
-		eye = sample.getLeftEye()
-	elif sample.isRightSample():
-		eye = sample.getRightEye()
-	else:
-		report_error("No eye found")
+
+	# We can select which eye we want to record in the eye-tracking
+	# software so we can just pick it directly here.
+	eye = sample.getLeftEye()
+
 	if target == "PUPIL_SIZE":
 		response = eye.getPupilSize()
 	else:
