@@ -138,6 +138,32 @@ def end_experiment():
 	tracker.receiveDataFile(edf_file_name, edf_file_name)
 	tracker.close()
 
+def query(target):
+	# This method can be called from the client on behalf of the
+	# server - if the Java server sends a query/ message to the
+	# client!
+	# It queries the eye-tracker and then tells the client to
+	# send an answer to the Java server again!
+	# The Java server then will update a public float with
+	# the latest pupil size
+
+	# see the pylink.Eyelink documentation Jelmer linked on
+	# Nestor for details on the methods below.
+	tracker = pylink.getEYELINK()
+	sample = tracker.getNewestSample()
+	if sample.isLeftSample():
+		eye = sample.getLeftEye()
+	elif sample.isRightSample():
+		eye = sample.getRightEye()
+	else:
+		report_error("No eye found")
+	if target == "PUPIL_SIZE":
+		response = eye.getPupilSize()
+	else:
+		report_error("Invalid target")
+
+	client.send("PUPIL_SIZE " + str(response))
+
 
 def report_error(error_message):
 	client.send(error_message)
