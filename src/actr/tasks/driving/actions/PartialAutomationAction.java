@@ -10,6 +10,6 @@ public class PartialAutomationAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         System.out.println("Partial automation!");
-        Controls.setAaLevel(AaLevel.cruise);
+        //Controls.setAaLevel(AaLevel.cruise);
     }
 }
