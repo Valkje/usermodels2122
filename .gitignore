@@ -4,3 +4,5 @@
 .Ruserdata
 /simulations/*.Rproj
 Driving_Python/__pycache__/client.cpython-37.pyc
+Driving_Python/__pycache__/main.cpython-37.pyc
+Driving_Python/__pycache__/input_handler.cpython-37.pyc
