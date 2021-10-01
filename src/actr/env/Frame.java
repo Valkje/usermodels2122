@@ -137,11 +137,9 @@ public class Frame extends JFrame {
 		splitPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
 				.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, true), "steerNeutral");
 		splitPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-				.put(KeyStroke.getKeyStroke(KeyEvent.VK_1, 0), "noAutomation");
+				.put(KeyStroke.getKeyStroke(KeyEvent.VK_1, 0), "decreaseAutomation");
 		splitPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-				.put(KeyStroke.getKeyStroke(KeyEvent.VK_2, 0), "partialAutomation");
-		splitPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-				.put(KeyStroke.getKeyStroke(KeyEvent.VK_3, 0), "fullAutomation");
+				.put(KeyStroke.getKeyStroke(KeyEvent.VK_2, 0), "increaseAutomation");
 
 		splitPane.getActionMap().put("increaseSpeed", new IncreaseSpeedAction());
 		splitPane.getActionMap().put("decreaseSpeed", new DecreaseSpeedAction());
@@ -151,6 +149,8 @@ public class Frame extends JFrame {
 		splitPane.getActionMap().put("noAutomation", new NoAutomationAction());
 		splitPane.getActionMap().put("partialAutomation", new PartialAutomationAction());
 		splitPane.getActionMap().put("fullAutomation", new FullAutomationAction());
+		splitPane.getActionMap().put("decreaseAutomation", new DecreaseAutomationAction());
+		splitPane.getActionMap().put("increaseAutomation", new IncreaseAutomationAction());
 
 		brainPanel = new Brain(this);
 		brainPanel.setVisible(false);

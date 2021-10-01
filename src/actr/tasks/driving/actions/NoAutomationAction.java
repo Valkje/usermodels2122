@@ -10,6 +10,6 @@ public class NoAutomationAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         System.out.println("No automation!");
-        Controls.setAaLevel(AaLevel.none);
+        //Controls.setAaLevel(AaLevel.none);
     }
 }

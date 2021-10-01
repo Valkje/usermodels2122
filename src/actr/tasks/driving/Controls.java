@@ -11,7 +11,7 @@ import net.java.games.input.Component.Identifier;
 public class Controls {
     private static double steerAngle = 0;
     private static double accelBrake = 0.2;
-    private static AaLevel aaLevel = AaLevel.full;
+    private static int aaChange = 0;
     private static Controller steerPedals = null;
     private static Controller gamePad = null;
 
@@ -73,11 +73,11 @@ public class Controls {
         return Controls.steerAngle;
     }
 
-    public static void setAaLevel(AaLevel aaLevel) {
-        Controls.aaLevel = aaLevel;
+    public static void setAaChange(int aaChange) {
+        Controls.aaChange = aaChange;
     }
 
-    public static AaLevel getAaLevel() { return Controls.aaLevel; }
+    public static int getAaChange() { return Controls.aaChange; }
 
     public static void setAccelBrake(double accelBrake) {
         Controls.accelBrake = accelBrake;
