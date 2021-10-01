@@ -9,6 +9,10 @@ import main
 
 
 def handle_input(input_string):
+	# This function gets called once the client receives
+	# a message from the Java part! We implement a check here
+	# that tells the main python interface to query the
+	# eyetracker for the latest pupil size!
 	print(input_string)
 	if input_string.startswith("info/ "):
 		information = input_string[len("info/ "):]
@@ -19,6 +23,9 @@ def handle_input(input_string):
 	elif input_string.startswith("send/ "):
 		message = input_string[len("send/ "):]
 		main.send_tracker(message)
+	elif input_string.startswith("query/ "):
+		message = input_string[len("query/ "):]
+		main.query(message)
 	else:
 		print("ERROR: Invalid message")
 
