@@ -10,6 +10,7 @@ import actr.model.Model;
 import actr.task.*;
 import actr.tasks.driving.Env;
 import actr.tasks.driving.actions.*;
+import networking.ServerMain;
 
 /**
  * The class that defines a graphical frame (window) for editing and running an
@@ -419,10 +420,13 @@ public class Frame extends JFrame {
 					return null;
 				stop = false;
 				update();
+				ServerMain.participant.prepareExperiment();
+				ServerMain.participant.prepareTrial(0, false, 0);
 				clearOutput();
 				output("> (run-analysis " + n + ")\n");
 				if (model != null && model.getTask() != null) {
 					Task[] tasks = new Task[n];
+					ServerMain.participant.startTrial();
 					for (int i = 0; !stop && i < n; i++) {
 						model = Model.compile(modelText, frame);
 						brainPanel.setVisible(false);
@@ -433,6 +437,7 @@ public class Frame extends JFrame {
 						model.getTask().finish();
 						tasks[i] = model.getTask();
 					}
+					ServerMain.participant.endTrial();
 					if (stop && model != null)
 						model.getTask().analyze(tasks, true);
 					// model = null;
