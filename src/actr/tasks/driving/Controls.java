@@ -10,7 +10,7 @@ import net.java.games.input.Component.Identifier;
 
 public class Controls {
     private static double steerAngle = 0;
-    private static double accelBrake = 0.2;
+    private static double accelBrake = 0.0;
     private static int aaChange = 0;
     private static Controller steerPedals = null;
     private static Controller gamePad = null;

@@ -9,6 +9,6 @@ public class DecreaseSpeedAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         System.out.println("Down pressed!");
-        Controls.setAccelBrake(Controls.getAccelBrake() - 0.1);
+        Controls.setAccelBrake(-1);
     }
 }

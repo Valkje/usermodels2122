@@ -129,6 +129,10 @@ public class Frame extends JFrame {
 		splitPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
 				.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "decreaseSpeed");
 		splitPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+				.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0, true), "neutralSpeed");
+		splitPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+				.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, true), "neutralSpeed");
+		splitPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
 				.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), "steerRight");
 		splitPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
 				.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), "steerLeft");
@@ -143,6 +147,7 @@ public class Frame extends JFrame {
 
 		splitPane.getActionMap().put("increaseSpeed", new IncreaseSpeedAction());
 		splitPane.getActionMap().put("decreaseSpeed", new DecreaseSpeedAction());
+		splitPane.getActionMap().put("neutralSpeed", new NeutralSpeedAction());
 		splitPane.getActionMap().put("steerRight", new SteerRightAction());
 		splitPane.getActionMap().put("steerLeft", new SteerLeftAction());
 		splitPane.getActionMap().put("steerNeutral", new SteerNeutralAction());
