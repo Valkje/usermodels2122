@@ -20,8 +20,8 @@ public class Resources
 	{
 		try
 		{
-			if (Main.inApplet())
-				return Main.getApplet().getImage (Main.getApplet().getCodeBase(), "resources/" + name);
+			if (ApplicationMain.inApplet())
+				return ApplicationMain.getApplet().getImage (ApplicationMain.getApplet().getCodeBase(), "resources/" + name);
 			else
 				return Toolkit.getDefaultToolkit().getImage (Resources.class.getResource (name));
 		}

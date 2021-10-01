@@ -8,7 +8,6 @@ import javax.swing.*;
 
 import actr.model.Model;
 import actr.task.*;
-import actr.tasks.driving.Controls;
 import actr.tasks.driving.Env;
 import actr.tasks.driving.actions.*;
 
@@ -166,7 +165,7 @@ public class Frame extends JFrame {
 		menus = new Menus(actions, core.getPreferences());
 		setJMenuBar(menus);
 
-		if (Main.inApplication())
+		if (ApplicationMain.inApplication())
 			setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
 		addWindowListener(new WindowAdapter() {
@@ -536,7 +535,7 @@ public class Frame extends JFrame {
 	}
 
 	void save(boolean forceSaveAs) {
-		if (Main.inApplet())
+		if (ApplicationMain.inApplet())
 			return;
 
 		try {
@@ -656,7 +655,7 @@ public class Frame extends JFrame {
 	boolean closing() {
 		if (model != null && core.hasLock(frame))
 			stop();
-		if (Main.inApplication() && getDocument().isChanged()) {
+		if (ApplicationMain.inApplication() && getDocument().isChanged()) {
 			SaveDialog saveDialog = new SaveDialog(frame, getFileName());
 			if (saveDialog.cancel)
 				return false;

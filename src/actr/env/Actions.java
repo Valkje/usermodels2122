@@ -206,7 +206,7 @@ class Actions {
 
 		pasteAction.setEnabled(frame.getEditor() != null
 				// && frame.getEditor().hasFocus()
-				&& (Main.inApplet() || Toolkit.getDefaultToolkit().getSystemClipboard().getContents(this) != null));
+				&& (ApplicationMain.inApplet() || Toolkit.getDefaultToolkit().getSystemClipboard().getContents(this) != null));
 
 		findAction.setEnabled(true);
 		findNextAction.setEnabled(frame.isFindNextPossible());
@@ -241,7 +241,7 @@ class Actions {
 		return new AbstractAction(name) {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					frame.open(new URL(Main.getApplet().getCodeBase(), "models/" + name));
+					frame.open(new URL(ApplicationMain.getApplet().getCodeBase(), "models/" + name));
 				} catch (Exception ex) {
 				}
 			}

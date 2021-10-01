@@ -25,7 +25,7 @@ class Menus extends JMenuBar {
 
 		fileMenu = new JMenu("File");
 
-		if (Main.inApplication()) {
+		if (ApplicationMain.inApplication()) {
 			addToMenu(fileMenu, actions.newAction, KeyEvent.VK_N);
 			addToMenu(fileMenu, actions.openAction, KeyEvent.VK_O);
 
@@ -39,7 +39,7 @@ class Menus extends JMenuBar {
 				addToMenu(fileMenu, actions.saveAsAction, KeyEvent.VK_S, accelerator + ActionEvent.SHIFT_MASK);
 				fileMenu.addSeparator();
 				addToMenu(fileMenu, actions.printAction, KeyEvent.VK_P);
-				if (!Main.onMac()) {
+				if (!ApplicationMain.onMac()) {
 					fileMenu.addSeparator();
 					addToMenu(fileMenu, actions.aboutAction);
 					fileMenu.addSeparator();
@@ -66,7 +66,7 @@ class Menus extends JMenuBar {
 			addToMenu(editMenu, actions.findAction, KeyEvent.VK_F);
 			addToMenu(editMenu, actions.findNextAction, KeyEvent.VK_G);
 			addToMenu(editMenu, actions.findPreviousAction, KeyEvent.VK_G, accelerator + ActionEvent.SHIFT_MASK);
-			if (!Main.onMac()) {
+			if (!ApplicationMain.onMac()) {
 				editMenu.addSeparator();
 				addToMenu(editMenu, actions.prefsAction);
 			}

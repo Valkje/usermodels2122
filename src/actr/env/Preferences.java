@@ -13,9 +13,9 @@ class Preferences {
 	int indentSpaces;
 	Vector<String> recentFiles = new Vector<String>();
 
-	private static final String prefsFilePath = ((Main.inApplet()) ? null
-			: (Main.onMac()) ? System.getProperty("user.home") + "/Library/Preferences/actr.txt"
-					: ((Main.onNix()) ? System.getProperty("user.home") + "/.actr"
+	private static final String prefsFilePath = ((ApplicationMain.inApplet()) ? null
+			: (ApplicationMain.onMac()) ? System.getProperty("user.home") + "/Library/Preferences/actr.txt"
+					: ((ApplicationMain.onNix()) ? System.getProperty("user.home") + "/.actr"
 							: System.getProperty("user.home") + File.separator + "actrprefs.txt"));
 
 	private final int maxRecentFiles = 5;
@@ -43,7 +43,7 @@ class Preferences {
 	}
 
 	static Preferences load(Core core) {
-		if (Main.inApplet())
+		if (ApplicationMain.inApplet())
 			return new Preferences();
 
 		try {
@@ -114,7 +114,7 @@ class Preferences {
 	}
 
 	void save() {
-		if (Main.inApplet())
+		if (ApplicationMain.inApplet())
 			return;
 
 		try {

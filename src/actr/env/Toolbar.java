@@ -22,7 +22,7 @@ class Toolbar extends JToolBar {
 		setFocusable(false);
 		setRollover(true);
 
-		if (Main.inApplication()) {
+		if (ApplicationMain.inApplication()) {
 			addButton(actions.newAction);
 			addButton(actions.openAction);
 			addButton(actions.saveAction);

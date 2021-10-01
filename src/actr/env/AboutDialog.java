@@ -21,7 +21,7 @@ class AboutDialog extends JDialog {
 		icon.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 		JLabel text = new JLabel(
-				"<html><center>" + "<font size=4><b>ACT-R</b></font><br>" + "<font size=2>" + Main.getVersion()
+				"<html><center>" + "<font size=4><b>ACT-R</b></font><br>" + "<font size=2>" + ApplicationMain.getVersion()
 						+ "</font><br><br>" + "<font size=2>Application by Dario Salvucci &copy; 2010</font><br><br>"
 						+ "<font size=2>Icon image by Niels Taatgen &copy; 2007</font><br><br>"
 						+ "<font size=2>Cognitive theory by John R. Anderson<br>" + "and the ACT-R community</font><br>"

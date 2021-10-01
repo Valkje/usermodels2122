@@ -14,7 +14,7 @@ import javax.swing.*;
  * 
  * @author Dario Salvucci
  */
-public class Main extends JApplet {
+public class ApplicationMain extends JApplet {
 	/** The application's version string. */
 	private static final String version = "1.1";
 
@@ -93,7 +93,7 @@ public class Main extends JApplet {
 	public static String getVersion() {
 		if (inApplication()) {
 			try {
-				URL url = Main.class.getResource("Version.txt");
+				URL url = ApplicationMain.class.getResource("Version.txt");
 				InputStream in = url.openStream();
 				StringWriter sw = new StringWriter();
 				int c;
@@ -114,7 +114,7 @@ public class Main extends JApplet {
 	 * 
 	 * @param args the arguments
 	 */
-	public static void main(String[] args) {
+	public static void startApplication() {
 		if (!onMac()) // MacOS.start();
 		// else
 		{

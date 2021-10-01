@@ -169,7 +169,7 @@ public class Core {
 		frames.remove(frame);
 		frame.setVisible(false);
 		if (frames.size() == 0) {
-			if (Main.onMac()) {
+			if (ApplicationMain.onMac()) {
 				if (invisibleFrame == null)
 					invisibleFrame = new InvisibleFrame(this);
 				invisibleFrame.setVisible(true);

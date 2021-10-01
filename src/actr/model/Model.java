@@ -793,7 +793,7 @@ public class Model {
 	// mlh
 	public void print(List<String> output, String filename, int participant) {
 
-		String nbackLevel = Main.core.getFilename();
+		String nbackLevel = ApplicationMain.core.getFilename();
 		nbackLevel = nbackLevel.replace(".actr", "");
 		try {
 			FileWriter writer = new FileWriter(outputPath + nbackLevel + filename + String.format("%02d", participant) + ".txt");
