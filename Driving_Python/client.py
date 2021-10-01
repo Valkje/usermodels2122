@@ -23,5 +23,7 @@ def start_receiving_thread():
 	t.start()
 
 def send(message):
+	# We use this function to send back information to the
+	# Java part. For example the last pupil size we get from the eye tracker!
 	message += "\n"
 	sock.sendall(message.encode())

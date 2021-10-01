@@ -15,6 +15,7 @@ public class Server {
     private Socket client;
     public int posX;
     public int posY;
+    public float lastPupilSample;
 
     public Server() throws IOException {
         server = new ServerSocket(PORT);
@@ -49,6 +50,11 @@ public class Server {
     }
 
     private void handleInput(String input) {
+        /**
+         * Here we should listen to messages that come back from Python.
+         */
+        System.out.println("Input from python");
+        System.out.println(input);
         if (input.startsWith("POS_X ")) {
             String posXString = input.substring("POS_X ".length());
             posX = Integer.parseInt(posXString);
@@ -56,11 +62,17 @@ public class Server {
         if (input.startsWith("POS_Y ")) {
             String posYString = input.substring("POS_Y ".length());
             posY = Integer.parseInt(posYString);
+        } if (input.startsWith("PUPIL_SIZE")) {
+            String pupilString = input.substring("PUPIL_SIZE ".length());
+            lastPupilSample = Float.parseFloat(pupilString);
         }
     }
 
     public void send(String message) {
-        
+        /**
+         * Use this to send a message to the client from anywhere in the Java code!
+         * For example: query/ PUPIL_SIZE to get the pupil size from the Eye-tracker.
+         */
         try {
             PrintWriter out = new PrintWriter(client.getOutputStream(), true);
             out.println(message);
