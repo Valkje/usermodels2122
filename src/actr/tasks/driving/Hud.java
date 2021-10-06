@@ -22,15 +22,18 @@ public class Hud {
         this.car = simcar;
     }
 
-    int dashHeight = Env.envHeight / 3; // default: 80, from Simcar.draw()
+    int dashHeight, hudWidth, hudHeight, hudX, hudY;
 
-    int hudWidth = Env.envWidth / 6;
-    int hudHeight = hudWidth / 4;
-    int hudX = 200;
-    int hudY = Env.envHeight-dashHeight-hudHeight;
     Color hudColor = new Color(204, 204, 204, 80); // semi-transparent Color.lightgray
 
     void draw(Graphics g, Env env) {
+        dashHeight = Env.envHeight / 3; // default: 80, from Simcar.draw()
+
+        hudWidth = Env.envWidth / 6;
+        hudHeight = hudWidth / 4;
+        hudX = 200;
+        hudY = Env.envHeight-dashHeight-hudHeight;
+
         // Head-Up Display (HUD)
         g.setColor(hudColor);
         g.fillRoundRect(hudX, hudY, hudWidth, hudHeight, 5, 5);

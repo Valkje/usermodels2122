@@ -235,33 +235,46 @@ public class Simcar extends Vehicle {
 
 		// mh - speedometer
 		double speedNum = speed;
-		int speedoX = (Env.envWidth / 4 - steerR) / 2; // In-between the left border and the steering wheel
-		int speedoY = (int) (Env.envHeight * (2.6 / 3)); // Just under the middle of the dashboard
+		int speedoX = Env.envWidth / 4; // In-between the left border and the steering wheel
+		int speedoY = steerY - steerR / 2; // Just under the middle of the dashboard
 		String speed = Integer.toString((int) Utilities.mph2kph(Utilities.mps2mph(speedNum)));
 		Font myFont = new Font("Helvetica", Font.BOLD, 24);
 		g.setFont(myFont);
 		g.setColor(Color.WHITE);
+
+		FontMetrics fm = g.getFontMetrics();
+		speedoX = speedoX - fm.stringWidth(speed) / 2 ;
+
 		g.drawString(speed, speedoX, speedoY);
 
 		// top - mirror
+		int mirrorWidth = Env.envWidth / 10;
+		int mirrorHeight = Env.envHeight / 20;
+		int mirrorX = Env.envWidth / 2 - mirrorWidth / 2;
+		int mirrorY = Env.envHeight / 20;
+
 		g.setColor(Color.black);
-		g.fillRoundRect(225, 15, 70, 30, 30, 20);
-		g.fillRect(255, 0, 10, 20);
+		g.fillRoundRect(mirrorX, mirrorY, mirrorWidth, mirrorHeight, 30, 20);
+		g.fillRect(Env.envWidth / 2 - 5, 0, 10, mirrorY);
 		g.setColor(Color.LIGHT_GRAY);
-		g.fillRoundRect(230, 20, 60, 20, 30, 20);
+		g.fillRoundRect(mirrorX + 5, mirrorY + 5, mirrorWidth - 10, mirrorHeight - 10, 30, 20);
 		// g.fillRoundRect(5, Env.envHeight - dashHeight, 45, 25, 30, 20); side-view
 
+		mirrorWidth = Env.envWidth / 20;
+		mirrorX = 5;
+		mirrorY = Env.envHeight - dashHeight - mirrorHeight;
 		// left-side mirror
 		g.setColor(Color.black);
-		g.fillRoundRect(5, Env.envHeight - dashHeight - 30, 60, 30, 40, 20);
+		g.fillRoundRect(mirrorX, mirrorY, mirrorWidth, mirrorHeight, 40, 20);
 		g.setColor(Color.LIGHT_GRAY);
-		g.fillRoundRect(10, Env.envHeight - dashHeight - 25, 50, 20, 40, 20);
+		g.fillRoundRect(mirrorX + 5, mirrorY + 5, mirrorWidth - 10, mirrorHeight - 10, 40, 20);
 
+		mirrorX = Env.envWidth - mirrorWidth - 5;
 		// right-side mirror
 		g.setColor(Color.black);
-		g.fillRoundRect(Env.envWidth - 65, Env.envHeight - dashHeight - 30, 60, 30, 40, 20);
+		g.fillRoundRect(mirrorX, mirrorY, mirrorWidth, mirrorHeight, 40, 20);
 		g.setColor(Color.LIGHT_GRAY);
-		g.fillRoundRect(Env.envWidth - 60, Env.envHeight - dashHeight - 25, 50, 20, 40, 20);
+		g.fillRoundRect(mirrorX + 5, mirrorY + 5, mirrorWidth - 10, mirrorHeight - 10, 40, 20);
 
 		hud.draw(g, env);
 	}
