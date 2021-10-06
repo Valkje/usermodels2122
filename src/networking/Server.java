@@ -15,7 +15,7 @@ public class Server {
     private Socket client;
     public int posX;
     public int posY;
-    public float lastPupilSample;
+    public double lastPupilSample;
 
     public Server() throws IOException {
         server = new ServerSocket(PORT);
@@ -64,7 +64,7 @@ public class Server {
             posY = Integer.parseInt(posYString);
         } if (input.startsWith("PUPIL_SIZE")) {
             String pupilString = input.substring("PUPIL_SIZE ".length());
-            lastPupilSample = Float.parseFloat(pupilString);
+            lastPupilSample = Double.parseDouble(pupilString);
         }
     }
 

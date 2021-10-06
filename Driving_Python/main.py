@@ -154,13 +154,19 @@ def query(target):
 
 	# We can select which eye we want to record in the eye-tracking
 	# software so we can just pick it directly here.
-	eye = sample.getLeftEye()
+	try:
+		eye = sample.getLeftEye()
 
-	if target == "PUPIL_SIZE":
-		response = eye.getPupilSize()
-	else:
-		report_error("Invalid target")
+		if target == "PUPIL_SIZE":
+			response = eye.getPupilSize()
+		else:
+			report_error("Invalid target")
 
+	except AttributeError:
+		response = 0
+		print("WARNING: Empty sample")
+
+	# Inform client to send back Pupil size to Java server.
 	client.send("PUPIL_SIZE " + str(response))
 
 
