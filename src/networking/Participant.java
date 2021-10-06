@@ -22,7 +22,7 @@ public class Participant {
     }
 
     public void prepareExperiment() {
-        String edfFileName = "PART" + participantNumber + ".EDF";
+        String edfFileName = "UM" + participantNumber + ".EDF";
         s.send("info/ EDF " + edfFileName);
 
         s.send("info/ DIM_X " + dimX);

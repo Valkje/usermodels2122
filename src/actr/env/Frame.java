@@ -10,6 +10,7 @@ import actr.model.Model;
 import actr.task.*;
 import actr.tasks.driving.Env;
 import actr.tasks.driving.actions.*;
+import networking.ServerMain;
 
 /**
  * The class that defines a graphical frame (window) for editing and running an
@@ -129,6 +130,10 @@ public class Frame extends JFrame {
 		splitPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
 				.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "decreaseSpeed");
 		splitPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+				.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0, true), "neutralSpeed");
+		splitPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+				.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, true), "neutralSpeed");
+		splitPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
 				.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), "steerRight");
 		splitPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
 				.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), "steerLeft");
@@ -137,20 +142,21 @@ public class Frame extends JFrame {
 		splitPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
 				.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, true), "steerNeutral");
 		splitPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-				.put(KeyStroke.getKeyStroke(KeyEvent.VK_1, 0), "noAutomation");
+				.put(KeyStroke.getKeyStroke(KeyEvent.VK_1, 0), "decreaseAutomation");
 		splitPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-				.put(KeyStroke.getKeyStroke(KeyEvent.VK_2, 0), "partialAutomation");
-		splitPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-				.put(KeyStroke.getKeyStroke(KeyEvent.VK_3, 0), "fullAutomation");
+				.put(KeyStroke.getKeyStroke(KeyEvent.VK_2, 0), "increaseAutomation");
 
 		splitPane.getActionMap().put("increaseSpeed", new IncreaseSpeedAction());
 		splitPane.getActionMap().put("decreaseSpeed", new DecreaseSpeedAction());
+		splitPane.getActionMap().put("neutralSpeed", new NeutralSpeedAction());
 		splitPane.getActionMap().put("steerRight", new SteerRightAction());
 		splitPane.getActionMap().put("steerLeft", new SteerLeftAction());
 		splitPane.getActionMap().put("steerNeutral", new SteerNeutralAction());
 		splitPane.getActionMap().put("noAutomation", new NoAutomationAction());
 		splitPane.getActionMap().put("partialAutomation", new PartialAutomationAction());
 		splitPane.getActionMap().put("fullAutomation", new FullAutomationAction());
+		splitPane.getActionMap().put("decreaseAutomation", new DecreaseAutomationAction());
+		splitPane.getActionMap().put("increaseAutomation", new IncreaseAutomationAction());
 
 		brainPanel = new Brain(this);
 		brainPanel.setVisible(false);
@@ -419,10 +425,13 @@ public class Frame extends JFrame {
 					return null;
 				stop = false;
 				update();
+				ServerMain.participant.prepareExperiment();
+				ServerMain.participant.prepareTrial(0, false, 0);
 				clearOutput();
 				output("> (run-analysis " + n + ")\n");
 				if (model != null && model.getTask() != null) {
 					Task[] tasks = new Task[n];
+					ServerMain.participant.startTrial();
 					for (int i = 0; !stop && i < n; i++) {
 						model = Model.compile(modelText, frame);
 						brainPanel.setVisible(false);
@@ -433,6 +442,7 @@ public class Frame extends JFrame {
 						model.getTask().finish();
 						tasks[i] = model.getTask();
 					}
+					ServerMain.participant.endTrial();
 					if (stop && model != null)
 						model.getTask().analyze(tasks, true);
 					// model = null;

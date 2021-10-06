@@ -44,6 +44,7 @@ public class Hud {
         if ( Math.abs(speed-speedLimit) > 0.1*speedLimit ) { //deviation from limit by more than 10%
             drawSpeedWarning(g, env);
         }
+
         drawAutomationLevel(g, env);
     }
 
@@ -78,8 +79,7 @@ public class Hud {
         int cx = Math.round(hudX + (float) (hudWidth - hudHeight)/2);
         int cy1 = Math.round(hudY + (float) hudHeight / 3);
         int cy2 = cy1 + Math.round((float) hudHeight / 3);
-
-        switch (Controls.getAaLevel()) {
+        switch (env.aas.getAaLevel()) {
             case none:
                 aaLevelText = " \n ";
                 break;

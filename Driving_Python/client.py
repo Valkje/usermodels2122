@@ -11,7 +11,6 @@ print("Launched client")
 sock.connect((HOST, PORT))
 print("Connected to server")
 
-
 def receive():
 	while True:
 		message = sock.recv(1024).decode()
@@ -28,5 +27,3 @@ def send(message):
 	# Java part. For example the last pupil size we get from the eye tracker!
 	message += "\n"
 	sock.sendall(message.encode())
-
-send("hello")

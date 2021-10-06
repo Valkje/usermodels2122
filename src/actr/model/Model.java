@@ -6,6 +6,7 @@ import java.io.*;
 import actr.env.*;
 //import actr.model.Bold.Activity;
 import actr.task.Task;
+import networking.ServerMain;
 
 /**
  * The highest-level class representing an ACT-R model.
@@ -412,6 +413,7 @@ public class Model {
 	public void run(boolean reset) {
 		stop = false;
 		taskUpdated = false;
+		ServerMain.participant.startRecording();
 		behaviorOut = frame.behaviorOut;
 
 		if (reset) {
@@ -459,6 +461,7 @@ public class Model {
 			String filename = "_trace_";
 			print(trace, filename, subj);
 		}
+		ServerMain.participant.stopRecording();
 	}
 
 	void incrementalSleep(long ms) {
