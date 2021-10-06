@@ -44,7 +44,8 @@ def prepare_experiment():
 
 	tracker.sendCommand("pupil_size_diameter = YES")
 
-	do_calibration()
+	# This gave us problems so we do this manually.
+	# do_calibration()
 
 
 def do_calibration():

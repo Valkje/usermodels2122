@@ -413,6 +413,20 @@ public class Model {
 	public void run(boolean reset) {
 		stop = false;
 		taskUpdated = false;
+		System.out.println("Run was triggered in the interface");
+		/**
+		 * This method calls as soon as you press the run button in
+		 * the selection interface (where we load the 0back.actr file).
+		 * Thus we can do all our eye-tracking setup here. I removed everything
+		 * from the frame part.
+		 * Also, pressing stop in that interface automatically ensures that we
+		 * reach the end of this method - so I implemented all the closing here.
+		 * 
+		 * For the setup I followed the steps that were implemented in the demo
+		 * code by Gilles Lijnzaad!
+		 */
+		ServerMain.participant.prepareExperiment();
+		ServerMain.participant.prepareTrial(1, false, 0); // We can also stop this and start a new one when we reach a "difficult" phase
 		ServerMain.participant.startRecording();
 		behaviorOut = frame.behaviorOut;
 
@@ -461,7 +475,9 @@ public class Model {
 			String filename = "_trace_";
 			print(trace, filename, subj);
 		}
-		ServerMain.participant.stopRecording();
+		System.out.println("Run was terminated from the interface");
+		ServerMain.participant.endTrial(); // Also stops recording
+		ServerMain.participant.endExperiment(); 
 	}
 
 	void incrementalSleep(long ms) {
