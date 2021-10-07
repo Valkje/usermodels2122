@@ -12,7 +12,15 @@ edf_file_name = ""
 trial_number = 0
 trial_id = ""
 
-pylink.EyeLink(trackeraddress=None)
+connected = False
+
+while not connected:
+    try:
+        pylink.EyeLink(trackeraddress=None)
+        connected = True
+    except RuntimeError:
+        print("Connection to eye tracker failed, trying again...")
+
 client.start_receiving_thread()
 
 
