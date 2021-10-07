@@ -13,8 +13,6 @@ import javax.swing.JLabel;
 
 import actr.task.Result;
 import actr.task.Task;
-import networking.ServerMain;
-import networking.Server;
 
 /**
  * The main Driving task class that sets up the simulation and starts periodic
@@ -68,7 +66,7 @@ public class Driving extends actr.task.Task {
 	double switch_to_safe = 0;
 
 	static boolean VERBOSE = false;
-	Server server = ServerMain.server;
+	
 
 	public Driving() {
 		super();
@@ -149,8 +147,7 @@ public class Driving extends actr.task.Task {
 
 	public void update(double time) {
 		Env env = simulation.env;
-		server.send("query/ PUPIL_SIZE");
-		System.out.println(server.lastPupilSample);
+		
 		// if (time <= endTime) {
 		if (env.road.block < simulation.scenario.blocks) {
 			env.time = time - startTime;

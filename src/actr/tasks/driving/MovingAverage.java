@@ -52,5 +52,10 @@ public class MovingAverage {
         // Gets latest moving average value
         return(currentValue);
     }
+
+    public int getCurrentSize() {
+        // Gets current size of buffer
+        return(currentBufferSize);
+    }
     
 }
