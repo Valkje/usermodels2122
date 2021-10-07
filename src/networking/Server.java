@@ -53,8 +53,8 @@ public class Server {
         /**
          * Here we should listen to messages that come back from Python.
          */
-        System.out.println("Input from python");
-        System.out.println(input);
+//        System.out.println("Input from python");
+//        System.out.println(input);
         if (input.startsWith("POS_X ")) {
             String posXString = input.substring("POS_X ".length());
             posX = Integer.parseInt(posXString);
@@ -81,7 +81,7 @@ public class Server {
             e.printStackTrace();
         }
         
-        System.out.println(message);
+//        System.out.println(message);
     }
 
 }
