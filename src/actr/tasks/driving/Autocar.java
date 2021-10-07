@@ -135,6 +135,7 @@ public class Autocar extends Vehicle {
 		Coordinate im2 = env.world2image(pos2);
 
 		if (im1 != null && im2 != null) {
+			// Draws other cars
 			g.setColor(Color.blue);
 			g.fillRect(im1.x, im2.y, im2.x - im1.x, im1.y - im2.y);
 		} else {

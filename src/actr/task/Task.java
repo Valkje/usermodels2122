@@ -372,7 +372,7 @@ public class Task extends JPanel {
 	 * @param y the new y coordinate
 	 */
 	public void moveAttention(int x, int y) {
-		showAttention = true;
+//		showAttention = true; -> Don't wanna see this
 		attentionX = x;
 		attentionY = y;
 		repaint();
@@ -385,7 +385,7 @@ public class Task extends JPanel {
 	 * @param y the new y coordinate
 	 */
 	public void moveEye(int x, int y) {
-		showEye = true;
+//		showEye = true; -> Don't wanna see this
 		eyeX = x;
 		eyeY = y;
 		repaint();
