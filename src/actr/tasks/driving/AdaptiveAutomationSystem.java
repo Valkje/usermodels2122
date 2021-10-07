@@ -12,10 +12,10 @@ public class AdaptiveAutomationSystem {
 
     private boolean levelLocked = false;
     private double timerStart;
-    private double lockTimeS = 3;
+    private double lockTimeS = 10;
     // Tuning parameters for the MAs and MV
-    private int bufferSizeShort = 100;
-    private int bufferSizeLong = 1000;
+    private int bufferSizeShort = 150;
+    private int bufferSizeLong = 2500;
     // Tuning parameter for decision
     private float decisionSensitivity = 0.75f;
     private MovingAverage ShortTermTrend;
@@ -50,7 +50,6 @@ public class AdaptiveAutomationSystem {
                     if (!levelLocked) {
                         tmpSecondBaseline = shortPred;
                     }
-                    
                 }
                 break;
             case cruise:
@@ -76,11 +75,17 @@ public class AdaptiveAutomationSystem {
 
     public void update(Env env) {
         server.send("query/ PUPIL_SIZE");
+        
 		// System.out.println(server.lastPupilSample);
-        ShortTermTrend.update(server.lastPupilSample);
-        LongTermTrend.update(server.lastPupilSample);
-        // One-step ahead orediction or not? If yes -> swap with line 39
-        LongTermMSE.update(LongTermTrend.getCurrentValue(), server.lastPupilSample);
+        if (server.lastPupilSample > 0) {
+            ShortTermTrend.update(server.lastPupilSample);
+            LongTermTrend.update(server.lastPupilSample);
+            server.send(String.format("plot/ LONG %f", LongTermTrend.getCurrentValue()));
+            server.send(String.format("plot/ SHORT %f", ShortTermTrend.getCurrentValue()));
+            // One-step ahead orediction or not? If yes -> swap with line 39
+            LongTermMSE.update(LongTermTrend.getCurrentValue(), server.lastPupilSample);
+        }
+        
         updateLevelLock();
 
         // Only start making decisions after 100 samples have arrived

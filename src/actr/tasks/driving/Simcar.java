@@ -41,7 +41,7 @@ public class Simcar extends Vehicle {
 	int max_order = 10;
 	double gravity = 9.8;
 	double air_drag_coeff = .25;
-	double engine_max_watts = 106000;
+	double engine_max_watts = 150000;
 	double brake_max_force = 8000;
 	double f_surface_friction = .2;
 	double lzz = 2618;

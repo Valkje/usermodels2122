@@ -13,7 +13,7 @@ def handle_input(input_string):
 	# a message from the Java part! We implement a check here
 	# that tells the main python interface to query the
 	# eyetracker for the latest pupil size!
-	print(input_string)
+	#print(input_string)
 	if input_string.startswith("info/ "):
 		information = input_string[len("info/ "):]
 		set_info(information)
@@ -26,6 +26,9 @@ def handle_input(input_string):
 	elif input_string.startswith("query/ "):
 		message = input_string[len("query/ "):]
 		main.query(message)
+	elif input_string.startswith("plot/ "):
+		message = input_string[len("plot/ "):]
+		main.save_for_plot(message)
 	else:
 		print("ERROR: Invalid message")
 

@@ -3,6 +3,7 @@
 import pylink
 import client
 import time
+from matplotlib import pyplot as plt
 
 
 # global variables, will be changed by input_handler
@@ -11,6 +12,9 @@ display_y = 0
 edf_file_name = ""
 trial_number = 0
 trial_id = ""
+
+plot_dat_short = []
+plot_dat_long = []
 
 connected = False
 
@@ -146,6 +150,10 @@ def end_experiment():
 	tracker.closeDataFile()
 	tracker.receiveDataFile(edf_file_name, edf_file_name)
 	tracker.close()
+	plt.plot(range(len(plot_dat_long)),plot_dat_long,color="blue")
+	plt.plot(range(len(plot_dat_short)),plot_dat_short,colo="red")
+	plt.title("Long term trend vs. short term change")
+	plt.show()
 
 def query(target):
 	# This method can be called from the client on behalf of the
@@ -173,11 +181,19 @@ def query(target):
 
 	except AttributeError:
 		response = 0
-		print("WARNING: Empty sample")
+		#print("WARNING: Empty sample")
 
 	# Inform client to send back Pupil size to Java server.
 	client.send("PUPIL_SIZE " + str(response))
 
+
+def save_for_plot(message):
+	if message.startswith("LONG "):
+		value = message[len("LONG "):]
+		plot_dat_long.append(float(value))
+	if message.startswith("SHORT "):
+		value = message[len("SHORT "):]
+		plot_dat_short.append(float(value))
 
 def report_error(error_message):
 	client.send(error_message)
