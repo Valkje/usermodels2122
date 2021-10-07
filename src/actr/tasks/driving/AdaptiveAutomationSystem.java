@@ -3,6 +3,7 @@ import networking.ServerMain;
 import networking.Server;
 import actr.tasks.driving.MovingAverage;
 import actr.tasks.driving.MovingPredictionErrorVariance;
+import java.lang.Math;
 
 public class AdaptiveAutomationSystem {
 
@@ -39,7 +40,7 @@ public class AdaptiveAutomationSystem {
     private void decideAutomationLevel() {
         double shortPred = ShortTermTrend.getCurrentValue();
         double longPred = LongTermTrend.getCurrentValue();
-        double longTermMSE = LongTermMSE.getCurrentValue();
+        double longTermMSE = Math.sqrt(LongTermMSE.getCurrentValue());
         switch (this.aaLevel) {
             case none:
                 if(shortPred > (longPred + (decisionSensitivity * longTermMSE))) {
