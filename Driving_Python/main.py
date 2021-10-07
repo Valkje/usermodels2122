@@ -15,6 +15,8 @@ trial_id = ""
 
 plot_dat_short = []
 plot_dat_long = []
+plot_dat_upper = []
+plot_dat_lower = []
 
 connected = False
 
@@ -151,7 +153,9 @@ def end_experiment():
 	tracker.receiveDataFile(edf_file_name, edf_file_name)
 	tracker.close()
 	plt.plot(range(len(plot_dat_long)),plot_dat_long,color="blue")
-	plt.plot(range(len(plot_dat_short)),plot_dat_short,colo="red")
+	plt.plot(range(len(plot_dat_upper)),plot_dat_upper,color="blue",linetype='dashed')
+	plt.plot(range(len(plot_dat_lower)),plot_dat_lower,color="blue",linetype='dashed')
+	plt.plot(range(len(plot_dat_short)),plot_dat_short,color="red")
 	plt.title("Long term trend vs. short term change")
 	plt.show()
 
@@ -194,6 +198,12 @@ def save_for_plot(message):
 	if message.startswith("SHORT "):
 		value = message[len("SHORT "):]
 		plot_dat_short.append(float(value))
+	if message.startswith("UPPER "):
+		value = message[len("UPPER "):]
+		plot_dat_upper.append(float(value))
+	if message.startswith("LOWER "):
+		value = message[len("LOWER "):]
+		plot_dat_lower.append(float(value))
 
 def report_error(error_message):
 	client.send(error_message)

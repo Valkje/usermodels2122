@@ -18,11 +18,11 @@ public class AdaptiveAutomationSystem {
     private int bufferSizeShort = 150;
     private int bufferSizeLong = 2500;
     // Tuning parameter for decision
-    private float decisionSensitivity = 0.75f;
+    private float decisionSensitivity = 0.5f;
     private MovingAverage ShortTermTrend;
     private MovingAverage LongTermTrend;
     private MovingPredictionErrorVariance LongTermMSE;
-    private double tmpSecondBaseline = 5000.0;
+    private double tmpSecondBaseline = 100000.0;
 
     Server server = ServerMain.server;
 
@@ -81,10 +81,12 @@ public class AdaptiveAutomationSystem {
         if (server.lastPupilSample > 0) {
             ShortTermTrend.update(server.lastPupilSample);
             LongTermTrend.update(server.lastPupilSample);
-            server.send(String.format("plot/ LONG %f", LongTermTrend.getCurrentValue()));
-            server.send(String.format("plot/ SHORT %f", ShortTermTrend.getCurrentValue()));
             // One-step ahead orediction or not? If yes -> swap with line 39
             LongTermMSE.update(LongTermTrend.getCurrentValue(), server.lastPupilSample);
+            server.send(String.format("plot/ LONG %f", LongTermTrend.getCurrentValue()));
+            server.send(String.format("plot/ SHORT %f", ShortTermTrend.getCurrentValue()));
+            server.send(String.format("plot/ UPPER %f", LongTermTrend.getCurrentValue() + (Math.sqrt(LongTermMSE.getCurrentValue()) * decisionSensitivity)));
+            server.send(String.format("plot/ LOWER %f", LongTermTrend.getCurrentValue() - (Math.sqrt(LongTermMSE.getCurrentValue()) * decisionSensitivity)));
         }
         
         updateLevelLock();
