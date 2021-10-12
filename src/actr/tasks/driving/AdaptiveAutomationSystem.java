@@ -1,13 +1,15 @@
 package actr.tasks.driving;
 import networking.ServerMain;
 import networking.Server;
-import actr.tasks.driving.MovingAverage;
-import actr.tasks.driving.MovingPredictionErrorVariance;
+
 import java.lang.Math;
 
 public class AdaptiveAutomationSystem {
 
     private AaLevel aaLevel;
+    private AaChange aaChange = AaChange.none;
+    private boolean loaChanging = false;
+
     private Simcar simcar;
     private Env env;
 
@@ -30,6 +32,7 @@ public class AdaptiveAutomationSystem {
         this.aaLevel = AaLevel.full;
         this.simcar = simcar;
         this.env = env;
+        simcar.hud.setDisplayedAaLevel(aaLevel);
 
         // Initialize Moving averages and MSE
         ShortTermTrend = new MovingAverage(bufferSizeShort);
@@ -46,7 +49,7 @@ public class AdaptiveAutomationSystem {
                 if(shortPred > (longPred + (decisionSensitivity * longTermMSE))) {
                     // Check whether automation level should increase from 1 to 2
                     System.out.println("Model wants to increase from automation level 1 to 2");
-                    increaseAutomation();
+                    prepareIncreaseAutomation();
                     // Set new baseline for 2 to 3 decisions.
                     if (!levelLocked) {
                         tmpSecondBaseline = shortPred;
@@ -57,20 +60,36 @@ public class AdaptiveAutomationSystem {
                 if(shortPred > (tmpSecondBaseline + (decisionSensitivity * longTermMSE))) {
                     // Check whether automation level should increase from 2 to 3
                     System.out.println("Model wants to increase from automation level 1 to 2");
-                    increaseAutomation();
+                    prepareIncreaseAutomation();
                 } else if (shortPred < (longPred - (decisionSensitivity * longTermMSE))) {
                     // Check whether automation level should decrease from 2 to 1
                     System.out.println("Model wants to increase from automation level 1 to 2");
-                    decreaseAutomation();
+                    prepareDecreaseAutomation();
                 }
                 break;
             case full:
                 if (shortPred < (tmpSecondBaseline - (decisionSensitivity * longTermMSE))) {
                     // Check whether automation level should decrease from 3 to 2
                     System.out.println("Model wants to increase from automation level 1 to 2");
-                    decreaseAutomation();
+                    prepareDecreaseAutomation();
                 }
                 break;
+        }
+    }
+
+    private void updateAutomationLevel(){
+        if (!loaChanging) { // this is set to false by the hud after blinking
+            switch (aaChange) {
+                case increase:
+                    increaseAutomation();
+                    aaChange = AaChange.none;
+                    break;
+                case decrease:
+                    System.out.println("decreased!!!!!!!1111");
+                    decreaseAutomation();
+                    aaChange = AaChange.none;
+                    break;
+            }
         }
     }
 
@@ -95,12 +114,15 @@ public class AdaptiveAutomationSystem {
         if(LongTermTrend.getCurrentSize() > 100) {
             decideAutomationLevel();
         }
+
+        updateAutomationLevel();
         
         // Manual automation changes
-        if (Controls.getAaChange() == 1) { //TODO: make this just slightly more interesting
-            increaseAutomation();
-        } else if (Controls.getAaChange() == -1) {
-            decreaseAutomation();
+        if (Controls.getAaChange() == 1) {
+            prepareIncreaseAutomation();
+        }
+        else if (Controls.getAaChange() == -1) {
+            prepareDecreaseAutomation();
         }
         Controls.setAaChange(0);
 
@@ -125,6 +147,14 @@ public class AdaptiveAutomationSystem {
         }
     }
 
+    public void prepareIncreaseAutomation() {
+        if (aaChange == AaChange.none && aaLevel!= AaLevel.full && !levelLocked) {
+            setLoaChanging(true); // to start the blinking of the new automation level //TODO: perhaps remove the delay for increase?
+            simcar.hud.increaseDisplayedAaLevel(); // display the new level
+            setAaChange(AaChange.increase); // indicate that we want to switch after blinking
+        }
+    }
+
     private void increaseAutomation() {
         if (!levelLocked){
             switch (this.aaLevel) {
@@ -139,6 +169,14 @@ public class AdaptiveAutomationSystem {
                     break;
             }
             levelLocked = true;
+        }
+    }
+
+    private void prepareDecreaseAutomation(){
+        if (aaChange == AaChange.none && aaLevel!=AaLevel.none && !levelLocked) {
+            setLoaChanging(true); // to start the blinking of the new automation level
+            simcar.hud.decreaseDisplayedAaLevel(); //display the new level
+            setAaChange(AaChange.decrease);
         }
     }
 
@@ -169,6 +207,22 @@ public class AdaptiveAutomationSystem {
         this.aaLevel = aaLevel;
     }
 
+    public boolean isLoaChanging() {
+        return loaChanging;
+    }
 
+    public void setLoaChanging(boolean loaChanging) {
+        System.out.println("setLoaChanging()");
+        System.out.println(env.time);
+        this.loaChanging = loaChanging;
+    }
+
+    public AaChange getAaChange() {
+        return aaChange;
+    }
+
+    public void setAaChange(AaChange aaChange) {
+        this.aaChange = aaChange;
+    }
 
 }
