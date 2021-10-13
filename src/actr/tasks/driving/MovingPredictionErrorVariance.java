@@ -64,6 +64,7 @@ public class MovingPredictionErrorVariance {
 
           // push new sample to queue
           buffer.addLast(squareDiff);
+          currentBufferSize += 1;
 
           // Calculate variance (with sample bias correction)
           // See: https://en.wikipedia.org/wiki/Bessel%27s_correction
