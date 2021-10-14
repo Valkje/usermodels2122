@@ -168,8 +168,8 @@ def end_experiment():
 	# Plot data
 	plt.plot(range(len(raw_data)),raw_data,color="black")
 	plt.plot(range(len(plot_dat_long)),plot_dat_long,color="blue")
-	plt.plot(range(len(plot_dat_upper)),plot_dat_upper,color="blue",linetype='dashed')
-	plt.plot(range(len(plot_dat_lower)),plot_dat_lower,color="blue",linetype='dashed')
+	plt.plot(range(len(plot_dat_upper)),plot_dat_upper,color="blue",linestyle='dashed')
+	plt.plot(range(len(plot_dat_lower)),plot_dat_lower,color="blue",linestyle='dashed')
 	plt.plot(range(len(plot_dat_short)),plot_dat_short,color="red")
 	plt.title("Long term trend vs. short term change")
 	plt.xlabel("Samples")
