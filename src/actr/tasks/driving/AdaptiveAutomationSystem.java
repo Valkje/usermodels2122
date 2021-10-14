@@ -102,11 +102,14 @@ public class AdaptiveAutomationSystem {
             LongTermTrend.update(server.lastPupilSample);
             // One-step ahead orediction or not? If yes -> swap with line 39
             LongTermMSE.update(LongTermTrend.getCurrentValue(), server.lastPupilSample);
-            server.send(String.format("plot/ LONG %f", LongTermTrend.getCurrentValue()));
-            server.send(String.format("plot/ SHORT %f", ShortTermTrend.getCurrentValue()));
-            server.send(String.format("plot/ UPPER %f", LongTermTrend.getCurrentValue() + (Math.sqrt(LongTermMSE.getCurrentValue()) * decisionSensitivity)));
-            server.send(String.format("plot/ LOWER %f", LongTermTrend.getCurrentValue() - (Math.sqrt(LongTermMSE.getCurrentValue()) * decisionSensitivity)));
+            
         }
+        // Send plot-data over to Python
+        server.send(String.format("plot/ RAW %f", server.lastPupilSample));
+        server.send(String.format("plot/ LONG %f", LongTermTrend.getCurrentValue()));
+        server.send(String.format("plot/ SHORT %f", ShortTermTrend.getCurrentValue()));
+        server.send(String.format("plot/ UPPER %f", LongTermTrend.getCurrentValue() + (Math.sqrt(LongTermMSE.getCurrentValue()) * decisionSensitivity)));
+        server.send(String.format("plot/ LOWER %f", LongTermTrend.getCurrentValue() - (Math.sqrt(LongTermMSE.getCurrentValue()) * decisionSensitivity)));
         
         updateLevelLock();
 
