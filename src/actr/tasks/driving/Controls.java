@@ -35,6 +35,24 @@ public class Controls {
         if (steerPedals == null) {
             System.out.println("Found no steering wheel!");
         }
+
+        if (gamePad != null) {
+            System.out.println(gamePad.getRumblers());
+            for (Rumbler rumbler : gamePad.getRumblers()) {
+                rumbler.rumble(1);
+
+                new java.util.Timer().schedule(
+                        new java.util.TimerTask() {
+                            @Override
+                            public void run() {
+                                rumbler.rumble(0);
+                            }
+                        },
+                        1000
+                );
+
+            }
+        }
     }
 
     public static double getValue(Identifier identifier) {
@@ -114,5 +132,36 @@ public class Controls {
             indicator = "";
         }
         return indicator;
+    }
+
+    public static void rumble() {
+        Controls.rumble(1, 1000);
+    }
+
+    public static void rumble(float intensity, int duration) {
+        Controller controller = null;
+
+        if (steerPedals != null)
+            controller = steerPedals;
+        else if(gamePad != null)
+            controller = gamePad;
+
+        if (controller == null)
+            return;
+
+        for (Rumbler rumbler : controller.getRumblers()) {
+            rumbler.rumble(intensity);
+
+            // Turn the rumbler off after the specified duration
+            new java.util.Timer().schedule(
+                    new java.util.TimerTask() {
+                        @Override
+                        public void run() {
+                            rumbler.rumble(0);
+                        }
+                    },
+                    duration
+            );
+        }
     }
 }

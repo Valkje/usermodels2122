@@ -163,6 +163,9 @@ public class AdaptiveAutomationSystem {
                     break;
                 case cruise:
                     this.aaLevel = AaLevel.full;
+
+                    Controls.rumble();
+
                     break;
                 case full:
                     // no higher level
