@@ -8,8 +8,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.ThreadLocalRandom;
 
 import javax.swing.JLabel;
+
+import com.sun.speech.freetts.Voice;
+import com.sun.speech.freetts.VoiceManager;
 
 import actr.task.Result;
 import actr.task.Task;
@@ -66,7 +70,9 @@ public class Driving extends actr.task.Task {
 	double switch_to_safe = 0;
 
 	static boolean VERBOSE = false;
-	
+
+	Voice voice;
+	double lastSpeechTime = 0;
 
 	public Driving() {
 		super();
@@ -80,6 +86,15 @@ public class Driving extends actr.task.Task {
 		leftLaneLabel = new JLabel("lLane");
 		rightLaneLabel = new JLabel("rLane");
 		construction = new JLabel("Cons");
+
+		// Not working without this for whatever reason
+		System.setProperty(
+				"freetts.voices",
+				"com.sun.speech.freetts.en.us"
+						+ ".cmu_us_kal.KevinVoiceDirectory");
+
+		// kevin16 is the 16bit version. There is also an 8bit version, but is not that amazing
+		voice = VoiceManager.getInstance().getVoice("kevin16");
 	}
 
 	public void start() {
@@ -143,6 +158,12 @@ public class Driving extends actr.task.Task {
 		getModel().getVision().addVisualnoStuffing("right-lane", "right-lane", "clear", 180, 20, 20, 20, 10);
 
 		addPeriodicUpdate(Env.sampleTime);
+
+		voice.allocate();
+
+		voice.setRate(145); // rate of the voice
+		voice.setPitch(140); // pitch of the voice
+		voice.setVolume(5); // volume of the voice
 	}
 
 	public void update(double time) {
@@ -150,6 +171,20 @@ public class Driving extends actr.task.Task {
 		
 		// if (time <= endTime) {
 		if (env.road.block < simulation.scenario.blocks) {
+			if (time - lastSpeechTime > 5) {
+				int min = 5, max = 20;
+				int randomNum1 = ThreadLocalRandom.current().nextInt(min, max + 1);
+				int randomNum2 = ThreadLocalRandom.current().nextInt(min, max + 1);
+
+				String text = randomNum1 + " times " + randomNum2;
+
+				new Thread(() -> {
+					voice.speak(text);
+				}).start();
+
+				lastSpeechTime = time;
+			}
+
 			env.time = time - startTime;
 			updateVisuals();
 			simulation.update();
