@@ -172,6 +172,10 @@ def end_experiment():
 	plt.plot(range(len(plot_dat_lower)),plot_dat_lower,color="blue",linetype='dashed')
 	plt.plot(range(len(plot_dat_short)),plot_dat_short,color="red")
 	plt.title("Long term trend vs. short term change")
+	plt.xlabel("Samples")
+	plt.ylabel("Pupil size")
+	plt.legend(["Raw data","Long-term trend","Upper decision boundary",
+				"Lower decision boundary","Short-term trend"],loc="upper right")
 	plt.show()
 
 def query(target):
