@@ -159,9 +159,11 @@ public class AdaptiveAutomationSystem {
         if (!levelLocked){
             switch (this.aaLevel) {
                 case none:
+                    server.send("/send AUTOMATION_INCREASE cruise");
                     this.aaLevel = AaLevel.cruise;
                     break;
                 case cruise:
+                    server.send("/send AUTOMATION_INCREASE full");
                     this.aaLevel = AaLevel.full;
 
                     Controls.rumble();
@@ -190,9 +192,11 @@ public class AdaptiveAutomationSystem {
                     // no lower level
                     break;
                 case cruise:
+                    server.send("/send AUTOMATION_DECREASE none");
                     this.aaLevel = AaLevel.none;
                     break;
                 case full:
+                    server.send("/send AUTOMATION_DECREASE cruise");
                     this.aaLevel = AaLevel.cruise;
                     break;
             }
