@@ -165,9 +165,6 @@ public class AdaptiveAutomationSystem {
                 case cruise:
                     server.send("/send AUTOMATION_INCREASE full");
                     this.aaLevel = AaLevel.full;
-
-                    Controls.rumble();
-
                     break;
                 case full:
                     // no higher level
