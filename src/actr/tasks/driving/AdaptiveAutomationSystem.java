@@ -6,6 +6,8 @@ import java.lang.Math;
 
 public class AdaptiveAutomationSystem {
 
+    private boolean systemActived = true;
+
     private AaLevel aaLevel;
     private AaChange aaChange = AaChange.none;
     private boolean loaChanging = false;
@@ -27,6 +29,10 @@ public class AdaptiveAutomationSystem {
     private double tmpSecondBaseline = 100000.0;
 
     Server server = ServerMain.server;
+
+    private boolean experimentStarted = false;
+
+    private double startDelay = 0;
 
     public AdaptiveAutomationSystem(Simcar simcar, Env env) {
         this.aaLevel = AaLevel.full;
@@ -85,15 +91,25 @@ public class AdaptiveAutomationSystem {
                     aaChange = AaChange.none;
                     break;
                 case decrease:
-                    System.out.println("decreased!!!!!!!1111");
                     decreaseAutomation();
                     aaChange = AaChange.none;
                     break;
+                case initial:
+                    server.send("send/ AUTOMATION_DECREASE none");
+                    server.send("send/ EXPERIMENT STARTED"); //TODO: ask Josh if this works
+                    this.aaLevel = AaLevel.none;
+                    aaChange = AaChange.none;
+                    this.startDelay = env.time;
             }
         }
     }
 
     public void update(Env env) {
+        if (env.time >= 6 && !experimentStarted) { // 3 second delay before the warnign is given that the switch to driver control is made
+            prepareDriverControlMode();
+            experimentStarted = true;
+        }
+
         server.send("query/ PUPIL_SIZE");
         
 		// System.out.println(server.lastPupilSample);
@@ -113,18 +129,18 @@ public class AdaptiveAutomationSystem {
         
         updateLevelLock();
 
-        // Only start making decisions after 100 samples have arrived
-        if(LongTermTrend.getCurrentSize() > 100) {
+        // Only start making decisions after 100 samples have arrived and system is activated
+        if(LongTermTrend.getCurrentSize() > 100 && systemActived && experimentStarted) {
             decideAutomationLevel();
         }
 
         updateAutomationLevel();
         
         // Manual automation changes
-        if (Controls.getAaChange() == 1) {
+        if (Controls.getAaChange() == 1 && experimentStarted) {
             prepareIncreaseAutomation();
         }
-        else if (Controls.getAaChange() == -1) {
+        else if (Controls.getAaChange() == -1 && experimentStarted) {
             prepareDecreaseAutomation();
         }
         Controls.setAaChange(0);
@@ -204,6 +220,14 @@ public class AdaptiveAutomationSystem {
         }
     }
 
+    /** for the initial start of the experiment **/
+
+    void prepareDriverControlMode() {
+        setLoaChanging(true); // to start the blinking of the new automation level
+        simcar.hud.setDisplayedAaLevel(AaLevel.none);
+        setAaChange(AaChange.initial);
+    }
+
     /** GETTERS AND SETTERS **/
 
     public AaLevel getAaLevel() {
@@ -218,11 +242,7 @@ public class AdaptiveAutomationSystem {
         return loaChanging;
     }
 
-    public void setLoaChanging(boolean loaChanging) {
-        System.out.println("setLoaChanging()");
-        System.out.println(env.time);
-        this.loaChanging = loaChanging;
-    }
+    public void setLoaChanging(boolean loaChanging) { this.loaChanging = loaChanging; }
 
     public AaChange getAaChange() {
         return aaChange;
@@ -231,5 +251,7 @@ public class AdaptiveAutomationSystem {
     public void setAaChange(AaChange aaChange) {
         this.aaChange = aaChange;
     }
+
+    public double getStartDelay() { return startDelay; }
 
 }
