@@ -420,25 +420,25 @@ public class Road extends Driving {
 		 * 
 		 * } else { construction_ri = env.simcar.roadIndex; } }
 		 */
-		for (int i = 0; i < 3; i++) {
-			lane_blocked = 2;
-			lane_blocked += i;
-			if (env.world2image(location(cri_stop, lane_blocked - 0.05)) != null) {
-				Polygon yellow_line = new Polygon();
-				g.setColor(Color.yellow);
-				Coordinate b_left = env.world2image(location(cri_start, lane_blocked - 0.05));
-				if(b_left == null)
-					return;
-				Coordinate t_left = env.world2image(location(cri_stop, lane_blocked - 0.05));
-				yellow_line.addPoint(b_left.x, b_left.y);
-				yellow_line.addPoint(t_left.x, t_left.y);
-				Coordinate b_right = env.world2image(location(cri_start, lane_blocked + 0.05));
-				Coordinate t_right = env.world2image(location(cri_stop, lane_blocked + 0.05));
-				yellow_line.addPoint(t_right.x, t_right.y);
-				yellow_line.addPoint(b_right.x, b_right.y);
-				g.fillPolygon(yellow_line);
-			}
-		}
+//		for (int i = 0; i < 3; i++) {
+//			lane_blocked = 2;
+//			lane_blocked += i;
+//			if (env.world2image(location(cri_stop, lane_blocked - 0.05)) != null) {
+//				Polygon yellow_line = new Polygon();
+//				g.setColor(Color.yellow);
+//				Coordinate b_left = env.world2image(location(cri_start, lane_blocked - 0.05));
+//				if(b_left == null)
+//					return;
+//				Coordinate t_left = env.world2image(location(cri_stop, lane_blocked - 0.05));
+//				yellow_line.addPoint(b_left.x, b_left.y);
+//				yellow_line.addPoint(t_left.x, t_left.y);
+//				Coordinate b_right = env.world2image(location(cri_start, lane_blocked + 0.05));
+//				Coordinate t_right = env.world2image(location(cri_stop, lane_blocked + 0.05));
+//				yellow_line.addPoint(t_right.x, t_right.y);
+//				yellow_line.addPoint(b_right.x, b_right.y);
+//				g.fillPolygon(yellow_line);
+//			}
+//		}
 	}
 
 	void drawInstructions(Graphics g, Env env) {

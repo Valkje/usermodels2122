@@ -12,8 +12,8 @@ public class Scenario {
 	int drivingMinutes = 15;
 	int timeBetweenTrials = 240;
 	boolean baselineOnly = false;
-	double[] lanewidth = {3.5, 2.5}; // adjust lane-width here, {highway, construction} (3.5m Bundesstraße, 3.66m (12ft) US highways)
-	int block_length = 4000;
+	double[] lanewidth = {3.5, 3.5}; // adjust lane-width here, {highway, construction} (3.5m Bundesstraße, 3.66m (12ft) US highways)
+	int block_length = 100; // 4000
 	int blocks = 10;
 
 	Scenario() {

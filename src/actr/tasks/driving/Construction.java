@@ -59,12 +59,13 @@ public class Construction extends Road {
     }
 
     void drawConstruction(Graphics g, Env env) {
-        if (start_con > 0 && env.simcar.roadIndex < stop_con) {
-            pyno = pylons.size() - 30; // simply don't attempt to draw all the pylons in pylons[]
-            if (pyno < 0)
-                pyno = 0;
-            drawPylon(g, env, pylons.get(pyno));
-        }
+//        if (start_con > 0 && env.simcar.roadIndex < stop_con) {
+//            pyno = pylons.size() - 30; // simply don't attempt to draw all the pylons in pylons[]
+//            if (pyno < 0)
+//                pyno = 0;
+//            drawPylon(g, env, pylons.get(pyno));
+//        }
+        return;
     }
 
     void drawPylon(Graphics g, Env env, double pylonFrac) {
