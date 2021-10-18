@@ -29,6 +29,8 @@ def handle_input(input_string):
 	elif input_string.startswith("plot/ "):
 		message = input_string[len("plot/ "):]
 		main.save_for_plot(message)
+	elif input_string.startswith("fetch/"):
+		main.fetch_raw_avg_rmse()
 	else:
 		print("ERROR: Invalid message")
 

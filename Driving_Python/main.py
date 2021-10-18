@@ -14,6 +14,7 @@ edf_file_name = ""
 trial_number = 0
 trial_id = ""
 
+
 raw_data = []
 plot_dat_short = []
 plot_dat_long = []
@@ -111,7 +112,7 @@ def start_recording():
 		report_error("TRIAL ERROR")
 
 	pylink.beginRealTimeMode(100)                   # tells Windows to give priority to this
-
+	client.TRACKER_RECORDING = True
 	if not tracker.waitForBlockStart(1000, 1, 0):
 		report_error("TRIAL ERROR")
 
@@ -140,6 +141,7 @@ def end_trial():
 	pylink.endRealTimeMode()
 	pylink.pumpDelay(100)
 	tracker.stopRecording()
+	client.TRACKER_RECORDING = False
 	while tracker.getkey():
 		pass
 
@@ -154,29 +156,8 @@ def end_experiment():
 	tracker.closeDataFile()
 	tracker.receiveDataFile(edf_file_name, edf_file_name)
 	tracker.close()
-
-	# Save data
-	dataDict = {'raw':raw_data,
-				'long':plot_dat_long,
-				'short':plot_dat_short,
-				'lowerCI':plot_dat_lower,
-				'upperCI':plot_dat_upper}
+	client.close_threads(trial_number=trial_number)
 	
-	pdFrame = pd.DataFrame(data=dataDict)
-	pdFrame.to_csv(f"./outputPandas_{trial_number}.csv",index=False,header=True)
-
-	# Plot data
-	plt.plot(range(len(raw_data)),raw_data,color="black")
-	plt.plot(range(len(plot_dat_long)),plot_dat_long,color="blue")
-	plt.plot(range(len(plot_dat_upper)),plot_dat_upper,color="blue",linestyle='dashed')
-	plt.plot(range(len(plot_dat_lower)),plot_dat_lower,color="blue",linestyle='dashed')
-	plt.plot(range(len(plot_dat_short)),plot_dat_short,color="red")
-	plt.title("Long term trend vs. short term change")
-	plt.xlabel("Samples")
-	plt.ylabel("Pupil size")
-	plt.legend(["Raw data","Long-term trend","Upper decision boundary",
-				"Lower decision boundary","Short-term trend"],loc="upper right")
-	plt.show()
 
 def query(target):
 	# This method can be called from the client on behalf of the
@@ -192,22 +173,35 @@ def query(target):
 	tracker = pylink.getEYELINK()
 	sample = tracker.getNewestSample()
 
+	# Handle the attribute error we kept catching.
+
+	if sample is None:
+		return -1
+
 	# We can select which eye we want to record in the eye-tracking
 	# software so we can just pick it directly here.
-	try:
-		eye = sample.getLeftEye()
 
-		if target == "PUPIL_SIZE":
-			response = eye.getPupilSize()
-		else:
-			report_error("Invalid target")
+	response = 0
+	eye = sample.getLeftEye()
 
-	except AttributeError:
-		response = 0
-		#print("WARNING: Empty sample")
+	if target == "PUPIL_SIZE":
+		response = eye.getPupilSize()
+	else:
+		report_error("Invalid target")
 
-	# Inform client to send back Pupil size to Java server.
-	client.send("PUPIL_SIZE " + str(response))
+	# Inform client to send back Pupil size to Java server. [Deprecated]
+	# client.send("PUPIL_SIZE " + str(response))
+	return response
+
+def fetch_raw_avg_rmse():
+	# collect values
+	SV = client.shortTermTrend.getCurrentValue()
+	LV = client.longTermTrend.getCurrentValue()
+	RMSE = client.longTermRMSE.getCurrentValue()
+
+	client.send(f"MODEL_VAL SV {SV}")
+	client.send(f"MODEL_VAL LV {LV}")
+	client.send(f"MODEL_VAL RMSE {RMSE}")
 
 
 def save_for_plot(message):

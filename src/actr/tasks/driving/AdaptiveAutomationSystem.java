@@ -18,15 +18,18 @@ public class AdaptiveAutomationSystem {
     private boolean levelLocked = false;
     private double timerStart;
     private double lockTimeS = 10;
+
     // Tuning parameters for the MAs and MV
     private int bufferSizeShort = 150;
     private int bufferSizeLong = 2500;
     // Tuning parameter for decision
     private float decisionSensitivity = 0.5f;
-    private MovingAverage ShortTermTrend;
-    private MovingAverage LongTermTrend;
-    private MovingPredictionErrorVariance LongTermMSE;
+    //private MovingAverage ShortTermTrend;
+    //private MovingAverage LongTermTrend;
+    //private MovingPredictionErrorVariance LongTermMSE;
     private double tmpSecondBaseline = 100000.0;
+    private int updateCounter = 0;
+
 
     Server server = ServerMain.server;
 
@@ -41,15 +44,15 @@ public class AdaptiveAutomationSystem {
         simcar.hud.setDisplayedAaLevel(aaLevel);
 
         // Initialize Moving averages and MSE
-        ShortTermTrend = new MovingAverage(bufferSizeShort);
-        LongTermTrend = new MovingAverage(bufferSizeLong);
-        LongTermMSE = new MovingPredictionErrorVariance(bufferSizeLong);
+        //ShortTermTrend = new MovingAverage(bufferSizeShort);
+        //LongTermTrend = new MovingAverage(bufferSizeLong);
+        //LongTermMSE = new MovingPredictionErrorVariance(bufferSizeLong);
     }
 
     private void decideAutomationLevel() {
-        double shortPred = ShortTermTrend.getCurrentValue();
-        double longPred = LongTermTrend.getCurrentValue();
-        double longTermMSE = Math.sqrt(LongTermMSE.getCurrentValue());
+        double shortPred = server.SV;
+        double longPred = server.LV;
+        double longTermMSE = server.RMSE;
         switch (this.aaLevel) {
             case none:
                 if(shortPred > (longPred + (decisionSensitivity * longTermMSE))) {
@@ -110,9 +113,9 @@ public class AdaptiveAutomationSystem {
             experimentStarted = true;
         }
 
-        server.send("query/ PUPIL_SIZE");
+        server.send("fetch/");
         
-		// System.out.println(server.lastPupilSample);
+        /**
         if (server.lastPupilSample > 0) {
             ShortTermTrend.update(server.lastPupilSample);
             LongTermTrend.update(server.lastPupilSample);
@@ -120,17 +123,21 @@ public class AdaptiveAutomationSystem {
             LongTermMSE.update(LongTermTrend.getCurrentValue(), server.lastPupilSample);
             
         }
+        */
+
         // Send plot-data over to Python
+        /**
         server.send(String.format("plot/ RAW %f", server.lastPupilSample));
         server.send(String.format("plot/ LONG %f", LongTermTrend.getCurrentValue()));
         server.send(String.format("plot/ SHORT %f", ShortTermTrend.getCurrentValue()));
         server.send(String.format("plot/ UPPER %f", LongTermTrend.getCurrentValue() + (Math.sqrt(LongTermMSE.getCurrentValue()) * decisionSensitivity)));
         server.send(String.format("plot/ LOWER %f", LongTermTrend.getCurrentValue() - (Math.sqrt(LongTermMSE.getCurrentValue()) * decisionSensitivity)));
-        
+        */
+
         updateLevelLock();
 
         // Only start making decisions after 100 samples have arrived and system is activated
-        if(LongTermTrend.getCurrentSize() > 100 && systemActived && experimentStarted) {
+        if(updateCounter > 100 && systemActived && experimentStarted) {
             decideAutomationLevel();
         }
 
@@ -144,12 +151,14 @@ public class AdaptiveAutomationSystem {
             prepareDecreaseAutomation();
         }
         Controls.setAaChange(0);
+        updateCounter += 1;
 
         /** Determining the source of control (human vs. model) is handled in the Driving class.
          * The methods in this class influence simcar properties. Sampling might be slower for the
          * model than the controller, but by this method everything keeps in sync. Then the simcar
          * dynamics have to be updated.*/
         simcar.update(env);
+        
     }
 
     private void updateLevelLock() {

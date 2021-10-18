@@ -16,6 +16,9 @@ public class Server {
     public int posX;
     public int posY;
     public double lastPupilSample;
+    public double SV;
+    public double LV;
+    public double RMSE;
 
     public Server() throws IOException {
         server = new ServerSocket(PORT);
@@ -65,6 +68,18 @@ public class Server {
         } if (input.startsWith("PUPIL_SIZE")) {
             String pupilString = input.substring("PUPIL_SIZE ".length());
             lastPupilSample = Double.parseDouble(pupilString);
+        } if (input.startsWith("MODEL_VAL ")) {
+            String modelString = input.substring("MODEL_VAL ".length());
+            if (modelString.startsWith("SV ")) {
+                String valueString = input.substring("SV ".length());
+                SV = Double.parseDouble(valueString);
+            } else if (modelString.startsWith("LV ")) {
+                String valueString = input.substring("LV ".length());
+                LV = Double.parseDouble(valueString);
+            } else if (modelString.startsWith("RMSE ")) {
+                String valueString = input.substring("RMSE ".length());
+                RMSE = Double.parseDouble(valueString);
+            }
         }
     }
 
