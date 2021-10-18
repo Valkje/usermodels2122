@@ -11,7 +11,7 @@ import pandas as pd
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 HOST = "localhost"
 PORT = 9000
-TRACKER_LOCK = False
+TRACKER_LOCK = threading.Lock()
 TRACKER_RECORDING = False
 STOP_THREADS = False
 
@@ -36,9 +36,12 @@ def queryTracker():
 	global TRACKER_LOCK
 	global STOP_THREADS
 	while not STOP_THREADS:
-		if (not TRACKER_LOCK) and TRACKER_RECORDING:
+		if TRACKER_RECORDING:
 			from main import query
+
+			TRACKER_LOCK.acquire()
 			newestSample = query("PUPIL_SIZE")
+			TRACKER_LOCK.release()
 			
 			# Skip invalid samples
 			if newestSample == -1:
@@ -63,11 +66,11 @@ def receive():
 	global STOP_THREADS
 	while not STOP_THREADS:
 		message = sock.recv(1024).decode()
-		TRACKER_LOCK = True
+		TRACKER_LOCK.acquire()
 		for line in message.splitlines():
 			from input_handler import handle_input
 			handle_input(line)
-		TRACKER_LOCK = False
+		TRACKER_LOCK.release()
 
 def close_threads(trial_number):
 	"""
