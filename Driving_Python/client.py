@@ -7,6 +7,7 @@ import MovingAverage
 import MovingRMSE
 from matplotlib import pyplot as plt
 import pandas as pd
+import queue
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 HOST = "localhost"
@@ -14,6 +15,7 @@ PORT = 9000
 TRACKER_LOCK = threading.Lock()
 TRACKER_RECORDING = False
 STOP_THREADS = False
+MSG_QUEUE = queue.Queue()
 
 # Pupil data tracking
 raw_data_C = []
@@ -28,35 +30,7 @@ longTermRMSE = MovingRMSE.MovingRMSE(1500)
 print("Launched client")
 sock.connect((HOST, PORT))
 print("Connected to server")
-
-def queryTracker():
-	"""
-	Query the eye-tracker.
-	"""
-	global TRACKER_LOCK
-	global STOP_THREADS
-	while not STOP_THREADS:
-		if TRACKER_RECORDING:
-			from main import query
-
-			TRACKER_LOCK.acquire()
-			newestSample = query("PUPIL_SIZE")
-			TRACKER_LOCK.release()
-			
-			# Skip invalid samples
-			if newestSample == -1:
-				continue
-
-			# Handle all remaining samples
-			raw_data_C.append(newestSample)
-			if newestSample != 0:
-				shortTermTrend.update(newestSample)
-				longTermTrend.update(newestSample)
-				longTermRMSE.update(longTermTrend.getCurrentValue(),newestSample)
-			
-			plot_dat_long_C.append(longTermTrend.getCurrentValue())
-			plot_dat_short_C.append(shortTermTrend.getCurrentValue())
-			plot_dat_RMSE_C.append(longTermRMSE.getCurrentValue())
+	
 
 def receive():
 	"""
@@ -64,12 +38,13 @@ def receive():
 	"""
 	global TRACKER_LOCK
 	global STOP_THREADS
+	global MSG_QUEUE
+
 	while not STOP_THREADS:
 		message = sock.recv(1024).decode()
 		TRACKER_LOCK.acquire()
 		for line in message.splitlines():
-			from input_handler import handle_input
-			handle_input(line)
+			MSG_QUEUE.put(line)
 		TRACKER_LOCK.release()
 
 def close_threads(trial_number):
@@ -107,8 +82,40 @@ def close_threads(trial_number):
 def start_receiving_thread():
 	t = threading.Thread(target=receive)
 	t.start()
-	t2 = threading.Thread(target=queryTracker)
-	t2.start()
+	# Use the main thread to query the eye-tracker while Java is not sending messages
+	global TRACKER_LOCK
+	global STOP_THREADS
+	global MSG_QUEUE
+	while not STOP_THREADS:
+		msg_list = []
+		TRACKER_LOCK.acquire()
+		while not MSG_QUEUE.empty():
+			line = MSG_QUEUE.get()
+			msg_list.append(line)
+		TRACKER_LOCK.release()
+
+		for msg in msg_list:
+			from input_handler import handle_input
+			handle_input(msg)
+
+		if TRACKER_RECORDING:
+			from main import query
+			newestSample = query("PUPIL_SIZE")
+			
+			# Skip invalid samples
+			if newestSample == -1:
+				continue
+
+			# Handle all remaining samples
+			raw_data_C.append(newestSample)
+			if newestSample != 0:
+				shortTermTrend.update(newestSample)
+				longTermTrend.update(newestSample)
+				longTermRMSE.update(longTermTrend.getCurrentValue(),newestSample)
+			
+			plot_dat_long_C.append(longTermTrend.getCurrentValue())
+			plot_dat_short_C.append(shortTermTrend.getCurrentValue())
+			plot_dat_RMSE_C.append(longTermRMSE.getCurrentValue())
 
 def send(message):
 	# We use this function to send back information to the
