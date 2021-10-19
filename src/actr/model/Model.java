@@ -14,6 +14,16 @@ import networking.ServerMain;
  * @author Dario Salvucci
  */
 public class Model {
+
+	//TODO: SET EACH TIME BEFORE THE EXPERIMENT
+
+	String subject = "44"; //subject number
+	String block = "1"; //1/2
+	String condition = "aided"; //aided/unaided
+	String list = "2"; //1/2
+
+	//////////////////////////////////////////////////
+
 	private Declarative declarative;
 	private Procedural procedural;
 	private Vision vision;
@@ -48,7 +58,6 @@ public class Model {
 	List<String> trace = new ArrayList<String>();
 	List<String> state_output = new ArrayList<String>();
 	public static String outputPath = "";
-
 
 	private Model(Frame frame) {
 		this.frame = frame;
@@ -811,11 +820,12 @@ public class Model {
 
 	// mlh
 	public void print(List<String> output, String filename, int participant) {
-
+		System.out.println("Model.print() called");
 		String nbackLevel = ApplicationMain.core.getFilename();
 		nbackLevel = nbackLevel.replace(".actr", "");
+
 		try {
-			FileWriter writer = new FileWriter(outputPath + nbackLevel + filename + String.format("%02d", participant) + ".txt");
+			FileWriter writer = new FileWriter(outputPath + "Subj_" + subject + "_Block_" + block + "_Condition_" + condition + "_list_" + list + ".txt");
 			for (String str : output) {
 				writer.write(str);
 			}
