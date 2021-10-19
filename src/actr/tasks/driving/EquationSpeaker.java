@@ -17,8 +17,8 @@ public class EquationSpeaker {
             "18 times 12", "16 times 17", "20 times 13", "18 times 19", "13 times 14", "17 times 18", "12 times 12", "15 times 13", "11 times 11", "14 times 16 "};
 
 
-    private String[] question1 = {"13 times 14", "17 times 12", "11 times 19", "14 times 16", "17 times 19", "13 times 19", "15 times 16", "19 times 18", "12 times 13", "14 times 15"};
-    private String[] question2 = {"18 times 14", "17 times 15", "14 times 19", "14 times 11", "12 times 19", "13 times 11", "16 times 18", "12 times 18", "13 times 17", "11 times 15"};
+    private String[] question1 = {"16 times 20", "15 times 10", "10 times 11", "18 times 16", "16 times 14", "16 times 19", "18 times 20", "20 times 11", "20 times 21", "12 times 16", "13 times 20", "20 times 15", "16 times 17", "15 times 18", "14 times 17", "13 times 21", "21 times 11", "21 times 14", "18 times 14", "13 times 19"};
+    private String[] question2 = {"13 times 16", "11 times 16", "17 times 20", "12 times 21", "10 times 16", "11 times 12", "21 times 10", "18 times 21", "19 times 18", "17 times 17", "11 times 18", "19 times 19", "13 times 11", "17 times 19", "14 times 12", "18 times 13", "10 times 18", "16 times 16", "14 times 14", "10 times 12"};
     //TODO: SET PRIOR TO EXPERIMENT BLOCK
     private String[] equations = equations3; //equation1/equations2
     ////////////////////////////////////////////////////
