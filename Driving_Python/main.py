@@ -346,7 +346,7 @@ def close_threads(trial_number):
 	print(len(plot_dat_long_C))
 	print(len(plot_dat_short_C))
 	print(len(plot_dat_RMSE_C))
-	"""
+	
 	dataDict = {'raw':raw_data_C,
 				'long':plot_dat_long_C,
 				'short':plot_dat_short_C,
@@ -354,7 +354,7 @@ def close_threads(trial_number):
 	
 	pdFrame = pd.DataFrame(data=dataDict)
 	pdFrame.to_csv(f"./outputPandas_{trial_number}.csv",index=False,header=True)
-	"""
+	
 	# Plot data
 	
 	plt.plot(range(len(raw_data_C)),raw_data_C,color="black")

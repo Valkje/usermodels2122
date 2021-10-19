@@ -71,13 +71,13 @@ public class Server {
         } if (input.startsWith("MODEL_VAL ")) {
             String modelString = input.substring("MODEL_VAL ".length());
             if (modelString.startsWith("SV ")) {
-                String valueString = input.substring("SV ".length());
+                String valueString = modelString.substring("SV ".length());
                 SV = Double.parseDouble(valueString);
             } else if (modelString.startsWith("LV ")) {
-                String valueString = input.substring("LV ".length());
+                String valueString = modelString.substring("LV ".length());
                 LV = Double.parseDouble(valueString);
             } else if (modelString.startsWith("RMSE ")) {
-                String valueString = input.substring("RMSE ".length());
+                String valueString = modelString.substring("RMSE ".length());
                 RMSE = Double.parseDouble(valueString);
             }
         }
