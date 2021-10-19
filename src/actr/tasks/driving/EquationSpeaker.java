@@ -60,7 +60,10 @@ public class EquationSpeaker {
             e.printStackTrace();
         }
 
-        voice.speak("This voice will present you with multiplication problems");
+        new Thread(() -> {
+            voice.speak("This voice will preesent you with multiplication problems");
+        }).start();
+
     }
 
     Server server = ServerMain.server;
@@ -85,12 +88,14 @@ public class EquationSpeaker {
 
         if ( (env.time - env.aas.getStartDelay()) + ((beepDuration/1000)*2) > block * blockDuration && (block == 1 || block == 3) && !beeped) {
             // sound a beep prior to the start of the algebra block
-            try {
-                tone.sound(beepFrequency, beepDuration, 1.0);
-                beeped = true;
-            } catch (LineUnavailableException e) {
-                e.printStackTrace();
-            }
+            beeped = true;
+            new Thread(() -> {
+                try {
+                    tone.sound(beepFrequency, beepDuration, 1.0);
+                } catch (LineUnavailableException e) {
+                    e.printStackTrace();
+                }
+            }).start();
         }
 
         if (block == 2 || block == 4) { // algebra blocks, no interaction/algebra in blocks 1 and 3
@@ -102,7 +107,9 @@ public class EquationSpeaker {
             if (qCounter < maxQuestions && !mute) { // time to ask a new question
                 String text = getQuestionText();
                 qCounter++;
-                voice.speak(text);
+                new Thread(() -> {
+                    voice.speak(text);
+                }).start();
                 mute = true;
                 muteTime = env.time;
                 server.send(String.format("send/ QUESTION ASKED %d", qCounter));
@@ -113,7 +120,9 @@ public class EquationSpeaker {
             //TODO: End the sim/model/env and store data.
             server.send("send/ EXPERIMENT ENDED");
             if (!beeped) {
-                voice.speak("End of experiment");
+                new Thread(() -> {
+                    voice.speak("End of experiment");
+                }).start();
             }
             beeped = true;
         }
