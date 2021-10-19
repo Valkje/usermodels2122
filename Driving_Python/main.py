@@ -198,10 +198,11 @@ def fetch_raw_avg_rmse():
 	SV = client.shortTermTrend.getCurrentValue()
 	LV = client.longTermTrend.getCurrentValue()
 	RMSE = client.longTermRMSE.getCurrentValue()
-
+	"""
 	client.send(f"MODEL_VAL SV {SV}")
 	client.send(f"MODEL_VAL LV {LV}")
 	client.send(f"MODEL_VAL RMSE {RMSE}")
+	"""
 
 
 def save_for_plot(message):
