@@ -13,6 +13,7 @@ public class Env {
 	static Scenario scenario = null;
 
 	AdaptiveAutomationSystem aas;
+	EquationSpeaker equationSpeaker;
 	Simcar simcar;
 	Road road;
 	Autocar autocar;
@@ -49,6 +50,8 @@ public class Env {
 
 		aas = new AdaptiveAutomationSystem(simcar, this);
 
+		equationSpeaker = new EquationSpeaker(this);
+
 		done = false;
 	}
 
@@ -56,6 +59,7 @@ public class Env {
 		speedsign.update(this);
 
 		aas.update(this); // This replaces "simcar.update(this);"
+		equationSpeaker.update();
 
 		autocar.update(this);
 		construction.update(this);
