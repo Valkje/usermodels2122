@@ -2,11 +2,13 @@ package actr.tasks.driving;
 
 import com.sun.speech.freetts.Voice;
 import com.sun.speech.freetts.VoiceManager;
+import networking.ServerMain;
+import networking.Server;
 
+import javax.sound.sampled.LineUnavailableException;
 import java.util.Arrays;
-import java.util.Random;
 
-public class AudioSystem {
+public class EquationSpeaker {
 
     private String[] equations1 = {"1 times 2", "2 times 3", "4 times 5", "6 times 7", "6 times 7", "4 times 5", "2 times 3", "1 times 2"};
     private String[] equations2 = {"6 times 7", "4 times 5", "2 times 3", "1 times 2", "1 times 2", "2 times 3", "4 times 5", "6 times 7"};
@@ -21,13 +23,17 @@ public class AudioSystem {
     double qDuration = 5; // half a minute, had to fit into the block duration
     double maxQuestions = blockDuration/qDuration;
 
+    Tone tone = new Tone();
+    int beepDuration = 1000; // ms
+    int beepFrequency = 700; //Hz
+
     Boolean mute = false;
     double muteTime;
 
     private Voice voice;
     Env env;
  
-    public AudioSystem(Env env) {
+    public EquationSpeaker(Env env) {
 
         this.env = env;
 
@@ -54,44 +60,62 @@ public class AudioSystem {
             e.printStackTrace();
         }
 
+        voice.speak("This voice will present you with multiplication problems");
     }
+
+    Server server = ServerMain.server;
+    boolean beeped = false;
 
     public void update() {
 
         if ( (env.time - env.aas.getStartDelay()) > block * blockDuration ) { // this is why the block count starts at 1
             block++;
+            server.send("send/ NEXT BLOCK");
             qCounter = 0;
+            beeped = false;
 
-            System.out.print("time:");
-            System.out.println(env.time);
-            System.out.print("block:");
-            System.out.println(block);
+            if (block == 3) {
+                try {
+                    tone.sound(beepFrequency, beepDuration, 1.0);
+                } catch (LineUnavailableException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 
+        if ( (env.time - env.aas.getStartDelay()) + ((beepDuration/1000)*2) > block * blockDuration && (block == 1 || block == 3) && !beeped) {
+            // sound a beep prior to the start of the algebra block
+            try {
+                tone.sound(beepFrequency, beepDuration, 1.0);
+                beeped = true;
+            } catch (LineUnavailableException e) {
+                e.printStackTrace();
+            }
         }
 
         if (block == 2 || block == 4) { // algebra blocks, no interaction/algebra in blocks 1 and 3
 
             if ( mute && (env.time - muteTime) > qDuration )  { // time reserved for a question has elapsed
                 mute = false;
-                System.out.print("time:");
-                System.out.println(env.time);
-                System.out.println("unmuted");
             }
 
             if (qCounter < maxQuestions && !mute) { // time to ask a new question
-                System.out.print("time:");
-                System.out.println(env.time);
-                System.out.println("ask Question");
                 String text = getQuestionText();
                 qCounter++;
                 voice.speak(text);
                 mute = true;
                 muteTime = env.time;
+                server.send(String.format("send/ QUESTION ASKED %d", qCounter));
             }
         }
 
         if (block > maxBlocks) {
             //TODO: End the sim/model/env and store data.
+            server.send("send/ EXPERIMENT ENDED");
+            if (!beeped) {
+                voice.speak("End of experiment");
+            }
+            beeped = true;
         }
     }
 
