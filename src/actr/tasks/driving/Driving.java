@@ -25,6 +25,7 @@ import actr.task.Task;
  * @author Dario Salvucci
  */
 public class Driving extends actr.task.Task {
+
 	static Simulator simulator = null;
 
 	Simulation simulation;
@@ -170,20 +171,7 @@ public class Driving extends actr.task.Task {
 		Env env = simulation.env;
 		
 		// if (time <= endTime) {
-		if (env.road.block < simulation.scenario.blocks) {
-			if (time - lastSpeechTime > 5) {
-				int min = 5, max = 20;
-				int randomNum1 = ThreadLocalRandom.current().nextInt(min, max + 1);
-				int randomNum2 = ThreadLocalRandom.current().nextInt(min, max + 1);
-
-				String text = randomNum1 + " times " + randomNum2;
-
-//				new Thread(() -> {
-//					voice.speak(text);
-//				}).start();
-
-				lastSpeechTime = time;
-			}
+		if (!env.experimentDone) { //env.road.block < simulation.scenario.blocks //!env.experimentDone
 
 			env.time = time - startTime;
 			updateVisuals();
@@ -192,11 +180,12 @@ public class Driving extends actr.task.Task {
 			if (env.simcar.fracIndex > Env.scenario.block_length * env.road.block)
 				env.road.block++;
 		} else {
+			System.out.println("EXPERIMENT DONE FROM Driving.java");
 			String filename = "_behavior_";
 
 			if (simulation.model.behaviorOut) {
 				List<String> output = output(simulation.samples);
-				simulation.model.print(output, filename, simulation.model.subj);
+				simulation.model.print(output, filename, 0);
 			}
 			// simulation.model.print(simulation.samples, filename, simulation.model.subj);
 			getModel().stop();

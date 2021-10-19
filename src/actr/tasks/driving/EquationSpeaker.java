@@ -7,6 +7,7 @@ import networking.Server;
 
 import javax.sound.sampled.LineUnavailableException;
 import java.util.Arrays;
+import java.util.List;
 
 public class EquationSpeaker {
 
@@ -14,7 +15,8 @@ public class EquationSpeaker {
     private String[] equations2 = {"6 times 7", "4 times 5", "2 times 3", "1 times 2", "1 times 2", "2 times 3", "4 times 5", "6 times 7"};
 
     //TODO: SET PRIOR TO EXPERIMENT BLOCK
-    private String[] equations = equations1; // or equations2
+    private String[] equations = equations1; //equation1/equations2
+    ////////////////////////////////////////////////////
 
     int block = 1; // star block count at one for convenience
     double blockDuration = 20;
@@ -61,6 +63,7 @@ public class EquationSpeaker {
         }
 
         new Thread(() -> {
+            voice.speak("");
             voice.speak("This voice will preesent you with multiplication problems");
         }).start();
 
@@ -78,11 +81,13 @@ public class EquationSpeaker {
             beeped = false;
 
             if (block == 3) {
-                try {
-                    tone.sound(beepFrequency, beepDuration, 1.0);
-                } catch (LineUnavailableException e) {
-                    e.printStackTrace();
-                }
+                new Thread(() -> {
+                    try {
+                        tone.sound(beepFrequency, beepDuration, 1.0);
+                    } catch (LineUnavailableException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
             }
         }
 
@@ -125,6 +130,7 @@ public class EquationSpeaker {
                 }).start();
             }
             beeped = true;
+            env.experimentDone = true;
         }
     }
 

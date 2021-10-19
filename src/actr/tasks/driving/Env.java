@@ -32,6 +32,8 @@ public class Env {
 	static final int simWidth = 640; // 1440; // 640;
 	static final int simHeight = 1000; // 1000; // 360;
 
+	public boolean experimentDone = false;
+
 	Env(Driver driver, Scenario s) {
 		scenario = s;
 

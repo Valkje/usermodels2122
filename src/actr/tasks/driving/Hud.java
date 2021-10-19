@@ -37,7 +37,7 @@ public class Hud {
 
         hudWidth = Env.envWidth / 6;
         hudHeight = hudWidth / 4;
-        hudX = 200;
+        hudX = Env.envWidth / 4;
         hudY = Env.envHeight-dashHeight-hudHeight;
 
         // Head-Up Display (HUD)
