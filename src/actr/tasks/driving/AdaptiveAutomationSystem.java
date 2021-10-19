@@ -6,6 +6,7 @@ import java.lang.Math;
 
 public class AdaptiveAutomationSystem {
 
+    //TODO: SET PRIOR TO EXPERIMENT BLOCK
     private boolean systemActived = true;
 
     private AaLevel aaLevel;
@@ -103,6 +104,8 @@ public class AdaptiveAutomationSystem {
                     this.aaLevel = AaLevel.none;
                     aaChange = AaChange.none;
                     this.startDelay = env.time;
+                    System.out.print("delay time:");
+                    System.out.println(startDelay);
             }
         }
     }

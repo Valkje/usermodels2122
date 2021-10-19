@@ -71,7 +71,7 @@ public class Driving extends actr.task.Task {
 
 	static boolean VERBOSE = false;
 
-	Voice voice;
+//	Voice voice;
 	double lastSpeechTime = 0;
 
 	public Driving() {
@@ -94,7 +94,7 @@ public class Driving extends actr.task.Task {
 						+ ".cmu_us_kal.KevinVoiceDirectory");
 
 		// kevin16 is the 16bit version. There is also an 8bit version, but is not that amazing
-		voice = VoiceManager.getInstance().getVoice("kevin16");
+//		voice = VoiceManager.getInstance().getVoice("kevin16");
 	}
 
 	public void start() {
@@ -159,11 +159,11 @@ public class Driving extends actr.task.Task {
 
 		addPeriodicUpdate(Env.sampleTime);
 
-		voice.allocate();
-
-		voice.setRate(145); // rate of the voice
-		voice.setPitch(140); // pitch of the voice
-		voice.setVolume(5); // volume of the voice
+//		voice.allocate();
+//
+//		voice.setRate(145); // rate of the voice
+//		voice.setPitch(140); // pitch of the voice
+//		voice.setVolume(5); // volume of the voice
 	}
 
 	public void update(double time) {
@@ -178,9 +178,9 @@ public class Driving extends actr.task.Task {
 
 				String text = randomNum1 + " times " + randomNum2;
 
-				new Thread(() -> {
-					voice.speak(text);
-				}).start();
+//				new Thread(() -> {
+//					voice.speak(text);
+//				}).start();
 
 				lastSpeechTime = time;
 			}
