@@ -1,25 +1,44 @@
 # Contains all actions that the Python component can execute on behalf of the Java component.
 # author: Gilles Lijnzaad
 import pylink
-import client
 import time
 from matplotlib import pyplot as plt
 import pandas as pd
+import socket
+import threading
+import MovingAverage
+import MovingRMSE
 
 
-# global variables, will be changed by input_handler
+# # GLOBAL VARIABLES ORIGINAL MAIN
 display_x = 0
 display_y = 0
 edf_file_name = ""
 trial_number = 0
 trial_id = ""
 
+# GLOBAL VARIABLES ORIGINAL CLIENT
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+HOST = "localhost"
+PORT = 9000
+TRACKER_LOCK = threading.Lock()
+TRACKER_RECORDING = False
+STOP_THREADS = False
 
-raw_data = []
-plot_dat_short = []
-plot_dat_long = []
-plot_dat_upper = []
-plot_dat_lower = []
+# Pupil data tracking
+raw_data_C = []
+plot_dat_short_C = []
+plot_dat_long_C = []
+plot_dat_RMSE_C = []
+
+shortTermTrend = MovingAverage.MovingAverage(250)
+longTermTrend = MovingAverage.MovingAverage(1500)
+longTermRMSE = MovingRMSE.MovingRMSE(1500)
+
+
+print("Launched SOCKET")
+sock.connect((HOST, PORT))
+print("SOCKET connected")
 
 connected = False
 
@@ -29,8 +48,6 @@ while not connected:
         connected = True
     except RuntimeError:
         print("Connection to eye tracker failed, trying again...")
-
-client.start_receiving_thread()
 
 
 def prepare_experiment():
@@ -101,6 +118,7 @@ def drift_correction():
 
 
 def start_recording():
+	global TRACKER_RECORDING
 	tracker = pylink.getEYELINK()
 	if not tracker.isConnected():
 		report_error("ABORT EXPERIMENT")
@@ -112,7 +130,7 @@ def start_recording():
 		report_error("TRIAL ERROR")
 
 	pylink.beginRealTimeMode(100)                   # tells Windows to give priority to this
-	client.TRACKER_RECORDING = True
+	TRACKER_RECORDING = True
 	if not tracker.waitForBlockStart(1000, 1, 0):
 		report_error("TRIAL ERROR")
 
@@ -136,12 +154,13 @@ def send_tracker(message):
 
 
 def end_trial():
+	global TRACKER_RECORDING
 	tracker = pylink.getEYELINK()
 
 	pylink.endRealTimeMode()
 	pylink.pumpDelay(100)
 	tracker.stopRecording()
-	client.TRACKER_RECORDING = False
+	TRACKER_RECORDING = False
 	while tracker.getkey():
 		pass
 
@@ -156,7 +175,7 @@ def end_experiment():
 	tracker.closeDataFile()
 	tracker.receiveDataFile(edf_file_name, edf_file_name)
 	tracker.close()
-	client.close_threads(trial_number=trial_number)
+	close_threads(trial_number=trial_number)
 	
 
 def query(target):
@@ -195,32 +214,171 @@ def query(target):
 
 def fetch_raw_avg_rmse():
 	# collect values
-	SV = client.shortTermTrend.getCurrentValue()
-	LV = client.longTermTrend.getCurrentValue()
-	RMSE = client.longTermRMSE.getCurrentValue()
+	SV = shortTermTrend.getCurrentValue()
+	LV = longTermTrend.getCurrentValue()
+	RMSE = longTermRMSE.getCurrentValue()
 	"""
-	client.send(f"MODEL_VAL SV {SV}")
-	client.send(f"MODEL_VAL LV {LV}")
-	client.send(f"MODEL_VAL RMSE {RMSE}")
+	send(f"MODEL_VAL SV {SV}")
+	send(f"MODEL_VAL LV {LV}")
+	send(f"MODEL_VAL RMSE {RMSE}")
 	"""
-
-
-def save_for_plot(message):
-	if message.startswith("LONG "):
-		value = message[len("LONG "):]
-		plot_dat_long.append(float(value))
-	elif message.startswith("SHORT "):
-		value = message[len("SHORT "):]
-		plot_dat_short.append(float(value))
-	elif message.startswith("UPPER "):
-		value = message[len("UPPER "):]
-		plot_dat_upper.append(float(value))
-	elif message.startswith("LOWER "):
-		value = message[len("LOWER "):]
-		plot_dat_lower.append(float(value))
-	elif message.startswith("RAW "):
-		value = message[len("RAW "):]
-		raw_data.append(float(value))
 
 def report_error(error_message):
-	client.send(error_message)
+	send(error_message)
+
+
+########################################OLD INPUT HANDLER########################################################
+def handle_input(input_string):
+	# This function gets called once the client receives
+	# a message from the Java part! We implement a check here
+	# that tells the main python interface to query the
+	# eyetracker for the latest pupil size!
+	#print(input_string)
+	if input_string.startswith("info/ "):
+		information = input_string[len("info/ "):]
+		set_info(information)
+	elif input_string.startswith("do/ "):
+		command = input_string[len("do/ "):]
+		perform_action(command)
+	elif input_string.startswith("send/ "):
+		message = input_string[len("send/ "):]
+		send_tracker(message)
+	elif input_string.startswith("query/ "):
+		message = input_string[len("query/ "):]
+		query(message)
+	elif input_string.startswith("fetch/"):
+		fetch_raw_avg_rmse()
+	else:
+		print("ERROR: Invalid message")
+
+
+def set_info(information):
+	global edf_file_name
+	global display_x
+	global display_y
+	global trial_number
+	global trial_id
+
+	if information.startswith("EDF "):
+		edf_file_name = information[len("EDF "):]
+	elif information.startswith("DIM_X "):
+		dimx_string = information[len("DIM_X "):]
+		display_x = int(dimx_string)
+	elif information.startswith("DIM_Y "):
+		dimy_string = information[len("DIM_Y "):]
+		display_y = int(dimy_string)
+	elif information.startswith("TRIAL_NUMBER "):
+		number_string = information[len("TRIAL_NUMBER "):]
+		trial_number = int(number_string)
+	elif information.startswith("TRIAL_ID "):
+		trial_id = information[len("TRIAL_ID "):]
+	elif information.startswith("START TIME "):
+		time_string = information[len("START TIME "):]
+		send_SYNCTIME(int(time_string))
+	else:
+		print("ERROR: Invalid info")
+
+
+command_to_action = {
+	"PREPARE EXPERIMENT" : prepare_experiment,
+	"PREPARE TRIAL" : prepare_trial,
+	"DRIFT CORRECT" : drift_correction,
+	"START RECORDING" : start_recording,
+	"END TRIAL" : end_trial,
+	"END EXPERIMENT" : end_experiment
+}
+
+
+def perform_action(command):
+	command_to_action[command]()
+
+
+############################################# OLD CLIENT PARTS#########################################################
+def queryTracker():
+	"""
+	Query the eye-tracker.
+	"""
+	global TRACKER_LOCK
+	global STOP_THREADS
+	while not STOP_THREADS:
+		if TRACKER_RECORDING:
+			TRACKER_LOCK.acquire()
+			newestSample = query("PUPIL_SIZE")
+			
+
+			# Skip invalid samples
+			if newestSample == -1:
+				continue
+
+			# Handle all remaining samples
+			raw_data_C.append(newestSample)
+			if newestSample != 0:
+				shortTermTrend.update(newestSample)
+				longTermTrend.update(newestSample)
+				longTermRMSE.update(longTermTrend.getCurrentValue(),newestSample)
+
+			plot_dat_long_C.append(longTermTrend.getCurrentValue())
+			plot_dat_short_C.append(shortTermTrend.getCurrentValue())
+			plot_dat_RMSE_C.append(longTermRMSE.getCurrentValue())
+			TRACKER_LOCK.release()
+	
+def receive():
+	"""
+	Handle Java messages.
+	"""
+	global TRACKER_LOCK
+	global STOP_THREADS
+	while not STOP_THREADS:
+		message = sock.recv(1024).decode()
+		TRACKER_LOCK.acquire()
+		for line in message.splitlines():
+			handle_input(line)
+		TRACKER_LOCK.release()
+
+def close_threads(trial_number):
+	"""
+	Close threads, save and plot data.
+	"""
+	global STOP_THREADS
+	STOP_THREADS = True
+	# Save data
+	print(len(raw_data_C))
+	print(len(plot_dat_long_C))
+	print(len(plot_dat_short_C))
+	print(len(plot_dat_RMSE_C))
+	"""
+	dataDict = {'raw':raw_data_C,
+				'long':plot_dat_long_C,
+				'short':plot_dat_short_C,
+				'RMSE':plot_dat_RMSE_C}
+	
+	pdFrame = pd.DataFrame(data=dataDict)
+	pdFrame.to_csv(f"./outputPandas_{trial_number}.csv",index=False,header=True)
+	"""
+	# Plot data
+	
+	plt.plot(range(len(raw_data_C)),raw_data_C,color="black")
+	plt.plot(range(len(longTermTrend.history)),longTermTrend.history,color="blue")
+	plt.plot(range(len(shortTermTrend.history)),shortTermTrend.history,color="red")
+	plt.title("Long term trend vs. short term change")
+	plt.xlabel("Samples")
+	plt.ylabel("Pupil size")
+	plt.legend(["Raw data","Long-term trend","Upper decision boundary",
+				"Lower decision boundary","Short-term trend"],loc="upper right")
+	plt.show()
+
+def start_receiving_thread():
+	t = threading.Thread(target=receive)
+	t.start()
+	t2 = threading.Thread(target=queryTracker)
+	t2.start()
+
+def send(message):
+	# We use this function to send back information to the
+	# Java part. For example the last pupil size we get from the eye tracker!
+	message += "\n"
+	sock.sendall(message.encode())
+
+
+# Start listening to JAVA
+start_receiving_thread()
