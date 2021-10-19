@@ -13,16 +13,18 @@ public class EquationSpeaker {
 
     private String[] equations1 = {"1 times 2", "2 times 3", "4 times 5", "6 times 7", "6 times 7", "4 times 5", "2 times 3", "1 times 2"};
     private String[] equations2 = {"6 times 7", "4 times 5", "2 times 3", "1 times 2", "1 times 2", "2 times 3", "4 times 5", "6 times 7"};
+    private String[] equations3 = {"12 times 16", "15 times 11", "19 times 11", "13 times 11", "15 times 20", "12 times 11", "18 times 18", "17 times 14", "11 times 20", "14 times 16",
+            "18 times 12", "16 times 17", "20 times 13", "18 times 19", "13 times 14", "17 times 18", "12 times 12", "15 times 13", "11 times 11", "14 times 16 "};
 
     //TODO: SET PRIOR TO EXPERIMENT BLOCK
-    private String[] equations = equations1; //equation1/equations2
+    private String[] equations = equations3; //equation1/equations2
     ////////////////////////////////////////////////////
 
     int block = 1; // star block count at one for convenience
-    double blockDuration = 20;
+    double blockDuration = 150;
     int maxBlocks = 4;
     int qCounter = 0; //question counter
-    double qDuration = 5; // half a minute, had to fit into the block duration
+    double qDuration = 15; // half a minute, had to fit into the block duration
     double maxQuestions = blockDuration/qDuration;
 
     Tone tone = new Tone();
