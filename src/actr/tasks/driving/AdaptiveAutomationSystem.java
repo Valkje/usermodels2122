@@ -53,6 +53,13 @@ public class AdaptiveAutomationSystem {
         double shortPred = server.SV;
         double longPred = server.LV;
         double longTermMSE = server.RMSE;
+
+        // Update tmp baseline if long-term trend exceeds it while already in partial/full automation
+        if ((this.aaLevel == AaLevel.cruise || this.aaLevel == AaLevel.full) &&
+            (longPred > (tmpSecondBaseline + (decisionSensitivity * longTermMSE)))) {
+                tmpSecondBaseline = longPred;
+            }
+
         switch (this.aaLevel) {
             case none:
                 if(shortPred > (longPred + (decisionSensitivity * longTermMSE))) {
