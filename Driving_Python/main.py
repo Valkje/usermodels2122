@@ -30,7 +30,9 @@ PREVIOUS_SAMPLE = None
 raw_data_C = []
 plot_dat_short_C = []
 plot_dat_long_C = []
-plot_dat_RMSE_C = []
+plot_dat_UPPER_C = []
+plot_dat_LOWER_C = []
+
 
 shortTermTrend = MovingAverage.MovingAverage(600)
 longTermTrend = MovingAverage.MovingAverage(15000)
@@ -336,7 +338,8 @@ def queryTracker():
 
 			plot_dat_long_C.append(longTermTrend.getCurrentValue())
 			plot_dat_short_C.append(shortTermTrend.getCurrentValue())
-			plot_dat_RMSE_C.append(longTermRMSE.getCurrentValue())
+			plot_dat_LOWER_C.append(longTermTrend.getCurrentValue() - (1.15 * longTermRMSE.getCurrentValue()))
+			plot_dat_UPPER_C.append(longTermTrend.getCurrentValue() + (1.15 * longTermRMSE.getCurrentValue()))
 			TRACKER_LOCK.release()
 	
 def receive():
@@ -362,26 +365,29 @@ def close_threads(trial_number):
 	print(len(raw_data_C))
 	print(len(plot_dat_long_C))
 	print(len(plot_dat_short_C))
-	print(len(plot_dat_RMSE_C))
+	print(len(plot_dat_LOWER_C))
+	print(len(plot_dat_UPPER_C))
 	
 	dataDict = {'raw':raw_data_C,
 				'long':plot_dat_long_C,
 				'short':plot_dat_short_C,
-				'RMSE':plot_dat_RMSE_C}
+				'UPPER':plot_dat_UPPER_C,
+				'LOWER':plot_dat_LOWER_C}
 	
 	pdFrame = pd.DataFrame(data=dataDict)
 	pdFrame.to_csv(f"./outputPandas_{trial_number}.csv",index=False,header=True)
 	
 	# Plot data
-	
 	plt.plot(range(len(raw_data_C)),raw_data_C,color="black")
-	plt.plot(range(len(longTermTrend.history)),longTermTrend.history,color="blue")
-	plt.plot(range(len(shortTermTrend.history)),shortTermTrend.history,color="red")
+	plt.plot(range(len(plot_dat_long_C)),plot_dat_long_C,color="blue")
+	plt.plot(range(len(plot_dat_short_C)),plot_dat_short_C,color="red")
+	plt.plot(range(len(plot_dat_LOWER_C)),plot_dat_LOWER_C,color="blue",linestyle='dashed')
+	plt.plot(range(len(plot_dat_UPPER_C)),plot_dat_LOWER_C,color="blue",linestyle='dashed')
+
 	plt.title("Long term trend vs. short term change")
 	plt.xlabel("Samples")
 	plt.ylabel("Pupil size")
-	plt.legend(["Raw data","Long-term trend","Upper decision boundary",
-				"Lower decision boundary","Short-term trend"],loc="upper right")
+	plt.legend(["Raw data","Long-term trend","Short-term trend"],loc="upper right")
 	plt.show()
 
 def start_receiving_thread():
