@@ -32,9 +32,9 @@ plot_dat_short_C = []
 plot_dat_long_C = []
 plot_dat_RMSE_C = []
 
-shortTermTrend = MovingAverage.MovingAverage(250)
-longTermTrend = MovingAverage.MovingAverage(1500)
-longTermRMSE = MovingRMSE.MovingRMSE(1500)
+shortTermTrend = MovingAverage.MovingAverage(600)
+longTermTrend = MovingAverage.MovingAverage(15000)
+longTermRMSE = MovingRMSE.MovingRMSE()
 
 
 print("Launched SOCKET")
@@ -332,7 +332,7 @@ def queryTracker():
 			if newestSample != 0:
 				shortTermTrend.update(newestSample)
 				longTermTrend.update(newestSample)
-				longTermRMSE.update(longTermTrend.getCurrentValue(),newestSample)
+				longTermRMSE.update(longTermTrend.getCurrentValue(),shortTermTrend.getCurrentValue())
 
 			plot_dat_long_C.append(longTermTrend.getCurrentValue())
 			plot_dat_short_C.append(shortTermTrend.getCurrentValue())

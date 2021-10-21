@@ -21,14 +21,13 @@ public class AdaptiveAutomationSystem {
     private double lockTimeS = 10;
 
     // Tuning parameters for the MAs and MV
-    private int bufferSizeShort = 150;
-    private int bufferSizeLong = 2500;
+    //private int bufferSizeShort = 150;
+    //private int bufferSizeLong = 2500;
     // Tuning parameter for decision
-    private float decisionSensitivity = 0.5f;
+    private float decisionSensitivity = 1.15f;
     //private MovingAverage ShortTermTrend;
     //private MovingAverage LongTermTrend;
     //private MovingPredictionErrorVariance LongTermMSE;
-    private double tmpSecondBaseline = 100000.0;
     private int updateCounter = 0;
 
 
@@ -43,51 +42,39 @@ public class AdaptiveAutomationSystem {
         this.simcar = simcar;
         this.env = env;
         simcar.hud.setDisplayedAaLevel(aaLevel);
-
-        // Initialize Moving averages and MSE
-        //ShortTermTrend = new MovingAverage(bufferSizeShort);
-        //LongTermTrend = new MovingAverage(bufferSizeLong);
-        //LongTermMSE = new MovingPredictionErrorVariance(bufferSizeLong);
     }
 
     private void decideAutomationLevel() {
+        /**
+         * Provide explanation here.
+         */
         double shortPred = server.SV;
         double longPred = server.LV;
         double longTermMSE = server.RMSE;
 
-        // Update tmp baseline if long-term trend exceeds it while already in partial/full automation
-        if ((this.aaLevel == AaLevel.cruise || this.aaLevel == AaLevel.full) &&
-            (longPred > (tmpSecondBaseline + (decisionSensitivity * longTermMSE)))) {
-                tmpSecondBaseline = longPred;
-            }
-
         switch (this.aaLevel) {
             case none:
-                if(shortPred > (longPred + (decisionSensitivity * longTermMSE))) {
+                if(shortPred >= (longPred + (decisionSensitivity * longTermMSE))) {
                     // Check whether automation level should increase from 1 to 2
                     System.out.println("Model wants to increase from automation level 1 to 2");
                     prepareIncreaseAutomation();
-                    // Set new baseline for 2 to 3 decisions.
-                    if (!levelLocked) {
-                        tmpSecondBaseline = shortPred;
-                    }
                 }
                 break;
             case cruise:
-                if(shortPred > (tmpSecondBaseline + (decisionSensitivity * longTermMSE))) {
+                if(shortPred >= (longPred + (decisionSensitivity * longTermMSE))) {
                     // Check whether automation level should increase from 2 to 3
-                    System.out.println("Model wants to increase from automation level 1 to 2");
+                    System.out.println("Model wants to increase from automation level 2 to 3");
                     prepareIncreaseAutomation();
-                } else if (shortPred < (longPred - (decisionSensitivity * longTermMSE))) {
+                } else if (shortPred <= longPred) {
                     // Check whether automation level should decrease from 2 to 1
-                    System.out.println("Model wants to increase from automation level 1 to 2");
+                    System.out.println("Model wants to decrease from automation level 2 to 1");
                     prepareDecreaseAutomation();
                 }
                 break;
             case full:
-                if (shortPred < (tmpSecondBaseline - (decisionSensitivity * longTermMSE))) {
+                if (shortPred <= longPred) {
                     // Check whether automation level should decrease from 3 to 2
-                    System.out.println("Model wants to increase from automation level 1 to 2");
+                    System.out.println("Model wants to decrease from automation level 3 to 2");
                     prepareDecreaseAutomation();
                 }
                 break;
