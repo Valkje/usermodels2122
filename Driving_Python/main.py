@@ -26,6 +26,7 @@ TRACKER_RECORDING = False
 STOP_THREADS = False
 
 # Pupil data tracking
+PREVIOUS_SAMPLE = None
 raw_data_C = []
 plot_dat_short_C = []
 plot_dat_long_C = []
@@ -179,27 +180,43 @@ def end_experiment():
 	
 
 def query(target):
-	# This method can be called from the client on behalf of the
-	# server - if the Java server sends a query/ message to the
-	# client!
-	# It queries the eye-tracker and then tells the client to
-	# send an answer to the Java server again!
-	# The Java server then will update a public float with
-	# the latest pupil size
+	global PREVIOUS_SAMPLE
+	"""
+	This method is used to get the latest sample from the Eye-tracker.
+	We use this one to update the averages and RMSEs for the AAS.
+	Java then queries the Python parts to get the latest average values and
+	RMSEs. Initially we calculated those in Java as well, however the Java
+	parts are slowed down because they have to wait for ACT-R. Thus
+	calculations now happen all in Python while Java only executes the
+	actual AAS decision.
 
-	# see the pylink.Eyelink documentation Jelmer linked on
-	# Nestor for details on the methods below.
+	see the pylink.Eyelink documentation Jelmer linked on
+	Nestor for details on the methods below.
+	"""
+	
 	tracker = pylink.getEYELINK()
 	sample = tracker.getNewestSample()
 
 	# Handle the attribute error we kept catching.
-
+	# In pygaze this is the only check when sampling.
+	# For us that resulted in duplicated samples. So
+	# we also check the time in the next check :)
+	# See: https://github.com/esdalmaijer/PyGaze/blob/master/pygaze/_eyetracker/libeyelink.py
 	if sample is None:
 		return -1
 
+	# Now that we know there is a sample, we should check whether
+	# it contains new information (getTime() in the docs)
+	# See: https://github.com/ericandersonr/Landmark_LCIRT_Codebase/blob/master/LCIRT_EyelinkSync_LSL.py
+	if PREVIOUS_SAMPLE is not None:
+		if PREVIOUS_SAMPLE.getTime() == sample.getTime():
+			return -1
+	
+	# We got a sample with new information!
+	PREVIOUS_SAMPLE = sample
+
 	# We can select which eye we want to record in the eye-tracking
 	# software so we can just pick it directly here.
-
 	response = 0
 	eye = sample.getLeftEye()
 
@@ -217,23 +234,23 @@ def fetch_raw_avg_rmse():
 	SV = shortTermTrend.getCurrentValue()
 	LV = longTermTrend.getCurrentValue()
 	RMSE = longTermRMSE.getCurrentValue()
-	"""
+
 	send(f"MODEL_VAL SV {SV}")
 	send(f"MODEL_VAL LV {LV}")
 	send(f"MODEL_VAL RMSE {RMSE}")
-	"""
+
 
 def report_error(error_message):
 	send(error_message)
 
 
 ########################################OLD INPUT HANDLER########################################################
+
 def handle_input(input_string):
 	# This function gets called once the client receives
 	# a message from the Java part! We implement a check here
 	# that tells the main python interface to query the
 	# eyetracker for the latest pupil size!
-	#print(input_string)
 	if input_string.startswith("info/ "):
 		information = input_string[len("info/ "):]
 		set_info(information)
