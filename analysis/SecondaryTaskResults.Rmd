@@ -13,7 +13,7 @@ create an empty dataframe
 
 ```{r}
 subject  <- rep(1:8, 40)
-subject <- sort(subj)
+subject <- sort(subject)
 
 block <- rep(c(rep(1, 20), rep(2, 20)), 8)
 
@@ -23,18 +23,18 @@ list <- rep(c(rep(1, 20), rep(2, 20), rep(2, 20), rep(1, 20)),4)
 
 item <- rep(1:20, 16)
 
-accuracy <- rep(NA, 320)
+accuracy <- rep(0, 320)
 
 df <- cbind(subject,block, condition, list, item, accuracy)
 
-df <- as.data.frame(df)
+df <- data.frame(df)
 
 df$subject <- as.factor(df$subject)
 df$block <- as.factor(df$block)
 df$condition <- as.factor(df$condition)
 df$list <- as.factor(df$list)
 df$item <- as.factor(df$item)
-View(df)
+df$accuracy <- as.numeric(df$accuracy)
 ```
 
 fill the data for each participant, fill in the scores for the first block first, and the second block second.  fill in 1 for a correct trial and 0 for an incorrect trial
@@ -42,57 +42,88 @@ fill the data for each participant, fill in the scores for the first block first
 #subject 1
 n <- 0
 #block1
-df$accuracy[(1+n*40):(20+n*40)] <- c()
+df$accuracy[(1+n*40):(20+n*40)] <- c(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1)
 #block2
-df$accuracy[(21+n*40):(40+n*40)] <- c()
+df$accuracy[(21+n*40):(40+n*40)] <- c(0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1)
 
 #subject 2
 n <- 1
 #block1
-df$accuracy[(1+n*40):(20+n*40)] <- c()
+df$accuracy[(1+n*40):(20+n*40)] <- c(0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0)
 #block2
-df$accuracy[(21+n*40):(40+n*40)] <- c()
+df$accuracy[(21+n*40):(40+n*40)] <- c(1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1)
 
 #subject 3
 n <- 2
 #block1
-df$accuracy[(1+n*40):(20+n*40)] <- c()
+df$accuracy[(1+n*40):(20+n*40)] <- c(1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0)
 #block2
-df$accuracy[(21+n*40):(40+n*40)] <- c()
+df$accuracy[(21+n*40):(40+n*40)] <- c(1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1)
 
 #subject 4
 n <- 3
 #block1
-df$accuracy[(1+n*40):(20+n*40)] <- c()
+df$accuracy[(1+n*40):(20+n*40)] <- c(0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 1, 1)
 #block2
-df$accuracy[(21+n*40):(40+n*40)] <- c()
+df$accuracy[(21+n*40):(40+n*40)] <- c(1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1)
 
 #subject 5
 n <- 4
 #block1
-df$accuracy[(1+n*40):(20+n*40)] <- c()
+df$accuracy[(1+n*40):(20+n*40)] <- c(1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 0)
 #block2
-df$accuracy[(21+n*40):(40+n*40)] <- c()
+df$accuracy[(21+n*40):(40+n*40)] <- c(0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1)
 
 #subject 6
 n <- 5
 #block1
-df$accuracy[(1+n*40):(20+n*40)] <- c()
+df$accuracy[(1+n*40):(20+n*40)] <- c(0, 1, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1)
 #block2
-df$accuracy[(21+n*40):(40+n*40)] <- c()
+df$accuracy[(21+n*40):(40+n*40)] <- c(1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0)
 
 #subject 7
 n <- 6
 #block1
-df$accuracy[(1+n*40):(20+n*40)] <- c()
+df$accuracy[(1+n*40):(20+n*40)] <- c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1)
 #block2
-df$accuracy[(21+n*40):(40+n*40)] <- c()
+df$accuracy[(21+n*40):(40+n*40)] <- c(0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1)
 
 #subject 8
 n <- 7
 #block1
-df$accuracy[(1+n*40):(20+n*40)] <- c()
+df$accuracy[(1+n*40):(20+n*40)] <- c(0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1)
 #block2
-df$accuracy[(21+n*40):(40+n*40)] <- c()
+df$accuracy[(21+n*40):(40+n*40)] <- c(1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0)
 ```
+
+```{r}
+
+library(plotfunctions) #for se
+averages <- aggregate(accuracy ~ condition + subject, data = df, FUN = mean)
+meanSe <- ddply(averages, c("condition"), summarize,
+                meanAccuracy = mean(accuracy),
+                seAccuracy = se(accuracy))
+
+table1 <- cbind(meanSe[meanSe$condition=="UNAIDED",]$meanAccuracy,
+                meanSe[meanSe$condition=="AIDED",]$meanAccuracy)
+
+colnames(table1) <- c("Unaided", "Aided")
+
+bp <- barplot(table1, ylim=c(0,1), xlab = "Condition", ylab = "Accuracy",
+              col = "lightgrey", font.lab=2,
+              main= "Mean accuracy per condition")
+errorBars(bp, meanSe$meanAccuracy, meanSe$seAccuracy)
+```
+
+
+```{r}
+library(lme4)
+library(plotfunctions) #for se
+
+df$condition <- relevel(df$condition, ref='UNAIDED')
+
+m1 <- glmer(accuracy ~ condition + (1|subject), data = df, family = binomial)
+summary(m1)
+```
+
 
