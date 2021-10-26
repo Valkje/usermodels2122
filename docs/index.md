@@ -4,7 +4,7 @@
 
 1. [Introduction](#introduction)
 2. [Hypotheses](#hypotheses)
-3. [Experiment](#experiment-%28test-of-system%29)
+3. [Experiment](#experiment-test-of-system)
 4. [Levels of automation](#levels-of-automation)
 5. [Assessments](#assessments)
 6. [Application modules](#application-modules)
