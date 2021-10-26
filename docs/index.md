@@ -1,6 +1,6 @@
-#Maintaining steady driver workload with adaptive automation
+# Maintaining steady driver workload with adaptive automation
 
-##Table of contents
+## Table of contents
 
 1. [Introduction](#introduction)
 2. [Hypotheses](#hypotheses)
@@ -11,15 +11,15 @@
 7. [References](#references)
 8. [Answers to questions](#answers-to-questions)
 
-##Introduction
+## Introduction
 
 This project concerns itself with the adaptive automation of a simulated driving task. Relying on an existing driving model implemented in ACT-R, we will research and develop a real-time automation system that will determine when the model should take over partial or full control of the driving task and when control should be handed back to the human driver. The adaptive automation system will attempt to maintain a stable driver mental workload.
 
-##Hypotheses
+## Hypotheses
 
 We hypothesize that increases in automation will reduce the driver’s workload. Based on this we expect adaptive automation to lead to a more stable mental workload over time. Additionally, we hypothesize that we will be observing an improvement in human driving performance measures due to adaptive automation. It is likewise possible that we will mainly observe an improvement in the performance on a secondary task due to adaptive automation since subjects might be able to focus more on that secondary task when the model is in (partial) control of the driving task.
 
-##Experiment (Test of System)
+## Experiment (Test of System)
 
 To test these hypotheses, our experimental setup needs to account for multiple aspects: the participants, experiment design, and the type of follow-up analyses. For this experiment, we aim at having two experimental within-subjects conditions (aided vs. unaided): in the aided condition the adaptive automation system will be enabled, while in the unaided condition the driver remains in full control for the entire session. Additionally, we need to manipulate the load on the driver in both conditions to test whether our adaptive automation system takes over control in appropriate moments and how the increase in automation will impact the driver. To manipulate the load on the driver we will let the participants complete a secondary task: Solving multiplication problems. These problems will be presented to the participants with a text-to-speech synthesizer, so participants will still be able to watch the road, which allows us to continue to monitor changes in the size of the pupil. Participants can respond to the problems using their voice, and we will record their responses manually.
 
@@ -55,7 +55,7 @@ To prevent any effect of specific multiplication problems on pupil size and/or d
 | Unaided                          | Aided                            | List 1                          | List 2                          |
 | Unaided                          | Aided                            | List 2                          | List 1                          |
 
-##Levels of Automation
+## Levels of Automation
 
 In order to successfully drive a car, two distinct types of control need to be performed. The first type, called lateral control, concerns itself with the sideways motion of the vehicle, and thus with how well a car can keep in its designated lane, or switch lanes when necessary. A driver performs lateral control by turning the steering wheel to influence the direction of the car. The second type, called longitudinal control, concerns itself with the velocity of the vehicle and thus also with the distance to other vehicles, either in front or behind. A driver performs longitudinal control by pressing their foot on the gas or brake pedal to influence the speed of the vehicle.
 
@@ -78,7 +78,7 @@ Currently, we have implemented three different levels of automation:
 2. Partial automation in the form of cruise control: The driver can still steer the vehicle, but the speed is being controlled by the ACT-R model.
 3. Full automation, ACT-R controls both steering and speed.
 
-##Assessments
+## Assessments
 
 To answer our hypotheses and to monitor the load on the driver we first need to quantify driving performance and cognitive load. Regarding the former, we could consider multiple measures such as the time it takes to change lanes, the lateral deviations from the middle of the lane, deviations from speed limits (based on Savino, 2009), reaction times, and gap acceptance (Papantoniou, Papadimitriou, and Yannis, 2017). We will monitor a selection of these measures continuously during experimental sessions.
 
@@ -115,7 +115,7 @@ As part of the final statistical analysis, we will investigate how the size of t
 
 
 
-##Application modules
+## Application modules
 
 Our application can be divided up into four major parts:
 
@@ -124,29 +124,29 @@ Our application can be divided up into four major parts:
 3. Decision mechanism that combines all measures and decides on a level of automation.
 4. The implementation of the levels of automation.
 
-###Eye-tracking
+### Eye-tracking
 
 In some way or another, the adaptive automation decision system will depend on the pupil size. Thus, we will repeatedly query the pupil dilation from the eye-tracking device. We will have to make decisions about the sampling rate here.
 
-###Simulation measures
+### Simulation measures
 
 As discussed in the assessment section, a plethora of car control measures exists that are typically taken to assess driving performance in real life. Although most of these measures should be available from the simulation, some might be more easily accessible than others, so we will need to strike a balance between how informative a measure is (based on the literature) and how easy it is to monitor it.
 
 Currently, we are not yet using these simulation measures to decide on the automation level.
 
-###Decision mechanism
+### Decision mechanism
 
 Once the pupil dilation data and driving performance measures have been collected, they need to be used to decide on an appropriate level of automation. In the assessment section, we already outlined how we could take the pupil size measurements into account. To incorporate the driving performance measures we could rely on a variety of ways including handcrafted if-then rules, a set of SVMs, a Bayesian network, et cetera. It would be preferred if the mechanism that we will eventually use maintains transparency w.r.t. how it reached the conclusion that it should activate automation level X given the data. In other words, preserving explainability would be nice.
 
 At the moment of writing, the decision mechanism only bases its decision on the pupil dilation, as detailed in the Assessments section.
 
-###Implementation of automation levels
+### Implementation of automation levels
 
 We use the existing ACT-R model to automate the driving process. Since we sometimes want to use no or only partial automation, certain parts of the ACT-R model are sometimes ignored when controlling the car. Previously, we worried that ACT-R might not be able to adapt to situations in which its output is ignored, but as it turns out, the ACT-R model has no problem recovering from the no and partial automation levels.
 
 Although we have already implemented visual changes signifying the current level of automation, a system that warns the user that the information level is about to change still needs to be implemented.
 
-##References
+## References
 
 Papantoniou, P., Papadimitriou, E., & Yannis, G. (2017). Review of driving performance parameters critical for distracted driving research. Transportation Research Procedia, 25, 1796–1805.
 
@@ -158,7 +158,7 @@ Mindakis, G., Lohan, K. (2018) Using Pupil Diameter to Measure Cognitive Load
 Savino M. R. (2009) Standardized Names and Definitions for Driving Performance Measures
 Kahneman, D. (1973) Attention and Effort
 
-##Answers to questions
+## Answers to questions
 
 **Gilles' question**:
 
