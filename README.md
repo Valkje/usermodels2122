@@ -1,5 +1,7 @@
-# Nbackmodel
-ACT-R driving model that performs a five-level n-back task using speed signs. This model is based on the driving model by Dario Salvucci.
+# Driving model
+ACT-R driving model based on the driving model by Dario Salvucci.
+
+For our wiki, see [this](docs/index.md) page.
 
 ## Steering wheel and gamepad support
 To enable steering wheel support, the JInput JAR file has to be added to your project as a library. 
