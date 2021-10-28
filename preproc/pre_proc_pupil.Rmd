@@ -1,0 +1,292 @@
+---
+title: "Pre-processing pupil data"
+author: "Adaptive automation team"
+date: "10/28/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(eyelinker)
+library(PupilPre)
+library(plyr)
+library(dplyr)
+source("./src/preprocessing_helper_functions.R")
+```
+
+## Pre-processing pupil data
+
+For pre-processing we rely on the pupilpre package and follow the steps outlined
+in the vignette for this package (see links below). Since we have .asc files
+and pupilpre expects a sample report some functions are sourced that bring
+the .asc files in a format that pupilpre can work with.
+
+```{r}
+# Load in data from .asc file
+# Steps taken through out the entire file follow mostly the Basic preprocessing of pupil size data vignette
+# see: https://cran.microsoft.com/snapshot/2020-07-25/web/packages/PupilPre/vignettes/PupilPre_Basic_Preprocessing.html
+
+path_to_sub <- "SPECIFY_PATH_HERE"
+label <- "PROVIDE_DESCRIPTIVE_LABEL_HERE" # e.g. UM1_automated
+recorded_eye <- "Left" # do not change this :)
+
+sample_cl <- asc_to_ppl_pre(path_to_sub,
+                               label,
+                               recorded_eye)
+
+
+
+# Align to experimental begin as signaled by AUTOMATION_DECREASE none,EXPERIMENT STARTED msg
+sample_cl <- align_msg(sample_cl,Msg="^AUTOMATION_DECREASE none,EXPERIMENT STARTED")
+
+# Create time series object (we don't need to adjust so this can just be copied)
+sample_cl$Time <- sample_cl$Align
+
+# Create eye-agnostic data columns
+sample_cl <- ppl_select_recorded_eye(sample_cl,Recording = "L")
+
+# Marking & removing data-points outside screen
+sample_cl <- recode_off_screen(data=sample_cl,ScreenSize = c(1920,1080))
+sample_cl$Pupil[!(sample_cl$Screen == "OnScreen")] <- NA
+  
+# Plot before blink removal
+plot(sample_cl$Time,sample_cl$Pupil,ylab = "Pupil",xlab = "Time",type="l")
+
+# de-blink via SR logs
+deblinked_sample <- clean_blink(sample_cl,Delta = 5,LogFile = "./BlinkCleanup.rds")
+
+# Verify de-blinking (this takes some time to load the data)
+verify_cleanup_app(deblinked_sample, LogFile = "./BlinkCleanup.rds")
+
+# Final plot
+plot(deblinked_sample$Time,deblinked_sample$Pupil,ylab = "Pupil",xlab = "Time",type="l")
+```
+
+### Manual pre-processing
+
+We removed left-over blinks using the user clean app as described in the
+de-blinking vignette (see link below)
+
+```{r}
+# Manual Clean up preparations.
+# We want to follow the steps outlined in the vignette below:
+
+# See: https://cran.microsoft.com/snapshot/2020-07-25/web/packages/PupilPre/vignettes/PupilPre_Cleanup.html
+# However, since we have 10 minutes of re-cordings we first split this up
+# into 5 second windows.
+
+data_for_manual_clean <- deblinked_sample
+
+windows <- rep(1:200,each=2500)
+data_for_manual_clean$windows <- windows[1:nrow(data_for_manual_clean)]
+par(mfrow=c(2,2))
+for (window in 1:max(data_for_manual_clean$windows)) {
+  plot(data_for_manual_clean$Time[data_for_manual_clean$windows == window],
+       data_for_manual_clean$Pupil[data_for_manual_clean$windows == window],
+       ylab="Pupil",
+       xlab="Time",
+       type="l",
+       main=window,
+       ylim=c(min(data_for_manual_clean$Pupil,na.rm=T),
+              max(data_for_manual_clean$Pupil,na.rm=T)))
+}
+
+# re-write event column so that we don't have to try and clean a
+# 10 minutes stream of pupil data sampled at 500HZ...
+oldEvent <- data_for_manual_clean$Event
+data_for_manual_clean$Event <- as.factor(data_for_manual_clean$windows)
+```
+
+```{r}
+# Now we perform manual clean up based on clear deviations identified in
+# the plots above.
+user_cleanup_app(data_for_manual_clean,
+                 LogFile = paste0("./",label,"_ManualCleanup.rds"))
+```
+
+```{r}
+# Apply clean-up (or if you want to algin your data differently and have
+# completed pre-processing before just set the if(T) to if(F) and load
+# in the final cleaned data)
+if(T){
+  final_sample <- safe_apply_manual_clean(data_for_manual_clean,
+                                          paste0("./",label,"_ManualCleanup.rds"))
+  # Rewrite event column split earlier
+  final_sample$Event <- oldEvent
+
+  saveRDS(final_sample,file=paste0("./",label,"_final_cleaned.RDS"))
+} else{
+  final_sample <- readRDS(file=paste0("./",label,"_final_cleaned.RDS"))
+}
+
+# Final plot
+plot(final_sample$Time,final_sample$Pupil,ylab = "Pupil",xlab = "Time",type="l")
+```
+
+# Aligning data for analysis
+
+The next steps were dependent on what we wanted to investigate:
+
+- changes in pupil size over the entire session
+- changes in pupil size following a question
+- for automated blocks:
+  - changes in pupil size following a change in automation
+  
+To achieve this we again just follow the remaining steps in the aforementioned
+vignette: baselining and down-sampling. However, depending on the question we
+first re-align the data.
+
+First: changes in pupil size over the entire session
+
+```{r}
+# Baselined data
+baselined_sample <- baseline(final_sample,
+                             BaselineWindow = c(-200,200),
+                             BaselineType = "Subtraction")
+
+plot(baselined_sample$Time,baselined_sample$Pupil,
+     ylab = "Pupil change relative to baseline",
+     xlab = "Time",
+     type="l")
+```
+
+```{r}
+# Downsample
+downsampled_data <- downsample(baselined_sample,
+                               SamplingRate = 500,
+                               NewRate = 50)
+# save data
+saveRDS(baselined_sample,file=paste0("./",label,"_baselined_dat.RDS"))
+saveRDS(downsampled_data,file=paste0("./",label,"_downsampled_dat.RDS"))
+
+plot(downsampled_data$Time,downsampled_data$Pupil,
+     ylab = "Pupil change relative to baseline and at 50HZ",
+     xlab = "Time",
+     type="l")
+
+# We can still plot message lines, here for questions.
+for(row_index in 1:nrow(baselined_sample)){
+  if(!is.na(baselined_sample$SAMPLE_MESSAGE[row_index])){
+    msg_txt <- baselined_sample$SAMPLE_MESSAGE[row_index]
+    msg_time <- baselined_sample$Time[row_index]
+    if(startsWith(as.character(msg_txt),"QUESTION") ||
+       startsWith(as.character(msg_txt),"NEXT BLOCK,QUESTION")) {
+      abline(v=msg_time,col="green",lty=2)
+    }
+  }
+}
+
+```
+
+Second: changes in pupil following a question
+
+```{r}
+# Create new data-frame
+questionDatCleaned <- final_sample
+
+# Reset message to only Question asked for regular expression to work.
+questionDatCleaned$SAMPLE_MESSAGE <- as.character(questionDatCleaned$SAMPLE_MESSAGE)
+questionDatCleaned$SAMPLE_MESSAGE[startsWith(questionDatCleaned$SAMPLE_MESSAGE,"NEXT BLOCK,QUESTION")] <- "QUESTION ASKED 1"
+questionDatCleaned$SAMPLE_MESSAGE <- as.factor(questionDatCleaned$SAMPLE_MESSAGE)
+
+questionDatCleaned <- extract_samples_before_after_msg(questionDatCleaned,
+                                                       "QUESTION ASKED",
+                                                       0,
+                                                       7500,
+                                                       split_msg_by_block=T,
+                                                       split_msg_decision=10
+                                                       )
+
+# Re-align
+questionDatCleaned <- align_msg(questionDatCleaned,Msg="^QUESTION ASKED")
+questionDatCleaned$Time <- questionDatCleaned$Align
+
+```
+
+```{r}
+# baseline again
+question_baselined_sample <- baseline(questionDatCleaned,
+                             BaselineWindow = c(0,200),
+                             BaselineType = "Subtraction")
+
+unique(question_baselined_sample$Baseline)
+
+plot(question_baselined_sample$Time[question_baselined_sample$Event == "1.1"],
+     question_baselined_sample$Pupil[question_baselined_sample$Event == "1.1"],
+     type="l",ylab = "Pupil baselined",xlab="Time following question (in ms)")
+abline(v=0,lty=2,col="red")
+```
+
+```{r}
+# Downsample again
+question_downsampled_data <- downsample(question_baselined_sample,
+                               SamplingRate = 500,
+                               NewRate = 50)
+# save data
+saveRDS(question_baselined_sample,file=paste0("./",label,"_question_baselined_dat.RDS"))
+saveRDS(question_downsampled_data,file=paste0("./",label,"_question_downsampled_dat.RDS"))
+
+avgDat <- ddply(question_downsampled_data,c("Time"),summarise,
+                meanPupil = mean(Pupil,na.rm=T),
+                se=(sd(Pupil,na.rm = T)/length(Pupil)))
+
+plot(avgDat$Time,avgDat$meanPupil,type = "l",lwd=2)
+lines(avgDat$Time,avgDat$meanPupil + (1.96*avgDat$se),lty=2)
+lines(avgDat$Time,avgDat$meanPupil - (1.96*avgDat$se),lty=2)
+```
+
+Finally: changes in pupil following a question
+
+Here we can be creative, for now I only collect 1 to 2. If you want to
+collect for decrease or increase just adjust the AUTOMATION_INCREASE messages
+in line 243 and 249 accordingly.
+
+```{r}
+# Create new data-frame
+changeDatCleaned <- final_sample
+
+changeDatCleaned <- extract_samples_before_after_msg(changeDatCleaned,
+                                                       "AUTOMATION_INCREASE",
+                                                       0,
+                                                       5000
+                                                       )
+
+
+changeDatCleaned <- align_msg(changeDatCleaned,Msg="^AUTOMATION_INCREASE")
+changeDatCleaned$Time <- changeDatCleaned$Align
+```
+
+```{r}
+# baseline again
+change_baselined_sample <- baseline(changeDatCleaned,
+                             BaselineWindow = c(0,200),
+                             BaselineType = "Subtraction")
+
+unique(change_baselined_sample$Baseline)
+
+plot(change_baselined_sample$Time[change_baselined_sample$Event == "1"],
+     change_baselined_sample$Pupil[change_baselined_sample$Event == "1"],
+     type="l",ylab = "Pupil baselined",xlab="Time following change (in ms)")
+abline(v=0,lty=2,col="red")
+```
+
+```{r}
+# Downsample again
+change_downsampled_data <- downsample(change_baselined_sample,
+                               SamplingRate = 500,
+                               NewRate = 50)
+# save data
+saveRDS(change_baselined_sample,file=paste0("./",label,"_change_baselined_dat.RDS"))
+saveRDS(change_downsampled_data,file=paste0("./",label,"_change_downsampled_dat.RDS"))
+
+avgDat <- ddply(change_downsampled_data,c("Time"),summarise,
+                meanPupil = mean(Pupil,na.rm=T),
+                se=(sd(Pupil,na.rm = T)/length(Pupil)))
+
+plot(avgDat$Time,avgDat$meanPupil,type = "l",lwd=2,
+     ylab="Average change in pupil size",
+     xlab = "Time after automation increase (in ms)")
+lines(avgDat$Time,avgDat$meanPupil + (1.96*avgDat$se),lty=2)
+lines(avgDat$Time,avgDat$meanPupil - (1.96*avgDat$se),lty=2)
+abline(v=0,lty=2,col="red")
+```
