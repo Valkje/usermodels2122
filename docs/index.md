@@ -1,4 +1,4 @@
-# Maintaining steady driver workload with adaptive automation
+# Maintaining a steady driver workload with adaptive automation
 
 ## Table of contents
 
