@@ -235,7 +235,9 @@ lines(avgDat$Time,avgDat$meanPupil + (1.96*avgDat$se),lty=2)
 lines(avgDat$Time,avgDat$meanPupil - (1.96*avgDat$se),lty=2)
 ```
 
-Finally: changes in pupil following a question
+Finally: changes in pupil following a an automation change.
+Important: This only works for the automated session data, since the AAS
+did not write any messages during the un-aided session!
 
 Here we can be creative, for now I only collect 1 to 2. If you want to
 collect for decrease or increase just adjust the AUTOMATION_INCREASE messages
