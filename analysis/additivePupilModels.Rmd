@@ -55,7 +55,7 @@ First for entire sessions
 
 ```{r}
 # Specify path and pattern
-path_to_folders <- "C:/Users/joshu/OneDrive/Coding/CCS/user_models/git/usermodels2122/preproc/"
+path_to_folders <- ""
 data_patterns <- c("_automated_downsampled_dat.RDS","_non_automated_downsampled_dat.RDS")
 condition_names <- c("aided","unaided")
 
@@ -251,7 +251,7 @@ modes (cruise and full).
 
 ```{r}
 # Specify path and pattern
-path_to_folders <- "C:/Users/joshu/OneDrive/Coding/CCS/user_models/git/usermodels2122/preproc/"
+path_to_folders <- ""
 data_patterns <- c("_automated_question_downsampled_dat.RDS","_non_automated_question_downsampled_dat.RDS")
 condition_names <- c("aided","unaided")
 
@@ -429,7 +429,7 @@ Now for automated only we model the 10 seconds following an increase in automati
 
 ```{r}
 # Specify path and pattern
-path_to_folders <- "C:/Users/joshu/OneDrive/Coding/CCS/user_models/git/usermodels2122/preproc/"
+path_to_folders <- ""
 data_patterns <- c("_automated_change_downsampled_dat.RDS")
 condition_names <- c("aided")
 
