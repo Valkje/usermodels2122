@@ -199,7 +199,10 @@ extract_samples_before_after_msg <- function(data_from_final_clean,
                                              post_msg_sample_range,
                                              use_msg_for_label=T,
                                              split_msg_by_block=F,
-                                             split_msg_decision=0){
+                                             split_msg_decision=0,
+                                             check_pre_msg=F,
+                                             check_pre_msg_val=NULL,
+                                             check_pre_msg_inval=NULL){
   
   # This function is designed to take the data-frame obtained from
   # safe_apply_manual_clean() or apply_user_cleanup() and to create a new
@@ -240,6 +243,9 @@ extract_samples_before_after_msg <- function(data_from_final_clean,
   msg_counter <- 1
   split_msg <- 1
   
+  # Collect all parsed messages in case a check_pre_msg should be performed
+  message_history <- c()
+  
   # Extract data following a message starting with re_msg_for_split:
   for(row_index in 1:nrow(data_from_final_clean)){
     
@@ -272,6 +278,28 @@ extract_samples_before_after_msg <- function(data_from_final_clean,
           msg_dat$Event <- as.character(msg_counter)
         }
         
+        # Optionally perform a check_pre_msg check
+        if(check_pre_msg) {
+          val_check <- 0
+          # Did we already encounter previous messages?
+          if(length(message_history) > 0) {
+            # Now iterate over messages backwards
+            rev_msg_history <- rev(message_history)
+            
+            for(prev_msg in rev_msg_history) {
+              if(startsWith(prev_msg,check_pre_msg_val)) {
+                cat("Does meet check because of previous: ",prev_msg,"\n")
+                val_check <- 1
+                break
+              } else if(startsWith(prev_msg,check_pre_msg_inval)) {
+                cat("Does not meet check because of previous: ",prev_msg,"\n")
+                break
+              }
+            }
+          }
+          msg_dat$val_check <- val_check
+        }
+        
         # Attach current event to data-frame
         extracted_dat <- rbind(extracted_dat,msg_dat)
         
@@ -284,6 +312,9 @@ extract_samples_before_after_msg <- function(data_from_final_clean,
           }
         }
       }
+      
+      # Collect last message
+      message_history <- c(message_history,as.character(msg_txt))
     }
   }
   

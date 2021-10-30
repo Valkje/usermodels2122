@@ -1,0 +1,588 @@
+---
+title: "AMMS of pupil size"
+author: "Adaptive automation team"
+date: "10/30/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(mgcv) # 1.8-36
+library(itsadug) # 2.4
+library(plyr)
+library(dplyr)
+```
+
+This file fits the Additive mixed effect models (see Wood, 2017)
+for the three data-sets we created earlier:
+
+- changes in pupil size over the entire session
+- changes in pupil size following a question
+- for automated blocks:
+  - changes in pupil size following a change in automation
+  
+For the first two models we are mainly interested in the relationship between
+the size of the pupil and time and how this relationship differs between
+conditions. Thus these will be included as fixed effects.
+
+For the third model we only look at the relationship between time and the
+size of the pupil.
+
+In all models we estimate a tensor smooth for the impact gaze (x,y) location has
+on the size of the pupil, so that we can statistically control for gaze in
+our final plots (Van Rij et al. 2019).
+
+We do not perform any model comparisons - there are simply not enough subjects.
+For each model we do however fit alternative models that are more in line with
+the regression assumptions (e.g. by accounting for deviations from the
+aforementioned patterns per subject via random effects, see Faraway, 2016).
+However, because we have only tested 8 subjects, the fixed effects generally
+disappear or have very wide CIs for these more valid models.
+
+Thus, the results here should be interpreted with care - they might hint at
+something but are not robust enough to establish significance.
+
+We do plot model assumption checks for each model - which generally show marked
+violations of at least one assumption
+(see model criticism in Van Rij et al. 2019). This again
+highlights that these results should be interpreted with care.
+
+
+
+### Loading and merging data from all subjects
+
+First for entire sessions
+
+```{r}
+# Specify path and pattern
+path_to_folders <- "C:/Users/joshu/OneDrive/Coding/CCS/user_models/git/usermodels2122/preproc/"
+data_patterns <- c("_automated_downsampled_dat.RDS","_non_automated_downsampled_dat.RDS")
+condition_names <- c("aided","unaided")
+
+# collect subjects
+subjects <- list.files(path_to_folders)[startsWith(list.files(path_to_folders),"UM")]
+
+align_start <- -500
+align_end <- 600000
+
+# Check alignments
+for(subj in subjects) {
+  for(data_pattern in data_patterns) {
+    sub_dat <- readRDS(paste0(path_to_folders,subj,"/",subj,data_pattern))
+    if(min(sub_dat$Time,na.rm=T) > align_start) {
+      align_start <- min(sub_dat$Time,na.rm=T)
+    }
+    if(max(sub_dat$Time,na.rm=T) < align_end) {
+      print(max(sub_dat$Time,na.rm=T))
+      print(subj)
+      align_end <- max(sub_dat$Time,na.rm=T)
+    }
+    rm(sub_dat)
+  }
+  
+}
+
+
+# Merge data
+merged_dat <- NULL
+for(subj in subjects) {
+  condition_index <- 1
+  for(data_pattern in data_patterns) {
+    sub_dat <- readRDS(paste0(path_to_folders,subj,"/",subj,data_pattern))
+    cat(subj,data_pattern,"\n")
+
+    sub_dat <- sub_dat[((sub_dat$Time >= align_start) & (sub_dat$Time <= align_end)),]
+    
+    # Assign condition
+    sub_dat$condition <- condition_names[condition_index]
+    condition_index <- condition_index + 1
+    sub_dat$subject_c <- subj
+    
+    if(length(colnames(sub_dat)) != length(colnames(merged_dat)) && subj != "UM1") {
+      cat(subj, data_pattern, " had too many columns.\n")
+      # This happens in case the wrapper function (safe_apply_manual_clean) had to intervene
+      sub_dat <- sub_dat[,!(colnames(sub_dat) %in% c("PupilClean","PupilPrevious"))]
+    }
+    
+    merged_dat <- rbind(merged_dat,sub_dat)
+    rm(sub_dat)
+  }
+}
+
+# set to factor for gams
+merged_dat$condition <- as.factor(merged_dat$condition)
+merged_dat$subject_c <- as.factor(merged_dat$subject_c)
+
+# Averages plots
+avgDat <- ddply(merged_dat,c("Time","condition"),summarise,
+                meanPupil = mean(Pupil,na.rm=T),
+                se=(sd(Pupil,na.rm = T)/length(Pupil)))
+
+
+plot(0,0,type="n",ylim=c(-500,300),xlim=c(0,600000),
+     ylab="Average change in pupil size",
+     xlab = "Time (in ms)")
+
+colrs <- c("red","blue")
+col_index <- 1
+for(condition in condition_names) {
+  print(condition)
+  lines(avgDat$Time[avgDat$condition == condition],avgDat$meanPupil[avgDat$condition == condition],lwd=2,col=colrs[col_index])
+  lines(avgDat$Time[avgDat$condition == condition],avgDat$meanPupil[avgDat$condition == condition] + (1.96*avgDat$se[avgDat$condition == condition]),lty=2,col=colrs[col_index])
+  lines(avgDat$Time[avgDat$condition == condition],avgDat$meanPupil[avgDat$condition == condition] - (1.96*avgDat$se[avgDat$condition == condition]),lty=2,col=colrs[col_index])
+  col_index <- col_index + 1
+}
+abline(v=0,lty=2,col="red")
+
+```
+
+### Fitting models
+
+```{r}
+# build base model (Note: the Subject column is actually a subject*session interaction)
+# subject_c is truly a subject column)
+
+m1 <- bam(Pupil ~ condition +
+            s(Time, by=condition,k=10) +
+            te(Gaze_X,Gaze_Y),  # control for gaze position
+          data=merged_dat)
+summary(m1)
+
+plot_dat <- plot(m1)
+
+plot_smooth(m1,view="Time",plot_all="condition",cond = list("Gaze_X"=960,
+                                                            "Gaze_Y"=540))
+
+# Model checks (basically the models are horrible :)))
+hist(m1$residuals,
+     xlab = "Residuals")
+
+plot(m1$fitted.values,
+     m1$residuals,
+     xlab="Fitted",
+     ylab="Residuals",
+     main="m1")
+
+acf(m1$residuals)
+
+# Drastic between-subject variation:
+# Here we use non-linear random effects to model per subject deviations from
+# the relationship between the pupil size and time (see Van Rij et al. 2019)
+# for an overview about random non-linear effects see: Pedersen et al., 2019
+m1.25 <- bam(Pupil ~ condition +
+            s(Time, by=condition,k=10) +
+            te(Gaze_X,Gaze_Y) +  # control for gaze position
+            s(Time,subject_c,bs="fs"), # m=1, so penalty on first derivative (Wood,2017) seems to diverge.
+          data=merged_dat)
+summary(m1.25)
+
+plot_dat <- plot(m1.25)
+
+plot_smooth(m1.25,view="Time",plot_all="condition",cond = list("Gaze_X"=960,
+                                                               "Gaze_Y"=540))
+# Model checks
+hist(m1.25$residuals,
+     xlab = "Residuals")
+
+plot(m1.25$fitted.values,
+     m1.25$residuals,
+     xlab="Fitted",
+     ylab="Residuals",
+     main="m1.25")
+
+acf(m1.25$residuals)
+
+# Even simpler random effects lead to really wide CI bands:
+m1.35 <- bam(Pupil ~ condition +
+            s(Time, by=condition,k=10) +
+            te(Gaze_X,Gaze_Y) +  # control for gaze position
+            s(subject_c,bs="re") +
+            s(subject_c,condition,bs="re"),
+          data=merged_dat)
+summary(m1.35)
+
+plot_dat <- plot(m1.35)
+
+plot_smooth(m1.35,view="Time",plot_all="condition",cond = list("Gaze_X"=960,
+                                                               "Gaze_Y"=540))
+
+# Model checks
+hist(m1.35$residuals,
+     xlab = "Residuals")
+
+plot(m1.35$fitted.values,
+     m1.35$residuals,
+     xlab="Fitted",
+     ylab="Residuals",
+     main="m1.35")
+
+acf(m1.35$residuals)
+
+# How much does the smoothness assumption matter?
+m1.5 <- bam(Pupil ~ condition +
+            s(Time, by=condition,k=100) +
+            te(Gaze_X,Gaze_Y),  # control for gaze position
+          data=merged_dat)
+summary(m1.5)
+
+plot_dat <- plot(m1.5)
+
+plot_smooth(m1.5,view="Time",plot_all="condition",cond = list("Gaze_X"=960,
+                                                              "Gaze_Y"=540))
+
+# Model checks
+hist(m1.5$residuals,
+     xlab = "Residuals")
+
+plot(m1.5$fitted.values,
+     m1.5$residuals,
+     xlab="Fitted",
+     ylab="Residuals",
+     main="m1.5")
+
+acf(m1.5$residuals)
+```
+
+### Loading and merging data from all subjects
+
+Now for 15 seconds following a question. For "aided" only questions are
+included for which the driver was in any of the two automation
+modes (cruise and full).
+
+```{r}
+# Specify path and pattern
+path_to_folders <- "C:/Users/joshu/OneDrive/Coding/CCS/user_models/git/usermodels2122/preproc/"
+data_patterns <- c("_automated_question_downsampled_dat.RDS","_non_automated_question_downsampled_dat.RDS")
+condition_names <- c("aided","unaided")
+
+# collect subjects
+subjects <- list.files(path_to_folders)[startsWith(list.files(path_to_folders),"UM")]
+
+align_start <- -500
+align_end <- 600000
+
+# Check alignments
+for(subj in subjects) {
+  for(data_pattern in data_patterns) {
+    sub_dat <- readRDS(paste0(path_to_folders,subj,"/",subj,data_pattern))
+    if(min(sub_dat$Time,na.rm=T) > align_start) {
+      align_start <- min(sub_dat$Time,na.rm=T)
+    }
+    if(max(sub_dat$Time,na.rm=T) < align_end) {
+      print(max(sub_dat$Time,na.rm=T))
+      print(subj)
+      align_end <- max(sub_dat$Time,na.rm=T)
+    }
+    rm(sub_dat)
+  }
+  
+}
+
+
+# Merge data
+merged_dat <- NULL
+for(subj in subjects) {
+  condition_index <- 1
+  for(data_pattern in data_patterns) {
+    sub_dat <- readRDS(paste0(path_to_folders,subj,"/",subj,data_pattern))
+    cat(subj,data_pattern,"\n")
+
+    sub_dat <- sub_dat[((sub_dat$Time >= align_start) & (sub_dat$Time <= align_end)),]
+    
+    if(condition_names[condition_index] == "aided") {
+      # exclude on check
+      sub_dat <- sub_dat[sub_dat$val_check == 1,]
+    } else {
+      sub_dat$val_check <- 0
+    }
+    
+    # Assign condition
+    sub_dat$condition <- condition_names[condition_index]
+    condition_index <- condition_index + 1
+    sub_dat$subject_c <- subj
+    
+    if(length(colnames(sub_dat)) != length(colnames(merged_dat)) && subj != "UM1") {
+      cat(subj, data_pattern, " had too many columns.\n")
+      sub_dat <- sub_dat[,!(colnames(sub_dat) %in% c("PupilClean","PupilPrevious"))]
+    }
+    
+    merged_dat <- rbind(merged_dat,sub_dat)
+    rm(sub_dat)
+  }
+}
+
+# set to factor for gams
+merged_dat$condition <- as.factor(merged_dat$condition)
+merged_dat$subject_c <- as.factor(merged_dat$subject_c)
+
+# Averages plots
+avgDat <- ddply(merged_dat,c("Time","condition"),summarise,
+                meanPupil = mean(Pupil,na.rm=T),
+                se=(sd(Pupil,na.rm = T)/length(Pupil)))
+
+
+plot(0,0,type="n",ylim=c(-100,200),xlim=c(0,15000),
+     ylab="Average change in pupil size",
+     xlab = "Time (in ms)")
+
+colrs <- c("red","blue")
+col_index <- 1
+for(condition in condition_names) {
+  print(condition)
+  lines(avgDat$Time[avgDat$condition == condition],avgDat$meanPupil[avgDat$condition == condition],lwd=2,col=colrs[col_index])
+  lines(avgDat$Time[avgDat$condition == condition],avgDat$meanPupil[avgDat$condition == condition] + (1.96*avgDat$se[avgDat$condition == condition]),lty=2,col=colrs[col_index])
+  lines(avgDat$Time[avgDat$condition == condition],avgDat$meanPupil[avgDat$condition == condition] - (1.96*avgDat$se[avgDat$condition == condition]),lty=2,col=colrs[col_index])
+  col_index <- col_index + 1
+}
+abline(v=0,lty=2,col="red")
+
+```
+
+### Fitting models
+
+```{r}
+# build model (Note: the Subject column is actually a subject*session interaction)
+# subject_c is truly a subject column
+
+m2 <- bam(Pupil ~ condition +
+            s(Time, by=condition,k=20) +
+            te(Gaze_X,Gaze_Y),  # control for gaze position
+          data=merged_dat)
+summary(m2)
+
+plot(m2)
+
+
+plot_smooth(m2,view="Time",plot_all="condition",cond = list("Gaze_X"=960,
+                                                            "Gaze_Y"=540))
+
+# Model checks
+hist(m2$residuals,
+     xlab = "Residuals")
+
+plot(m2$fitted.values,
+     m2$residuals,
+     xlab="Fitted",
+     ylab="Residuals",
+     main="m2")
+
+acf(m2$residuals)
+
+# Again large amount of between subject variation:
+m2.25 <- bam(Pupil ~ condition +
+            s(Time, by=condition,k=20) +
+            te(Gaze_X,Gaze_Y) +  # control for gaze position
+            s(Time,subject_c,bs="fs",m=1), # random non-linear effect of time per subject
+          data=merged_dat)
+summary(m2.25)
+
+plot(m2.25)
+
+
+plot_smooth(m2.25,view="Time",plot_all="condition",cond = list("Gaze_X"=960,
+                                                            "Gaze_Y"=540))
+
+# Model checks
+hist(m2.25$residuals,
+     xlab = "Residuals")
+
+plot(m2.25$fitted.values,
+     m2.25$residuals,
+     xlab="Fitted",
+     ylab="Residuals",
+     main="m2.25")
+
+acf(m2.25$residuals)
+
+
+# Again for simpler REs:
+m2.35 <- bam(Pupil ~ condition +
+            s(Time, by=condition,k=20) +
+            te(Gaze_X,Gaze_Y) +  # control for gaze position
+            s(subject_c,bs="re") +
+            s(subject_c,condition,bs="re"),
+          data=merged_dat)
+summary(m2.35)
+
+plot(m2.35)
+
+
+plot_smooth(m2.35,view="Time",plot_all="condition",cond = list("Gaze_X"=960,
+                                                            "Gaze_Y"=540))
+
+# Model checks
+hist(m2.35$residuals,
+     xlab = "Residuals")
+
+plot(m2.35$fitted.values,
+     m2.35$residuals,
+     xlab="Fitted",
+     ylab="Residuals",
+     main="m2.35")
+
+acf(m2.35$residuals)
+```
+
+### Loading and merging data from all subjects
+
+Now for automated only we model the 10 seconds following an increase in automation.
+
+```{r}
+# Specify path and pattern
+path_to_folders <- "C:/Users/joshu/OneDrive/Coding/CCS/user_models/git/usermodels2122/preproc/"
+data_patterns <- c("_automated_change_downsampled_dat.RDS")
+condition_names <- c("aided")
+
+# collect subjects
+subjects <- list.files(path_to_folders)[startsWith(list.files(path_to_folders),"UM")]
+
+align_start <- -500
+align_end <- 600000
+
+# Check alignments
+for(subj in subjects) {
+  for(data_pattern in data_patterns) {
+    sub_dat <- readRDS(paste0(path_to_folders,subj,"/",subj,data_pattern))
+    if(min(sub_dat$Time,na.rm=T) > align_start) {
+      align_start <- min(sub_dat$Time,na.rm=T)
+    }
+    if(max(sub_dat$Time,na.rm=T) < align_end) {
+      print(max(sub_dat$Time,na.rm=T))
+      print(subj)
+      align_end <- max(sub_dat$Time,na.rm=T)
+    }
+    rm(sub_dat)
+  }
+  
+}
+
+
+# Merge data
+merged_dat <- NULL
+for(subj in subjects) {
+  condition_index <- 1
+  for(data_pattern in data_patterns) {
+    sub_dat <- readRDS(paste0(path_to_folders,subj,"/",subj,data_pattern))
+    cat(subj,data_pattern,"\n")
+
+    sub_dat <- sub_dat[((sub_dat$Time >= align_start) & (sub_dat$Time <= align_end)),]
+    
+    # Assign condition
+    sub_dat$condition <- condition_names[condition_index]
+    condition_index <- condition_index + 1
+    sub_dat$subject_c <- subj
+    
+    if(length(colnames(sub_dat)) != length(colnames(merged_dat)) && subj != "UM1") {
+      cat(subj, data_pattern, " had too many columns.\n")
+      sub_dat <- sub_dat[,!(colnames(sub_dat) %in% c("PupilClean","PupilPrevious"))]
+    }
+    
+    merged_dat <- rbind(merged_dat,sub_dat)
+    rm(sub_dat)
+  }
+}
+
+# set to factor for gams
+merged_dat$condition <- as.factor(merged_dat$condition)
+merged_dat$subject_c <- as.factor(merged_dat$subject_c)
+
+# Averages plots
+avgDat <- ddply(merged_dat,c("Time","condition"),summarise,
+                meanPupil = mean(Pupil,na.rm=T),
+                se=(sd(Pupil,na.rm = T)/length(Pupil)))
+
+
+plot(0,0,type="n",ylim=c(-100,50),xlim=c(0,10000),
+     ylab="Average change in pupil size",
+     xlab = "Time (in ms)")
+
+colrs <- c("red")
+col_index <- 1
+for(condition in condition_names) {
+  print(condition)
+  lines(avgDat$Time[avgDat$condition == condition],avgDat$meanPupil[avgDat$condition == condition],lwd=2,col=colrs[col_index])
+  lines(avgDat$Time[avgDat$condition == condition],avgDat$meanPupil[avgDat$condition == condition] + (1.96*avgDat$se[avgDat$condition == condition]),lty=2,col=colrs[col_index])
+  lines(avgDat$Time[avgDat$condition == condition],avgDat$meanPupil[avgDat$condition == condition] - (1.96*avgDat$se[avgDat$condition == condition]),lty=2,col=colrs[col_index])
+  col_index <- col_index + 1
+}
+abline(v=0,lty=2,col="red")
+
+```
+
+### Fitting models
+
+```{r}
+# Base Model for after change:
+m3 <- bam(Pupil ~ s(Time) +
+          te(Gaze_X,Gaze_Y),data=merged_dat)
+summary(m3)
+plot(m3)
+plot_smooth(m3,view="Time",cond = list("Gaze_X"=960,
+                                       "Gaze_Y"=540))
+
+# Model checks
+hist(m3$residuals,
+     xlab = "Residuals")
+
+plot(m3$fitted.values,
+     m3$residuals,
+     xlab="Fitted",
+     ylab="Residuals",
+     main="m3")
+
+acf(m3$residuals)
+
+# Random non-linear REs:
+m3.25 <- bam(Pupil ~ s(Time) +
+         te(Gaze_X,Gaze_Y) +
+         s(Time,subject_c,bs="fs",m=1),data=merged_dat)
+
+summary(m3.25)
+plot(m3.25)
+plot_smooth(m3.25,view="Time",cond = list("Gaze_X"=960,
+                                       "Gaze_Y"=540))
+
+# Model checks
+hist(m3.25$residuals,
+     xlab = "Residuals")
+
+plot(m3.25$fitted.values,
+     m3.25$residuals,
+     xlab="Fitted",
+     ylab="Residuals",
+     main="m3.25")
+
+acf(m3.25$residuals)
+
+# Simpler random effects:
+m3.35 <- bam(Pupil ~ s(Time) +
+         te(Gaze_X,Gaze_Y) +
+         s(subject_c,bs="re"),data=merged_dat)
+
+summary(m3.35)
+plot(m3.35)
+plot_smooth(m3.35,view="Time",cond = list("Gaze_X"=960,
+                                       "Gaze_Y"=540))
+
+# Model checks
+hist(m3.35$residuals,
+     xlab = "Residuals")
+
+plot(m3.35$fitted.values,
+     m3.35$residuals,
+     xlab="Fitted",
+     ylab="Residuals",
+     main="m3.35")
+
+acf(m3.35$residuals)
+```
+
+## References
+
+Faraway, J. (2016). Extending the Linear Model with R: Generalized Linear, Mixed Effects and Nonparametric Regression Models, Second Edition. https://doi.org/10.1201/9781315382722
+
+Pedersen, E., Miller, D., Simpson, G., & Ross, N. (2019). Hierarchical generalized additive models in ecology: An introduction with mgcv. PeerJ, 7, e6876. https://doi.org/10.7717/peerj.6876
+
+van Rij, J., Hendriks, P., van Rijn, H., Baayen, R. H., & Wood, S. N. (2019). Analyzing the Time Course of Pupillometric Data. Trends in Hearing, 23, 2331216519832483. https://doi.org/10.1177/2331216519832483
+
+Wood, S. N. (2017). Generalized Additive Models: An Introduction with R, Second Edition (2nd ed.). Chapman and Hall/CRC.
