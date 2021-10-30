@@ -13,7 +13,7 @@ library(plyr)
 library(dplyr)
 ```
 
-This file fits the Additive mixed effect models (see Wood, 2017)
+This file fits the Additive mixed effect models (AMMs, see Wood, 2017)
 for the three data-sets we created earlier:
 
 - changes in pupil size over the entire session
@@ -21,34 +21,6 @@ for the three data-sets we created earlier:
 - for automated blocks:
   - changes in pupil size following a change in automation
   
-For the first two models we are mainly interested in the relationship between
-the size of the pupil and time and how this relationship differs between
-conditions. Thus these will be included as fixed effects.
-
-For the third model we only look at the relationship between time and the
-size of the pupil.
-
-In all models we estimate a tensor smooth for the impact gaze (x,y) location has
-on the size of the pupil, so that we can statistically control for gaze in
-our final plots (Van Rij et al. 2019).
-
-We do not perform any model comparisons - there are simply not enough subjects.
-For each model we do however fit alternative models that are more in line with
-the regression assumptions (e.g. by accounting for deviations from the
-aforementioned patterns per subject via random effects, see Faraway, 2016).
-However, because we have only tested 8 subjects, the fixed effects generally
-disappear or have very wide CIs for these more valid models.
-
-Thus, the results here should be interpreted with care - they might hint at
-something but are not robust enough to establish significance.
-
-We do plot model assumption checks for each model - which generally show marked
-violations of at least one assumption
-(see model criticism in Van Rij et al. 2019). This again
-highlights that these results should be interpreted with care.
-
-
-
 ### Loading and merging data from all subjects
 
 First for entire sessions
@@ -110,6 +82,8 @@ for(subj in subjects) {
 }
 
 # set to factor for gams
+# Note: the Subject column is actually a subject*session interaction
+# subject_c is truly a subject column
 merged_dat$condition <- as.factor(merged_dat$condition)
 merged_dat$subject_c <- as.factor(merged_dat$subject_c)
 
@@ -139,12 +113,11 @@ abline(v=0,lty=2,col="red")
 ### Fitting models
 
 ```{r}
-# build base model (Note: the Subject column is actually a subject*session interaction)
-# subject_c is truly a subject column)
-
+# build base model based on the predictors outlined in (Van Rij, 2019)
+# to compare conditions.
 m1 <- bam(Pupil ~ condition +
             s(Time, by=condition,k=10) +
-            te(Gaze_X,Gaze_Y),  # control for gaze position
+            te(Gaze_X,Gaze_Y),  # control for gaze position (Van Rij, 2019)
           data=merged_dat)
 summary(m1)
 
@@ -153,7 +126,7 @@ plot_dat <- plot(m1)
 plot_smooth(m1,view="Time",plot_all="condition",cond = list("Gaze_X"=960,
                                                             "Gaze_Y"=540))
 
-# Model checks (basically the models are horrible :)))
+# Model checks (based on Model criticism in Van Rij, 2019)
 hist(m1$residuals,
      xlab = "Residuals")
 
@@ -341,12 +314,11 @@ abline(v=0,lty=2,col="red")
 ### Fitting models
 
 ```{r}
-# build model (Note: the Subject column is actually a subject*session interaction)
-# subject_c is truly a subject column
+# again build base model
 
 m2 <- bam(Pupil ~ condition +
             s(Time, by=condition,k=20) +
-            te(Gaze_X,Gaze_Y),  # control for gaze position
+            te(Gaze_X,Gaze_Y),  
           data=merged_dat)
 summary(m2)
 
@@ -368,11 +340,11 @@ plot(m2$fitted.values,
 
 acf(m2$residuals)
 
-# Again large amount of between subject variation:
+# Again drastic between subject variation:
 m2.25 <- bam(Pupil ~ condition +
             s(Time, by=condition,k=20) +
-            te(Gaze_X,Gaze_Y) +  # control for gaze position
-            s(Time,subject_c,bs="fs",m=1), # random non-linear effect of time per subject
+            te(Gaze_X,Gaze_Y) +  
+            s(Time,subject_c,bs="fs",m=1),
           data=merged_dat)
 summary(m2.25)
 
@@ -398,7 +370,7 @@ acf(m2.25$residuals)
 # Again for simpler REs:
 m2.35 <- bam(Pupil ~ condition +
             s(Time, by=condition,k=20) +
-            te(Gaze_X,Gaze_Y) +  # control for gaze position
+            te(Gaze_X,Gaze_Y) +  
             s(subject_c,bs="re") +
             s(subject_c,condition,bs="re"),
           data=merged_dat)
@@ -532,7 +504,7 @@ plot(m3$fitted.values,
 
 acf(m3$residuals)
 
-# Random non-linear REs:
+# Again random non-linear REs:
 m3.25 <- bam(Pupil ~ s(Time) +
          te(Gaze_X,Gaze_Y) +
          s(Time,subject_c,bs="fs",m=1),data=merged_dat)
@@ -554,7 +526,7 @@ plot(m3.25$fitted.values,
 
 acf(m3.25$residuals)
 
-# Simpler random effects:
+# Again simpler REs:
 m3.35 <- bam(Pupil ~ s(Time) +
          te(Gaze_X,Gaze_Y) +
          s(subject_c,bs="re"),data=merged_dat)
