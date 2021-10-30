@@ -1,5 +1,14 @@
 # Contains all actions that the Python component can execute on behalf of the Java component.
 # author: Gilles Lijnzaad
+"""
+Originally, Gilles split the code below across 3 files: client, server, inputhandler.
+We did notice that this would lead to some ghost threads being spawned due to
+recursive imports. Thus, to limit the number of possible errors that could happen
+we moved everything into one file.
+
+Most of the functions were left un-changed, but we did add some of our own
+methods to allow for online processing of the data available through the link.
+"""
 import pylink
 import time
 from matplotlib import pyplot as plt
@@ -232,7 +241,9 @@ def query(target):
 	return response
 
 def fetch_raw_avg_rmse():
-	# collect values
+	"""
+	Sends the latest values back to Java!
+	"""
 	SV = shortTermTrend.getCurrentValue()
 	LV = longTermTrend.getCurrentValue()
 	RMSE = longTermRMSE.getCurrentValue()
@@ -315,7 +326,12 @@ def perform_action(command):
 ############################################# OLD CLIENT PARTS#########################################################
 def queryTracker():
 	"""
-	Query the eye-tracker.
+	This function is called in one of the threads spawned in the beginning
+	and repeatedly queries the eye-tracker (if currently no messages are written
+	to it as requested from JAVA).
+
+	Also updates the moving averages and cumulative RMSE and collects values for
+	plotting.
 	"""
 	global TRACKER_LOCK
 	global STOP_THREADS
@@ -327,6 +343,7 @@ def queryTracker():
 
 			# Skip invalid samples
 			if newestSample == -1:
+				TRACKER_LOCK.release()
 				continue
 
 			# Handle all remaining samples
@@ -344,7 +361,8 @@ def queryTracker():
 	
 def receive():
 	"""
-	Handle Java messages.
+	Original function by Gilles that delegates messages from Java,
+	updated to aknowledge and set the lock on the tracker.
 	"""
 	global TRACKER_LOCK
 	global STOP_THREADS
@@ -382,7 +400,7 @@ def close_threads(trial_number):
 	plt.plot(range(len(plot_dat_long_C)),plot_dat_long_C,color="blue")
 	plt.plot(range(len(plot_dat_short_C)),plot_dat_short_C,color="red")
 	plt.plot(range(len(plot_dat_LOWER_C)),plot_dat_LOWER_C,color="blue",linestyle='dashed')
-	plt.plot(range(len(plot_dat_UPPER_C)),plot_dat_LOWER_C,color="blue",linestyle='dashed')
+	plt.plot(range(len(plot_dat_UPPER_C)),plot_dat_UPPER_C,color="blue",linestyle='dashed')
 
 	plt.title("Long term trend vs. short term change")
 	plt.xlabel("Samples")
@@ -397,11 +415,14 @@ def start_receiving_thread():
 	t2.start()
 
 def send(message):
-	# We use this function to send back information to the
-	# Java part. For example the last pupil size we get from the eye tracker!
+	"""
+	We use this function by Gilles to send back information to the
+	Java part. For example the current moving average values and the
+	RMSE values.
+	"""
 	message += "\n"
 	sock.sendall(message.encode())
 
 
-# Start listening to JAVA
+# Start listening to JAVA and prepare querying eye-tracker.
 start_receiving_thread()

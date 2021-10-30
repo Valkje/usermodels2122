@@ -6,7 +6,7 @@ class MovingRMSE():
 
     def __init__(self):
         """
-        * Calculates the cumulative variance
+        * Calculates the cumulative variance (was simple moving variance in earlier versions)
         * of differences. Differences are directly calculated
         * in the update method.
         * 
