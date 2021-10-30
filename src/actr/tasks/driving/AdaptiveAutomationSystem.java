@@ -21,13 +21,7 @@ public class AdaptiveAutomationSystem {
     private double lockTimeS = 10;
 
     // Tuning parameters for the MAs and MV
-    //private int bufferSizeShort = 150;
-    //private int bufferSizeLong = 2500;
-    // Tuning parameter for decision
     private float decisionSensitivity = 1.15f;
-    //private MovingAverage ShortTermTrend;
-    //private MovingAverage LongTermTrend;
-    //private MovingPredictionErrorVariance LongTermMSE;
     private int updateCounter = 0;
 
 
