@@ -24,7 +24,7 @@ public class Speedsign extends Road {
     Position signPos;
     double signFrac;
     int sign_count = 0;
-    String[] allLimits = { "60", "70", "80", "90", "100", "110", "120", "130", "140" };
+    String[] allLimits = { "60", "70", "80", "90", "100", "110", "120", "130"};
     // String[] tmpLim = { "80", "90", "60", "90", "70", "100", "100", "90", "80" };
     // //to show off functionalities
     boolean visible = false;

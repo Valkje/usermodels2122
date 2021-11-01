@@ -825,7 +825,7 @@ public class Model {
 		nbackLevel = nbackLevel.replace(".actr", "");
 
 		try {
-			FileWriter writer = new FileWriter(outputPath + "Subj_" + subject + "_Block_" + block + "_Condition_" + condition + "_list_" + list + ".txt");
+			FileWriter writer = new FileWriter(outputPath + filename + "Subj_" + subject + "_Block_" + block + "_Condition_" + condition + "_list_" + list + ".txt");
 			for (String str : output) {
 				writer.write(str);
 			}
