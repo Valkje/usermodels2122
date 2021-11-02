@@ -125,7 +125,7 @@ We adapted this system by Novacic & Tokhi (n.d.) to utilize two moving averages 
     - if short_term_trend >= long_term_trend + weight * sqrt(variance):
         - schedule automation increase
     - if short_term_trend <= long_term_trend and automation_level > 1:
-        - schedule automation increase
+        - schedule automation decrease
 
 This routine will propose an increase in automation, should the short term trend exceed the decision boundary and will propose a decrease in automation as soon as the short term trend returns to the long term trend. In our implementation we further prevent this system from scheduling a change in automation for a fixed period (used to warn the driver about the upcoming change) after every change. This automatically ensures that, should any of the decision conditions again be met after this lockdown, the system will then propose to further increase or decrease the level of automation.
 
