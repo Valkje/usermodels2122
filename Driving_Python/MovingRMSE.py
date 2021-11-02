@@ -14,16 +14,15 @@ class MovingRMSE():
         * and see: https://en.wikipedia.org/wiki/Moving_average for definition of cumulative
         * 
         * This provides us with an efficient tool to calculate the
-        * (root, if desired) mean squared error between the long-term
-        * moving average of the pupil size ("observation") and the short-term
-        * trend: ("prediction").
+        * root mean squared error between the long-term
+        * moving average of the pupil size (our "prediction") and the short-term
+        * trend (our "observation"). 
         * 
         * See: https://en.wikipedia.org/wiki/Mean_squared_error
-        * 
-        * We can use this RMSE as a simple decision threshold:
-        * e.g. if short-term pupil size exceeds long-term pupil size + a * RMSE
-        * increase the level of automation. 'a' here allows us
-        * to control the sensitivity of our AAS.
+        *
+        * Note that we do not use raw observations but essentially
+        * replace them with predictions from the short-term trend as well.
+        * This makes the system less sensitive to outliers in the pupil size.
         * 
         * Monitoring short-term and long-term changes in the pupil
         * size to detect changes in demand was suggested in Minadakis & Lohan (2018)

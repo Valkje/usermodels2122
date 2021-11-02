@@ -99,15 +99,15 @@ These online samples are collected by Python, which also keeps track of updating
 
 Since we want to compute automation decisions online, our system has to be of low computational complexity. Mindakis and Lohan (2018) suggested that monitoring both long-term changes and short-term changes in the size of the pupil would allow for an online investigation of changes in cognitive load. They rely on moving averages of different window size to estimate the aforementioned long-term and short-term changes. Unfortunately, their actual decision mechanism is not formulated very explicitly: they "assume that, when the size of the pupil is larger than 70% of the maximum the cognitive load is high." (Mindakis & Lohan, 2018) but it is not immediately clear how the aforementioned trend estimates relate to the terms "maximum" and "size" in this sentence.
 
-Nevertheless, we interpreted this as suggesting that increases in cognitive load can be detected by monitoring short-term deviations from the long-term trend, which would align well with similar systems that have been utilized in the past (e.g. Katidioti et al., 2016). These kind of systems, essentially engage in "novelty" or "anomaly" detection by evaluating whether short term changes in the size of the pupil are signifcantly higher (Mindakis & Lohan, 2018) or lower (Katidioti et al., 2016) than some long-term base-line, which is taken as an indicator of an increase or decrease in cognitive load (Mindakis & Lohan, 2018; Katidioti et al., 2016).
+Nevertheless, we interpreted this as suggesting that increases in cognitive load can be detected by monitoring short-term deviations from the long-term trend, which would align well with similar systems that have been utilized in the past (e.g. Katidioti et al., 2016). These kind of systems, essentially engage in "novelty" or "outlier" detection (see: [here](https://scikit-learn.org/stable/modules/outlier_detection.html) for an overview) by evaluating whether short term changes in the size of the pupil are signifcantly higher (Mindakis & Lohan, 2018) or lower (Katidioti et al., 2016) than some long-term base-line, which is taken as an indicator of an increase or decrease in cognitive load (Mindakis & Lohan, 2018; Katidioti et al., 2016).
 
 An advantage of these systems is that moving averages can be computed efficiently (see Python implementation). Furthermore, relying on a moving average not just for long-term trend estimation but also for short-term trend estimation, as was done by Mindakis and Lohan (2018), reduces the impact possible outliers in the recorded pupil sizes have on the decision system. However, relying on a singular maximum value for the decision threshold is unlikely to be robust to the dynamic changes of the environment (e.g. light pollution) when driving a car.
 
-Therefore, we changed the decision mechanism to utilize more information. We were inspired by the moving window system described in Novacic & Tokhi (n.d.), which calculates the moving variance around a moving average of a continuously measured signal to estimate the expected degree of variation around that signal. The variance can then be multiplied by a fixed weight to define at what point a realization of the signal counts as outlier. While the weight is fixed in this system the variance itself remains adaptive (since it is also calculated for a moving window), ensuring that the system is more suitable for implementation in a car.
+Therefore, we wanted to change the decision mechanism to utilize more information. Specifically, we wanted our system to account for the "dispersion" (see: [here](https://en.wikipedia.org/wiki/Statistical_dispersion) for an overview) of the short-term trend's fluctuations around the long-term pupil size average. We can then utilize this measure of variation to decide when the short-term changes in pupil size deviate too extremely from the long-term changes in pupil size, which is a common strategy in outlier detection systems (see for example Mehrang, 2015 for an approach utilizing the median absolute deviation MAD). However, since we wanted to work with averages based on the recommendations by Mindakis & Lohan (2018) we opted to compute a cumulative estimate of the standard deviation or variance instead of the MAD (see: [here](https://en.wikipedia.org/wiki/Standard_deviation), [here](https://en.wikipedia.org/wiki/Root-mean-square_deviation) and the Python implementation for details). 
 
-We adapted this system by Novacic & Tokhi (n.d.) to utilize two moving averages based on the choices by Mindakis and Lohan (2018), resulting in the following algorithm:
+The algorithm below details how we combine the standard deviation and the moving averages to reach an automation decision:
 
-- Define initial values for weight, window_size_short_term, window_size_long_term, window_size_variance
+- Define initial values for weight, window_size_short_term, window_size_long_term
 - set automation_level to "no automation"
 
 - while recording:
@@ -124,6 +124,10 @@ We adapted this system by Novacic & Tokhi (n.d.) to utilize two moving averages 
         - schedule automation decrease
 
 This routine will propose an increase in automation, should the short term trend exceed the decision boundary and will propose a decrease in automation as soon as the short term trend returns to the long term trend. In our implementation we further prevent this system from scheduling a change in automation for a fixed period (used to warn the driver about the upcoming change) after every change. This automatically ensures that, should any of the decision conditions again be met after this lockdown, the system will then propose to further increase or decrease the level of automation.
+
+By changing the values for the different parameters in the system its sensitivity can be influenced. The figure below shows a very reactive system (window_size_short_term=600,window_size_long_term=15000,window_size_variance=inf). This system would quickly reduce the automation level after introducing it again.
+
+![AAS_sensitive](https://github.com/Valkje/usermodels2122/blob/main/docs/images/adaptive_system_sens.png)
 
 ### Implementation and Interface of the Adaptive Automation System 
 
@@ -153,7 +157,8 @@ Vidulich, M.A. and Tsang, P.S. (2012). Mental Workload and Situation Awareness. 
 
 Katidioti, I., Borst, J. P., Bierens de Haan, D. J., Pepping, T., van Vugt, M. K., & Taatgen, N. A. (2016). Interrupted by Your Pupil: An Interruption Management System Based on Pupil Dilation. International Journal of Human–Computer Interaction, 32(10), 791–801. https://doi.org/10.1080/10447318.2016.1198525
 
-Novacic, J., & Tokhi, K. (n.d.). Implementation of Anomaly Detection on a Time-series Temperature Data set. 47.
+Mehrang, S. (2016). Outlier Detection in Weight Time Series of Connected Scales: A Comparative Study.
+
 
 
 ## Answers to questions
