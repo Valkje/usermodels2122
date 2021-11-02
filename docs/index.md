@@ -187,3 +187,5 @@ About your second concern: We are pretty certain that there is a relation betwee
 Marquart G., Cabrall C., de Winter J. (2015), “Review of Eye-related Measures of Drivers’ Mental Workload”, Procedia Manufacturing. Vol 3, pp. 2854-2861. https://doi.org/10.1016/j.promfg.2015.07.783.
 
 Bruggen, A. (2015), "An empirical investigation of the relationship between workload and performance", Management Decision, Vol. 53 No. 10, pp. 2377-2389. https://doi.org/10.1108/MD-02-2015-0063
+
+Vidulich, M.A. and Tsang, P.S. (2012). Mental Workload and Situation Awareness. In Handbook of Human Factors and Ergonomics, G. Salvendy (Ed.). https://doi.org/10.1002/9781118131350.ch8
