@@ -6,7 +6,7 @@ class MovingRMSE():
 
     def __init__(self):
         """
-        * Calculates the cumulative variance (was simple moving variance in earlier versions)
+        * Calculates the cumulative variance
         * of differences. Differences are directly calculated
         * in the update method.
         * 
@@ -20,9 +20,12 @@ class MovingRMSE():
         * 
         * See: https://en.wikipedia.org/wiki/Mean_squared_error
         *
-        * Note that we do not use raw observations but essentially
+        * Note that we do not use raw observations as described in the wiki article but essentially
         * replace them with predictions from the short-term trend as well.
         * This makes the system less sensitive to outliers in the pupil size.
+        * In earlier versions we also experimented with a simple moving variance here
+        * (updated for a window like the averages). But the resulting decision boundaries
+        * were too sensitive.
         * 
         * Monitoring short-term and long-term changes in the pupil
         * size to detect changes in demand was suggested in Minadakis & Lohan (2018)

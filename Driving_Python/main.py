@@ -202,7 +202,7 @@ def query(target):
 	actual AAS decision.
 
 	see the pylink.Eyelink documentation Jelmer linked on
-	Nestor for details on the methods below.
+	Nestor and the pygaze sample method for details on the methods below.
 	"""
 	
 	tracker = pylink.getEYELINK()
