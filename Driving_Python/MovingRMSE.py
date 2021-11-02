@@ -10,10 +10,10 @@ class MovingRMSE():
         * of differences. Differences are directly calculated
         * in the update method.
         * 
-        * See: https://en.wikipedia.org/wiki/Variance
+        * Based on: https://en.wikipedia.org/wiki/Variance
         * and see: https://en.wikipedia.org/wiki/Moving_average for definition of cumulative
         * 
-        * This provides us with an efficient tool to calculate the
+        * This provides us with an efficient tool to essentially calculate the
         * root mean squared error between the long-term
         * moving average of the pupil size (our "prediction") and the short-term
         * trend (our "observation"). 

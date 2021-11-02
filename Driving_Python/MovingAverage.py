@@ -6,12 +6,8 @@ class MovingAverage():
     def __init__(self,size):
         """
         Relatively efficient simple moving average.
-        We will see whether this works for real-time.
-        Otherwise we should probably switch to an
-        exponential moving average - which should be
-        constant time complexity wise.
 
-        See: https://en.wikipedia.org/wiki/Moving_average
+        Based on: https://en.wikipedia.org/wiki/Moving_average
         """
         self.windowSize = size
         self.buffer = queue.Queue(maxsize= size + 1)
