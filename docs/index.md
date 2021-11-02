@@ -13,11 +13,11 @@
 
 ## Introduction
 
-This project concerns itself with the adaptive automation of a simulated driving task. Relying on an existing driving model implemented in ACT-R, we will research and develop a real-time automation system that will determine when the model should take over partial or full control of the driving task and when control should be handed back to the human driver. The adaptive automation system will attempt to maintain a stable driver mental workload.
+This project concerns itself with the adaptive automation of a simulated driving task. Relying on an existing driving model implemented in ACT-R, we will research and develop a real-time adaptive automation system that will determine when the model should take over partial or full control of the driving task and when control should be handed back to the human driver. The adaptive automation system should attempt to maintain a stable driver mental workload, increasing the level of automation when the driver's mental workload becomes too high and decreasing the level of automation again when the driver's mental workload has decreased sufficiently.
 
 ## Hypotheses
 
-We hypothesize that increases in automation will reduce the driver’s workload. Based on this we expect adaptive automation to lead to a more stable mental workload over time. Additionally, we hypothesize that we will be observing an improvement in human driving performance measures due to adaptive automation. It is likewise possible that we will mainly observe an improvement in the performance on a secondary task due to adaptive automation since subjects might be able to focus more on that secondary task when the model is in (partial) control of the driving task.
+We hypothesize that increases in automation will reduce the driver’s workload. Based on this we expect that adaptive automation will lead to a more stable mental workload over time. Additionally, we hypothesize that we will be observing an improvement in the performance on a secondary task due to adaptive automation since subjects might be able to focus more on that secondary task when the model is in (partial) control of the driving task. We also hypothesized that we would be able to observe an inprovement in human driving performance measures due to adaptive automation. However, we did not investigate this hypothesis further because of two reasons. First, due to a recording error we did not collect driving performance data during the experiment. More importantly however, investigating this hypothesis would have been complicated by the fact that driving performance metrics would reflect a mixture of the autonomous driving model's performance and the driver's performance (see Assessment).
 
 ## Experiment (Test of System)
 
@@ -59,17 +59,9 @@ To prevent any effect of specific multiplication problems on pupil size and/or d
 
 In order to successfully drive a car, two distinct types of control need to be performed. The first type, called lateral control, concerns itself with the sideways motion of the vehicle, and thus with how well a car can keep in its designated lane, or switch lanes when necessary. A driver performs lateral control by turning the steering wheel to influence the direction of the car. The second type, called longitudinal control, concerns itself with the velocity of the vehicle and thus also with the distance to other vehicles, either in front or behind. A driver performs longitudinal control by pressing their foot on the gas or brake pedal to influence the speed of the vehicle.
 
-
-
-
 These distinct types of control allow for various levels of automation. The lowest level of automation is when the driver is responsible for both types of control and is thus in full control of the vehicle (from now on referred to as no—automation). When the vehicle, or more specifically the model, takes over longitudinal control, we speak of partial automation. The model takes over longitudinal control, and not lateral, as this type of driver assistance is well-known, under the name cruise control, and participants will not have to get used to it. The highest level of automation is when the vehicle is responsible for both lateral and longitudinal control, we call this full automation.
 
-
-
-
 The terminology used does differ from a well-known taxonomy of levels of automation as determined by a committee of the Society of Automotive Engineers (SAE) (ORAD committee, 2018). This includes monitoring of the vehicle and the environment under automated activity as a driver task and takes this into account when determining the level of automation. As we, for this project/experiment, assume that the model performs correctly, this supervision while relying on the vehicle for either or both types of control does not play a part in our definition, and is not even considered a task of the driver. The SAE would classify our definition of partial automation as Driver Assistance (level 1) and our definition of full automation as either Partial Driving Automation (level 2), Conditional Driving Automation (level 3), High Driving Automation (level 4), or Full Driving Automation (level 5) dependent on whether the driver can overrule the car's decisions, needs to supervise or has to be able/ready to intervene.
-
-
 
 
 Currently, we have implemented three different levels of automation:
@@ -80,39 +72,15 @@ Currently, we have implemented three different levels of automation:
 
 ## Assessments
 
-To answer our hypotheses and to monitor the load on the driver we first need to quantify driving performance and cognitive load. Regarding the former, we could consider multiple measures such as the time it takes to change lanes, the lateral deviations from the middle of the lane, deviations from speed limits (based on Savino, 2009), reaction times, and gap acceptance (Papantoniou, Papadimitriou, and Yannis, 2017). We will monitor a selection of these measures continuously during experimental sessions.
+For investigating our hypotheses and for monitoring the load on the driver online we need to quantify cognitive load. We need an online measure because the adaptive automation system should have access to a direct measure of the mental/cognitive load currently experienced by the user when deciding whether to increase or decrease the level of automation. We will rely on Pupil dilation as such an indicator of cognitive load (Kahneman, 1973). Thus, we will continuously measure the size of the driver’s pupil. How these measures of the driver's pupil size are utilized to decide on the appropriate level of automation is detailed in the "Decision mechanism" section.
 
+As part of the final statistical analysis, we will investigate how the size of the pupil changes over time, following an increase in the level of automation. This will allow us to assess whether an adaptive automation system might allow to manipulate the mental workload imposed on a driver. Additionally, we will investigate how the pupil changes over time following a multiplication problem. This will allow us to assess whether a) our manipulation was effective in influencing mental workload and b) whether the pupil size following a question changed differently in the two conditions.
 
+We were also interested in the performance on a secondary task: solving multiplication problems. This task theoretically permits two performance metrics that could be taken into account: response time and response accuracy. Since we scored the answers participants gave manually we opted to only record the latter. As part of the statistical analysis we will investigate whether subjects performed better, according to this metric, in the aided condition compared to the unaided condition.
 
+Initially we also wanted to investigate driving performance metrics. We could have considered multiple measures such as the time it takes to change lanes, the lateral deviations from the middle of the lane, deviations from speed limits (based on Savino, 2009), reaction times, and gap acceptance (Papantoniou, Papadimitriou, and Yannis, 2017). However, just comparing any of these metrics between the two conditions (aided and unaided) would not be very informative, since the performance metrics recorded during the aided condition would reflect not just the driver's performance but also the autonomous system's performance. While we could have compared performance measures unrelated to the actions taken over by the model during partial-automation periods in the aided condition with the same measures in the unaided condition it would have been difficult to experimentally control for the influence other variables have on driving performance (e.g. is the driver currently solving a multiplication problem or not) during these periods. This would confound the interpretation of differences in performance.
 
-Driving performance in the unaided condition can then be compared to driving performance during no-automation periods in the aided condition. Additionally, driving performance measures unrelated to the actions taken over by the model during partial-automation in the aided condition can be compared to the same measures in the unaided condition (see example 1).
-
-
-
-
-Example 1: the above-mentioned deviations from the speed limit while the model performs lateral control can still be compared to the deviations measured in the unaided condition since this depends exclusively on longitudinal control which is still performed by the driver.
-
-Apart from relying on these driving performance measures, the adaptive automation system also should have access to a more direct measure of the mental/cognitive load currently experienced by the user. We will rely on Pupil dilation as such an indicator of cognitive load (Kahneman, 1973). Thus, we will also continuously measure the size of the driver’s pupil. One approach to detect changes in cognitive demand is to monitor both short-term and long-term changes in the size of the pupil (see example 2, Mindakis & Lohan, 2018).
-
-
-
-
-Example 2:
-
-
-
-![example image](images/baseline_estimate.png "Short term versus long term average")
-
-
-
-Example 2 shows resulting changes in pupil dilation (black, top panel) based on given changes in demand (lower panel) simulated using the pupil model by Hoeks & Levelt (1993). Keeping track of short-term deviations (green line, top panel) from the long-term trend in the size of the pupil (red line, top panel) by means of moving averages (Mindakis & Lohan, 2018) allows identifying the prolonged episodes of increased demand quite well. The adaptive automation system could then increase the level of automation if a significant short-term deviation from the long-term trend occurs. Similarly, the automation level could be decreased once the short-term demand gravitates towards the long-term trend again. Assuming that this would indeed lower the driver’s workload, the short-term changes in the size of the pupil should then begin to gravitate back towards the long-term trend which approximates the average size of the pupil during the recorded period quite well. The automation level could then again be decreased once the short-term changes have sufficiently converged back towards the long-term trend.
-
-
-
-
-As part of the final statistical analysis, we will investigate how the size of the pupil changes over time, following a change in the level of automation. This will allow us to assess whether the changes in the level of automation are actually associated with a change in the size of the pupil reflecting demand.
-
-
+Maybe you can add something here Chiel :)
 
 
 ## Application modules
@@ -135,6 +103,16 @@ As discussed in the assessment section, a plethora of car control measures exist
 Currently, we are not yet using these simulation measures to decide on the automation level.
 
 ### Decision mechanism
+
+Work in progress
+
+Integrate:
+
+![example image](images/baseline_estimate.png "Short term versus long term average")
+
+
+
+Example 2 shows resulting changes in pupil dilation (black, top panel) based on given changes in demand (lower panel) simulated using the pupil model by Hoeks & Levelt (1993). Keeping track of short-term deviations (green line, top panel) from the long-term trend in the size of the pupil (red line, top panel) by means of moving averages (Mindakis & Lohan, 2018) allows identifying the prolonged episodes of increased demand quite well. The adaptive automation system could then increase the level of automation if a significant short-term deviation from the long-term trend occurs. Similarly, the automation level could be decreased once the short-term demand gravitates towards the long-term trend again. Assuming that this would indeed lower the driver’s workload, the short-term changes in the size of the pupil should then begin to gravitate back towards the long-term trend which approximates the average size of the pupil during the recorded period quite well. The automation level could then again be decreased once the short-term changes have sufficiently converged back towards the long-term trend.
 
 Once the pupil dilation data and driving performance measures have been collected, they need to be used to decide on an appropriate level of automation. In the assessment section, we already outlined how we could take the pupil size measurements into account. To incorporate the driving performance measures we could rely on a variety of ways including handcrafted if-then rules, a set of SVMs, a Bayesian network, et cetera. It would be preferred if the mechanism that we will eventually use maintains transparency w.r.t. how it reached the conclusion that it should activate automation level X given the data. In other words, preserving explainability would be nice.
 
