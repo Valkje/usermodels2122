@@ -19,9 +19,23 @@ This project concerns itself with the adaptive automation of a simulated driving
 
 We hypothesize that increases in automation will reduce the driver’s workload. Based on this we expect that adaptive automation will lead to a more stable mental workload over time. Additionally, we hypothesize that we will be observing an improvement in the performance on a secondary task due to adaptive automation since subjects might be able to focus more on that secondary task when the model is in (partial) control of the driving task. We also hypothesized that we would be able to observe an inprovement in human driving performance measures due to adaptive automation. However, we did not investigate this hypothesis further because of two reasons. First, due to a recording error we did not collect driving performance data during the experiment. More importantly however, investigating this hypothesis would have been complicated by the fact that driving performance metrics would reflect a mixture of the autonomous driving model's performance and the driver's performance (see Assessment).
 
+## Levels of Automation
+
+In order to successfully drive a car, two distinct types of control need to be performed. The first type, called lateral control, concerns itself with the sideways motion of the vehicle, and thus with how well a car can keep in its designated lane, or switch lanes when necessary. A driver performs lateral control by turning the steering wheel to influence the direction of the car. The second type, called longitudinal control, concerns itself with the velocity of the vehicle and thus also with the distance to other vehicles, either in front or behind. A driver performs longitudinal control by pressing their foot on the gas or brake pedal to influence the speed of the vehicle.
+
+These distinct types of control allow for various levels of automation. The lowest level of automation is when the driver is responsible for both types of control and is thus in full control of the vehicle (from now on referred to as no—automation). When the vehicle, or more specifically the model, takes over longitudinal control, we speak of partial automation. The model takes over longitudinal control, and not lateral, as this type of driver assistance is well-known, under the name cruise control, and participants will not have to get used to it. The highest level of automation is when the vehicle is responsible for both lateral and longitudinal control, we call this full automation.
+
+The terminology used does differ from a well-known taxonomy of levels of automation as determined by a committee of the Society of Automotive Engineers (SAE) (ORAD committee, 2018). This includes monitoring of the vehicle and the environment under automated activity as a driver task and takes this into account when determining the level of automation. As we, for this project/experiment, assume that the model performs correctly, this supervision while relying on the vehicle for either or both types of control does not play a part in our definition, and is not even considered a task of the driver. The SAE would classify our definition of partial automation as Driver Assistance (level 1) and our definition of full automation as either Partial Driving Automation (level 2), Conditional Driving Automation (level 3), High Driving Automation (level 4), or Full Driving Automation (level 5) dependent on whether the driver can overrule the car's decisions, needs to supervise or has to be able/ready to intervene.
+
+We have implemented three different levels of automation:
+
+1. No automation, driver has full control.
+2. Partial automation in the form of cruise control: The driver can still steer the vehicle, but the speed is being controlled by the ACT-R model.
+3. Full automation, ACT-R controls both steering and speed.
+
 ## Experiment (Test of System)
 
-To test these hypotheses, our experimental setup needs to account for multiple aspects: the participants, experiment design, and the type of follow-up analyses. For this experiment, we aim at having two experimental within-subjects conditions (aided vs. unaided): in the aided condition the adaptive automation system will be enabled, while in the unaided condition the driver remains in full control for the entire session. Additionally, we need to manipulate the load on the driver in both conditions to test whether our adaptive automation system takes over control in appropriate moments and how the increase in automation will impact the driver. To manipulate the load on the driver we will let the participants complete a secondary task: Solving multiplication problems. These problems will be presented to the participants with a text-to-speech synthesizer, so participants will still be able to watch the road, which allows us to continue to monitor changes in the size of the pupil. Participants can respond to the problems using their voice, and we will record their responses manually.
+To test the hypotheses, our experimental setup needs to account for multiple aspects: the participants, experiment design, and the type of follow-up analyses. For this experiment, we aim at having two experimental within-subjects conditions (aided vs. unaided): in the aided condition the adaptive automation system will be enabled, while in the unaided condition the driver remains in full control for the entire session. Additionally, we need to manipulate the load on the driver in both conditions to test whether our adaptive automation system takes over control in appropriate moments and how the increase in automation will impact the driver. To manipulate the load on the driver we will let the participants complete a secondary task: Solving multiplication problems. These problems will be presented to the participants with a text-to-speech synthesizer, so participants will still be able to watch the road, which allows us to continue to monitor changes in the size of the pupil. Participants can respond to the problems using their voice, and we will record their responses manually.
 
 To create concrete switches between light and heavy mental workload, within each aided/unaided condition, periods in which the participant will be asked to solve multiplication problems are alternated with periods in which the participant is not asked to solve problems. More specifically, the experiment schedule looks as follows:
 
@@ -43,9 +57,6 @@ To create concrete switches between light and heavy mental workload, within each
     3. 2.5-minute without algebra problems
     4. 2.5-minute with algebra problems
 
-
-
-
 To prevent any effect of specific multiplication problems on pupil size and/or driving performance, two different lists of multiplication problems will be created and counterbalanced across the participants. Similarly, to prevent any learning effects, we will also have to counterbalance the aided/unaided conditions across participants. This yields 2*2=4 different experiment run configurations, as detailed in the table below. This means that we will recruit a number of participants dividable by four, so every configuration will be associated with the same number of participants.
 
 | Session 1 (automation condition) | Session 2 (automation condition) | Session 1 (multiplication list) | Session 2 (multiplication list) |
@@ -55,20 +66,6 @@ To prevent any effect of specific multiplication problems on pupil size and/or d
 | Unaided                          | Aided                            | List 1                          | List 2                          |
 | Unaided                          | Aided                            | List 2                          | List 1                          |
 
-## Levels of Automation
-
-In order to successfully drive a car, two distinct types of control need to be performed. The first type, called lateral control, concerns itself with the sideways motion of the vehicle, and thus with how well a car can keep in its designated lane, or switch lanes when necessary. A driver performs lateral control by turning the steering wheel to influence the direction of the car. The second type, called longitudinal control, concerns itself with the velocity of the vehicle and thus also with the distance to other vehicles, either in front or behind. A driver performs longitudinal control by pressing their foot on the gas or brake pedal to influence the speed of the vehicle.
-
-These distinct types of control allow for various levels of automation. The lowest level of automation is when the driver is responsible for both types of control and is thus in full control of the vehicle (from now on referred to as no—automation). When the vehicle, or more specifically the model, takes over longitudinal control, we speak of partial automation. The model takes over longitudinal control, and not lateral, as this type of driver assistance is well-known, under the name cruise control, and participants will not have to get used to it. The highest level of automation is when the vehicle is responsible for both lateral and longitudinal control, we call this full automation.
-
-The terminology used does differ from a well-known taxonomy of levels of automation as determined by a committee of the Society of Automotive Engineers (SAE) (ORAD committee, 2018). This includes monitoring of the vehicle and the environment under automated activity as a driver task and takes this into account when determining the level of automation. As we, for this project/experiment, assume that the model performs correctly, this supervision while relying on the vehicle for either or both types of control does not play a part in our definition, and is not even considered a task of the driver. The SAE would classify our definition of partial automation as Driver Assistance (level 1) and our definition of full automation as either Partial Driving Automation (level 2), Conditional Driving Automation (level 3), High Driving Automation (level 4), or Full Driving Automation (level 5) dependent on whether the driver can overrule the car's decisions, needs to supervise or has to be able/ready to intervene.
-
-
-Currently, we have implemented three different levels of automation:
-
-1. No automation, driver has full control.
-2. Partial automation in the form of cruise control: The driver can still steer the vehicle, but the speed is being controlled by the ACT-R model.
-3. Full automation, ACT-R controls both steering and speed.
 
 ## Assessments
 
@@ -110,9 +107,8 @@ Therefore, we changed the decision mechanism to utilize more information. We wer
 
 We adapted this system by Novacic & Tokhi (n.d.) to utilize two moving averages based on the choices by Mindakis and Lohan (2018), resulting in the following algorithm:
 
-- Define initial values for weight, window_size_short_term, window_size_long_term, window_size_variance, lock_duration
-- set automationLevel to 1
-
+- Define initial values for weight, window_size_short_term, window_size_long_term, window_size_variance
+- set automation_level to "no automation"
 
 - while recording:
     - get newest pupil size
@@ -122,19 +118,20 @@ We adapted this system by Novacic & Tokhi (n.d.) to utilize two moving averages 
         - calculate difference between short_term_trend and long_term_trend
         - update variance with difference
     
-    - if short_term_trend >= long_term_trend + weight * sqrt(variance):
+    - if short_term_trend >= long_term_trend + weight * sqrt(variance) and automation_level is not "full automation":
         - schedule automation increase
-    - if short_term_trend <= long_term_trend and automation_level > 1:
+    - if short_term_trend <= long_term_trend and automation_level is not "no automation":
         - schedule automation decrease
 
 This routine will propose an increase in automation, should the short term trend exceed the decision boundary and will propose a decrease in automation as soon as the short term trend returns to the long term trend. In our implementation we further prevent this system from scheduling a change in automation for a fixed period (used to warn the driver about the upcoming change) after every change. This automatically ensures that, should any of the decision conditions again be met after this lockdown, the system will then propose to further increase or decrease the level of automation.
 
-
-### Implementation of automation levels (perhaps name this Interface of the adaptive automation system?)
+### Implementation and Interface of the Adaptive Automation System 
 
 We use the existing ACT-R model to automate the driving process. Since we sometimes want to use no or only partial automation, certain parts of the ACT-R model are sometimes ignored when controlling the car. Previously, we worried that ACT-R might not be able to adapt to situations in which its output is ignored, but as it turns out, the ACT-R model has no problem recovering from the no and partial automation levels.
 
 Information regarding the adaptive automation system is presented to the driver using a head-up display (HUD) on top of the dashboard. The head-up display presents information on a transparent material in the line of sight of the driver such that they do not have to take their eyes of the road to perceive the information. On the left and middle parts of the HUD the automation level is displayed by a text string stating _DRIVER CONTROL_ indicating no automation, _CRUISE CONTROL_ indicating partial automation, or _PASSENGER MODE_ indicating full automation. In addition to the level of automation, the HUD also displays the current speed limit if the driver deviates more from that limit by more than 10%. We added this because at higher speeds, we found that it is sometimes (near) impossible to read the speed signs.
+
+When a change in automation is scheduled by the adaptive automation system, the text indicating the to-be level of automation will blink multiple times on the HUD. The text blinks three times and at the fourth appearance the blinking stops and the level of automation actually changes. After this change, a time lock of 10 seconds is activated during which the decision mechanism cannot schedule a change in automation. This time lock in implemented to make sure that the level of automation is not constantly changing, which would make use of the system rather chaotic.
 
 ![image](https://user-images.githubusercontent.com/45287198/139838439-35b31ffe-a4f6-4405-bf77-29f45b58d3f6.png)
 
