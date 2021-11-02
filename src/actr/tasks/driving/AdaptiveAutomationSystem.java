@@ -40,7 +40,7 @@ public class AdaptiveAutomationSystem {
 
     private void decideAutomationLevel() {
         /**
-         * Provide explanation here.
+         * See docs/index.md for an explanation of this routine.
          */
         double shortPred = server.SV;
         double longPred = server.LV;

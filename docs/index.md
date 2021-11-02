@@ -105,7 +105,7 @@ An advantage of these systems is that moving averages can be computed efficientl
 
 Therefore, we wanted to change the decision mechanism to utilize more information. Specifically, we wanted our system to account for the "dispersion" (see: [here](https://en.wikipedia.org/wiki/Statistical_dispersion) for an overview) of the short-term trend's fluctuations around the long-term pupil size average. We can then utilize this measure of variation to decide when the short-term changes in pupil size deviate too extremely from the long-term changes in pupil size, which is a common strategy in outlier detection systems (see for example Mehrang, 2015 for an approach utilizing the median absolute deviation MAD). However, since we wanted to work with averages based on the recommendations by Mindakis & Lohan (2018) we opted to compute a cumulative estimate of the standard deviation or variance instead of the MAD (see: [here](https://en.wikipedia.org/wiki/Standard_deviation), [here](https://en.wikipedia.org/wiki/Root-mean-square_deviation) and the Python implementation for details). 
 
-The algorithm below details how we combine the standard deviation and the moving averages to reach an automation decision:
+The algorithm below details how we combine the standard deviation and the moving averages to reach an automation decision (see AdaptiveAutomationSystem.java file):
 
 - Define initial values for weight, window_size_short_term, window_size_long_term
 - set automation_level to "no automation"
