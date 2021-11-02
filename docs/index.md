@@ -13,7 +13,7 @@
 
 ## Introduction
 
-This project concerns itself with the adaptive automation of a simulated driving task. Relying on an existing driving model implemented in ACT-R, we will research and develop a real-time adaptive automation system that will determine when the model should take over partial or full control of the driving task and when control should be handed back to the human driver. The adaptive automation system should attempt to maintain a stable driver mental workload, increasing the level of automation when the driver's mental workload becomes too high and decreasing the level of automation again when the driver's mental workload has decreased sufficiently.
+This project concerns itself with the adaptive automation of a simulated driving task. Relying on an existing driving model implemented in ACT-R, we will research and develop a real-time adaptive automation system that will determine when the model should take over partial or full control of the driving task and when control should be handed back to the human driver. The adaptive automation system should attempt to maintain a stable driver mental workload, increasing the level of automation when the driver's mental workload becomes too high and decreasing the level of automation again when the driver's mental workload has decreased sufficiently. The applicability of adaptive automation as a method for controlling excessive mental workload is that by taking away (sub)tasks we redistribute (or reduce) the workload imposed on the driver, thereby reducing mental workload (Vidulich and Chang (2012)). The advantage of an adaptive automation system ofver a non-adaptive automation system is that by maintaining a sufficiently high level of mental workload we can prevent error due to poor situation awareness, which could result in a driver not properly responsing to unexpected events.
 
 ## Hypotheses
 
@@ -80,7 +80,7 @@ We were also interested in the performance on a secondary task: solving multipli
 
 Initially we also wanted to investigate driving performance metrics. We could have considered multiple measures such as the time it takes to change lanes, the lateral deviations from the middle of the lane, deviations from speed limits (based on Savino, 2009), reaction times, and gap acceptance (Papantoniou, Papadimitriou, and Yannis, 2017). However, just comparing any of these metrics between the two conditions (aided and unaided) would not be very informative, since the performance metrics recorded during the aided condition would reflect not just the driver's performance but also the autonomous system's performance. While we could have compared performance measures unrelated to the actions taken over by the model during partial-automation periods in the aided condition with the same measures in the unaided condition it would have been difficult to experimentally control for the influence other variables have on driving performance (e.g. is the driver currently solving a multiplication problem or not) during these periods. This would confound the interpretation of differences in performance.
 
-Maybe you can add something here Chiel :)
+In addition, Vidulich and Chang (2012) outline a number of reasons why secondary task performance assesment of mental workload could be preferred over primary task performance (e.g. the driving performance measures outlined in the previous paragraph). For (semi-)automated systems it can be difficult, if not impossible, to acquire primary task performance measures. Also, primary task performance may be influenced by other factors than mental workload, for example inter-individual differences in skill and exerted mental effort, and may thus not be diagnostic of mental workload. Under the right instructions (i.e. to prioritize the main task) the secondary task performance should be reflective of the spare mental capacity that a subject has while performing the primary task, and thus the level of mental workload.
 
 
 ## Application modules
@@ -118,11 +118,13 @@ Once the pupil dilation data and driving performance measures have been collecte
 
 At the moment of writing, the decision mechanism only bases its decision on the pupil dilation, as detailed in the Assessments section.
 
-### Implementation of automation levels
+### Implementation of automation levels (perhaps name this Interface of the adaptive automation system?)
 
 We use the existing ACT-R model to automate the driving process. Since we sometimes want to use no or only partial automation, certain parts of the ACT-R model are sometimes ignored when controlling the car. Previously, we worried that ACT-R might not be able to adapt to situations in which its output is ignored, but as it turns out, the ACT-R model has no problem recovering from the no and partial automation levels.
 
-Although we have already implemented visual changes signifying the current level of automation, a system that warns the user that the information level is about to change still needs to be implemented.
+Information regarding the adapative automation system is presented to the driver using a head-up display (HUD) on top of the dashboard. The head-up display presents information on a transparent material in the line of sight of the driver such that they do not have to take their eyes of the road to perceive the information. On the leftand middle parts of the HUD the automation level is displayed by a text string stating _DRIVER CONTROL_ indicating no automation, _CRUISE CONTROL_ indicating partial automation, or _PASSENGER MODE_ indicating full automation. In addition to the level of automation, the HUD also displays the current speed limit if the driver deviates more thfrom that limit by more than 10%. We added this because at higher speeds, we found that is was sometimes (near) impossible to read the speedsigns.
+
+![image](https://user-images.githubusercontent.com/45287198/139838439-35b31ffe-a4f6-4405-bf77-29f45b58d3f6.png)
 
 ## References
 
@@ -131,10 +133,14 @@ Papantoniou, P., Papadimitriou, E., & Yannis, G. (2017). Review of driving perfo
 On-Road Automated Driving (ORAD) committee (2018). Taxonomy and Definition for Terms Related to Driving Automation System for On-Road Motor Vehicles. Available from https://doi.org/10.4271/J3016_201609
 
 Hoeks, B., Levelt, W. (1993) Pupillary dilation as a measure of attention: A quantitative system analysis
+
 Mindakis, G., Lohan, K. (2018) Using Pupil Diameter to Measure Cognitive Load
 
 Savino M. R. (2009) Standardized Names and Definitions for Driving Performance Measures
+
 Kahneman, D. (1973) Attention and Effort
+
+Vidulich, M.A. and Tsang, P.S. (2012). Mental Workload and Situation Awareness. In Handbook of Human Factors and Ergonomics, G. Salvendy (Ed.). https://doi.org/10.1002/9781118131350.ch8
 
 ## Answers to questions
 
@@ -166,4 +172,3 @@ Marquart G., Cabrall C., de Winter J. (2015), “Review of Eye-related Measures 
 
 Bruggen, A. (2015), "An empirical investigation of the relationship between workload and performance", Management Decision, Vol. 53 No. 10, pp. 2377-2389. https://doi.org/10.1108/MD-02-2015-0063
 
-Vidulich, M.A. and Tsang, P.S. (2012). Mental Workload and Situation Awareness. In Handbook of Human Factors and Ergonomics, G. Salvendy (Ed.). https://doi.org/10.1002/9781118131350.ch8
