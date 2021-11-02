@@ -7,7 +7,7 @@ Additionally, we manipulated the mental workload on the driver in both condition
 
 ![experiment set-up](images/experiment_set-up.png "Experiment set-up")
 
-To prevent any effect of specific multiplication problems on pupil size and/or driving performance, two different lists of multiplication problems will be created and counterbalanced across the participants. Similarly, to prevent any learning effects, we will also have to counterbalance the aided/unaided conditions across participants. This yields 2*2=4 different experiment run configurations, as detailed in the table below. This means that we will recruit a number of participants dividable by four, so every configuration will be associated with the same number of participants.
+To prevent any effect of specific multiplication problems on pupil size and/or driving performance, two different lists of multiplication problems were created; one for each session. The order in which the lists were presented was counterbalanced across subjects. Similarly, to prevent any effects of learning or practice, we also counterbalanced the order of the aided/unaided conditions across participants. This yielded 2*2=4 different experiment run configurations, as detailed in Table X.
 
 | Session 1 (automation condition) | Session 2 (automation condition) | Session 1 (multiplication list) | Session 2 (multiplication list) |
 |----------------------------------|----------------------------------|---------------------------------|---------------------------------|
