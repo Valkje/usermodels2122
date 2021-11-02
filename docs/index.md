@@ -94,29 +94,41 @@ Our application can be divided up into four major parts:
 
 ### Eye-tracking
 
-In some way or another, the adaptive automation decision system will depend on the pupil size. Thus, we will repeatedly query the pupil dilation from the eye-tracking device. We will have to make decisions about the sampling rate here.
+The adaptive automation decision system will depend on changes in the pupil size. Thus, we repeatedly query the pupil dilation from the eye-tracking device (EyeLink Portable Duo from SR research), which records at a sampling rate of 500 HZ. We only record the left eye. The recorded samples are written to an .EDF file for offline analysis but also made available online through the eye-tracker's "link".
 
-### Simulation measures
-
-As discussed in the assessment section, a plethora of car control measures exists that are typically taken to assess driving performance in real life. Although most of these measures should be available from the simulation, some might be more easily accessible than others, so we will need to strike a balance between how informative a measure is (based on the literature) and how easy it is to monitor it.
-
-Currently, we are not yet using these simulation measures to decide on the automation level.
+These online samples are collected by Python, which also keeps track of updating all the necessary parts of the adaptive automation system that are necessary for the decision (see "Decision mechanism" section).
 
 ### Decision mechanism
 
-Work in progress
+Since we want to compute automation decisions online, our system has to be of low computational complexity. Mindakis and Lohan (2018) suggested that monitoring both long-term changes and short-term changes in the size of the pupil would allow for an online investigation of changes in cognitive load. They rely on moving averages of different window size to estimate the aforementioned long-term and short-term changes. Unfortunately, their actual decision mechanism is not formulated very explicitly: they "assume that, when the size of the pupil is larger than 70% of the maximum the cognitive load is high." (Mindakis & Lohan, 2018) but it is not immediately clear how the aforementioned trend estimates relate to the terms "maximum" and "size" in this sentence.
 
-Integrate:
+Nevertheless, we interpreted this as suggesting that increases in cognitive load can be detected by monitoring short-term deviations from the long-term trend, which would align well with similar systems that have been utilized in the past (e.g. Katidioti et al., 2016). These kind of systems, essentially engage in "novelty" or "anomaly" detection by evaluating whether short term changes in the size of the pupil are signifcantly higher (Mindakis & Lohan, 2018) or lower (Katidioti et al., 2016) than some long-term base-line, which is taken as an indicator of an increase or decrease in cognitive load (Mindakis & Lohan, 2018; Katidioti et al., 2016).
 
-![example image](images/baseline_estimate.png "Short term versus long term average")
+An advantage of these systems is that moving averages can be computed efficiently (see Python implementation). Furthermore, relying on a moving average not just for long-term trend estimation but also for short-term trend estimation, as was done by Mindakis and Lohan (2018), reduces the impact possible outliers in the recorded pupil sizes have on the decision system. However, relying on a singular maximum value for the decision threshold is unlikely to be robust to the dynamic changes of the environment (e.g. light pollution) when driving a car.
+
+Therefore, we changed the decision mechanism to utilize more information. We were inspired by the moving window system described in Novacic & Tokhi (n.d.), which calculates the moving variance around a moving average of a continuously measured signal to estimate the expected degree of variation around that signal. The variance can then be multiplied by a fixed weight to define at what point a realization of the signal counts as outlier. While the weight is fixed in this system the variance itself remains adaptive (since it is also calculated for a moving window), ensuring that the system is more suitable for implementation in a car.
+
+We adapted this system by Novacic & Tokhi (n.d.) to utilize two moving averages based on the choices by Mindakis and Lohan (2018), resulting in the following algorithm:
+
+- Define initial values for weight, window_size_short_term, window_size_long_term, window_size_variance, lock_duration
+- set automationLevel to 1
 
 
+- while recording:
+    - get newest pupil size
+    - if newest pupil size is not zero:
+        - update short_term_trend
+        - update long_term_trend
+        - calculate difference between short_term_trend and long_term_trend
+        - update variance with difference
+    
+    - if short_term_trend >= long_term_trend + weight * sqrt(variance):
+        - schedule automation increase
+    - if short_term_trend <= long_term_trend and automation_level > 1:
+        - schedule automation increase
 
-Example 2 shows resulting changes in pupil dilation (black, top panel) based on given changes in demand (lower panel) simulated using the pupil model by Hoeks & Levelt (1993). Keeping track of short-term deviations (green line, top panel) from the long-term trend in the size of the pupil (red line, top panel) by means of moving averages (Mindakis & Lohan, 2018) allows identifying the prolonged episodes of increased demand quite well. The adaptive automation system could then increase the level of automation if a significant short-term deviation from the long-term trend occurs. Similarly, the automation level could be decreased once the short-term demand gravitates towards the long-term trend again. Assuming that this would indeed lower the driver’s workload, the short-term changes in the size of the pupil should then begin to gravitate back towards the long-term trend which approximates the average size of the pupil during the recorded period quite well. The automation level could then again be decreased once the short-term changes have sufficiently converged back towards the long-term trend.
+This routine will propose an increase in automation, should the short term trend exceed the decision boundary and will propose a decrease in automation as soon as the short term trend returns to the long term trend. In our implementation we further prevent this system from scheduling a change in automation for a fixed period (used to warn the driver about the upcoming change) after every change. This automatically ensures that, should any of the decision conditions again be met after this lockdown, the system will then propose to further increase or decrease the level of automation.
 
-Once the pupil dilation data and driving performance measures have been collected, they need to be used to decide on an appropriate level of automation. In the assessment section, we already outlined how we could take the pupil size measurements into account. To incorporate the driving performance measures we could rely on a variety of ways including handcrafted if-then rules, a set of SVMs, a Bayesian network, et cetera. It would be preferred if the mechanism that we will eventually use maintains transparency w.r.t. how it reached the conclusion that it should activate automation level X given the data. In other words, preserving explainability would be nice.
-
-At the moment of writing, the decision mechanism only bases its decision on the pupil dilation, as detailed in the Assessments section.
 
 ### Implementation of automation levels (perhaps name this Interface of the adaptive automation system?)
 
@@ -141,6 +153,11 @@ Savino M. R. (2009) Standardized Names and Definitions for Driving Performance M
 Kahneman, D. (1973) Attention and Effort
 
 Vidulich, M.A. and Tsang, P.S. (2012). Mental Workload and Situation Awareness. In Handbook of Human Factors and Ergonomics, G. Salvendy (Ed.). https://doi.org/10.1002/9781118131350.ch8
+
+Katidioti, I., Borst, J. P., Bierens de Haan, D. J., Pepping, T., van Vugt, M. K., & Taatgen, N. A. (2016). Interrupted by Your Pupil: An Interruption Management System Based on Pupil Dilation. International Journal of Human–Computer Interaction, 32(10), 791–801. https://doi.org/10.1080/10447318.2016.1198525
+
+Novacic, J., & Tokhi, K. (n.d.). Implementation of Anomaly Detection on a Time-series Temperature Data set. 47.
+
 
 ## Answers to questions
 
