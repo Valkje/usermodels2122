@@ -19,10 +19,10 @@ class MovingAverage():
 
     def update(self,newSample):
         """
-        * Three steps:
-        * 1) update buffer
-        * 2) update movingSum
-        * 3) update currentValue
+        * Wikipedia article recommends a FIFO, so we use that as well
+        * but instead of re-using the previous value as suggested in the
+        * article we manipulate just the moving sum and then re-compute the current value.
+        * We do need to keep track of the buffer size but that is relatively cheap.
         """
 
         # First add to current sum!
@@ -42,7 +42,7 @@ class MovingAverage():
         self.currentValue = self.movingSum/self.currentBufferSize
 
         # For plotting and analysis
-        self.history.append(self.currentValue)
+        #self.history.append(self.currentValue) #[Deprecated] we handled plotting in main
     
     def getCurrentValue(self):
         return self.currentValue

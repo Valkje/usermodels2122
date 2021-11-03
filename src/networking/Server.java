@@ -16,6 +16,7 @@ public class Server {
     public int posX;
     public int posY;
     public double lastPupilSample;
+    // The three parameters below are accessed by the adaptive automation system
     public double SV;
     public double LV;
     public double RMSE;
