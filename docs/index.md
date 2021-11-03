@@ -4,12 +4,12 @@
 
 1. [Introduction](#introduction)
 2. [Hypotheses](#hypotheses)
-3. [Experiment](#experiment-test-of-system)
-4. [Levels of automation](#levels-of-automation)
-5. [Assessments](#assessments)
-6. [Application modules](#application-modules)
-7. [References](#references)
-8. [Answers to questions](#answers-to-questions)
+3. [Levels of automation](#levels-of-automation)
+4. [Experiment](#experiment-test-of-system)
+6. [Assessments](#assessments)
+7. [Application modules](#application-modules)
+8. [References](#references)
+9. [Answers to questions](#answers-to-questions)
 
 ## Introduction
 
@@ -57,6 +57,8 @@ To create concrete switches between light and heavy mental workload, within each
     3. 2.5-minute without algebra problems
     4. 2.5-minute with algebra problems
 
+During the 2.5-minute algebra problem session the participant will be presented with 10 different multiplication problems. That means that there are 15-second periods for each question. The problem is vocalized (by the program) at the start of this period, the participant has the rest of the period to vocalize his/her answer.
+
 To prevent any effect of specific multiplication problems on pupil size and/or driving performance, two different lists of multiplication problems will be created and counterbalanced across the participants. Similarly, to prevent any learning effects, we will also have to counterbalance the aided/unaided conditions across participants. This yields 2*2=4 different experiment run configurations, as detailed in the table below. This means that we will recruit a number of participants dividable by four, so every configuration will be associated with the same number of participants.
 
 | Session 1 (automation condition) | Session 2 (automation condition) | Session 1 (multiplication list) | Session 2 (multiplication list) |
@@ -75,7 +77,7 @@ As part of the final statistical analysis, we will investigate how the size of t
 
 We were also interested in the performance on a secondary task: solving multiplication problems. This task theoretically permits two performance metrics that could be taken into account: response time and response accuracy. Since we scored the answers participants gave manually we opted to only record the latter. As part of the statistical analysis we will investigate whether subjects performed better, according to this metric, in the aided condition compared to the unaided condition.
 
-Initially we also wanted to investigate driving performance metrics. We could have considered multiple measures such as the time it takes to change lanes, the lateral deviations from the middle of the lane, deviations from speed limits (based on Savino, 2009), reaction times, and gap acceptance (Papantoniou, Papadimitriou, and Yannis, 2017). However, Vidulich and Chang (2012) outline a number of reasons why secondary task performance assessment of mental workload could be preferred over primary task performance (e.g. the driving performance measures outlined in the previous paragraph). For (semi-)automated systems it can be difficult, if not impossible, to acquire primary task performance measures. Specifically, the performance metrics recorded during the aided condition would reflect not just the driver's performance but also the autonomous system's performance. While we could have compared performance measures unrelated to the actions taken over by the model during partial-automation periods in the aided condition with the same measures in the unaided condition it would have been difficult to experimentally control for the influence other variables have on driving performance (e.g. is the driver currently solving a multiplication problem or not) during these periods. This would confound the interpretation of differences in performance. Also, primary task performance may be influenced by other factors than mental workload, for example inter-individual differences in skill and exerted mental effort, and may thus not be diagnostic of mental workload. Under the right instructions (i.e. to prioritize the main task) the secondary task performance should be reflective of the spare mental capacity that a subject has while performing the primary task, and thus the level of mental workload.
+Initially we also wanted to investigate driving performance metrics. We could have considered multiple measures such as the time it takes to change lanes, the lateral deviations from the middle of the lane, deviations from speed limits (based on Savino, 2009), reaction times, and gap acceptance (Papantoniou, Papadimitriou, and Yannis, 2017). However, Vidulich and Chang (2012) outline a number of reasons why secondary task performance assessment of mental workload could be preferred over primary task performance (e.g. the driving performance measures that were just outlined). For (semi-)automated systems it can be difficult, if not impossible, to acquire primary task performance measures. Specifically, the performance metrics recorded during the aided condition would reflect not just the driver's performance but also the autonomous system's performance. While we could have compared performance measures unrelated to the actions taken over by the model during partial-automation periods in the aided condition with the same measures in the unaided condition it would have been difficult to experimentally control for the influence other variables have on driving performance (e.g. is the driver currently solving a multiplication problem or not) during these periods. This would confound the interpretation of differences in performance. Also, primary task performance may be influenced by other factors than mental workload, for example inter-individual differences in skill and exerted mental effort, and may thus not be diagnostic of mental workload. Under the right instructions (i.e. to prioritize the main task) the secondary task performance should be reflective of the spare mental capacity that a subject has while performing the primary task, and thus the level of mental workload.
 
 
 ## Application modules
