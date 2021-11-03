@@ -160,36 +160,3 @@ Vidulich, M.A. and Tsang, P.S. (2012). Mental Workload and Situation Awareness. 
 Katidioti, I., Borst, J. P., Bierens de Haan, D. J., Pepping, T., van Vugt, M. K., & Taatgen, N. A. (2016). Interrupted by Your Pupil: An Interruption Management System Based on Pupil Dilation. International Journal of Human–Computer Interaction, 32(10), 791–801. https://doi.org/10.1080/10447318.2016.1198525
 
 Mehrang, S. (2016). Outlier Detection in Weight Time Series of Connected Scales: A Comparative Study.
-
-
-
-## Answers to questions
-
-**Gilles' question**:
-
-Good question! We want to measure pupil dilation as a proxy for cognitive load, to determine whether the driver might be needing some driving assistance. However, the term ‘cognitive load’ is poorly defined, and could be interpreted as 1) increased competition for specific resources or 2) increased usage of cognitive resources overall (but without increased competition). Whatever the interpretation, we think we can ensure that pupil dilation changes with our secondary task. We will argue why we think so for both interpretations of cognitive load:
-
-1) It is true that the secondary task we have planned (answering questions about an English listening test) uses a different perception modality (hearing) than the primary task (vision), but that does not mean that the different tasks do not draw on the same resources. While driving, participants need to focus on the approaching speed sign to read its contents (which is actually not that trivial) and then remember the speed limit they just saw. While listening to the audio file, they need to concentrate on its contents and remember it to properly answer the questions we will ask them. Attention and declarative/working memory should therefore be used in both tasks and cause some interference between the two, which should increase cognitive load according to definition 1) and therefore be reflected in the pupil size.
-
-2) Increased demands on cognitive control alone, which includes task switching, already increases the pupil size (van der Wel & van Steenbergen, 2018). As long as the participants have not mastered either of the tasks to the degree that they can perform it fully automatically (which we believe they will not be able to do in the time frame of the experiment), doing the two tasks together should increase the pupil size because they will need to switch between them regularly.
-
-Finally, if the current secondary task does turn out to be too easy and barely change pupil size, we will definitely consider using the n-back task (perhaps even in combination with the listening task).
-
-PS Thanks for your offer to help! We will keep it in mind :)
-
-*References*
-
-van der Wel P, van Steenbergen H. Pupil dilation as an index of effort in cognitive control tasks: A review. Psychon Bull Rev. 2018 Dec;25(6):2005-2015. doi: 10.3758/s13423-018-1432-y. PMID: 29435963; PMCID: PMC6267528.
-
-**Leander's question**:
-
-Thank you for your questions! With regard to your first consideration: In an earlier draft of our experiment setup we, among ourselves, also discussed having a short practice session, and this indeed might still be a good idea. As of this week, we have actually played around with the driving simulator using a steering wheel and pedals and we found that performing a 0-back task (i.e. keeping the current speed limit) is not all that difficult. 2-back however was quite challenging. Considering that the 0-back task was not that difficult, and that most people of our age have some experience driving, we do not think that there will be a very large increase in skill between (and also within) sessions. More importantly, the ordering of the aided and unaided sessions will be opposite for half of the subjects, thereby we hope to control for any learning effect.
-
-About your second concern: We are pretty certain that there is a relation between pupil dilation and driver workload (Marquart, Cabrall, & de Winter, 2015), as well as a relation between workload and performance (Bruggen, 2015). Workload and performance are not the same, however: Although performance can decrease with too much workload, it can also decrease with too little workload (again, see Bruggen (2015)). There indeed remains the question of how to set the sensitivity of the system. Following the method of working with short and long term moving averages, as described in our wiki, we change the level when the difference (either positively or negatively) between the short and long term trend is larger than K * (standard error of the long-term trend). We can use this scalar K to set the sensitivity of our system. This will probably be done by trial-and-error. We essentially do not want the system to continuously switch when the driver is not performing a secondary task.
-
-*References*
-
-Marquart G., Cabrall C., de Winter J. (2015), “Review of Eye-related Measures of Drivers’ Mental Workload”, Procedia Manufacturing. Vol 3, pp. 2854-2861. https://doi.org/10.1016/j.promfg.2015.07.783.
-
-Bruggen, A. (2015), "An empirical investigation of the relationship between workload and performance", Management Decision, Vol. 53 No. 10, pp. 2377-2389. https://doi.org/10.1108/MD-02-2015-0063
-
