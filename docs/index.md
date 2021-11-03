@@ -123,13 +123,9 @@ The algorithm below details how we combine the standard deviation and the moving
 
 This routine will propose an increase in automation should the short term trend exceed the decision boundary (i.e. the weighted standard deviation) and will propose a decrease in automation as soon as the short term trend returns to the long term trend. In our implementation we further prevent this system from scheduling a change in automation for a fixed period (used to warn the driver about the upcoming change) after every change (this was also done by Katidioti et al., 2016). This automatically ensures that, should any of the decision conditions again be met after this lockdown, the system will then propose to further increase or decrease the level of automation.
 
-By changing the values for the different parameters in the system its sensitivity can be influenced. The figure below shows a very reactive system (window_size_short_term=600,window_size_long_term=15000,weight=1.15). The short-term average is depicted in red, while the long-term average and the decision boundaries are highlighted in blue. This system would quickly reduce the automation level after introducing it again, since the long-term trend is still very responsive to changes in the pupil size. This system was used for our experiment.
+The figure below shows the system we used during the experiment (window_size_short_term=600,window_size_long_term=15000,weight=1.15). The short-term average is depicted in red, while the long-term average and the decision boundaries are highlighted in blue.
 
 ![AAS_sensitive](https://github.com/Valkje/usermodels2122/blob/main/docs/images/adaptive_system_sens.png)
-
-Alternatively, a system that decreases automation more reluctantly could be achieved by replacing the long-term average with a cumulative estimate (or by increasing the window size drastically) as well. In that case the weight parameter needs to be decreased since the deviations between the short-term trend and the long-term trend increase because the latter becomes less responsive. The figure below shows again the different trend estimates and the decision boundaries for such a system (window_size_short_term=600,window_size_long_term=inf,weight=0.5)
-
-![AAS_slow](https://github.com/Valkje/usermodels2122/blob/main/docs/images/adaptive_system_slow.png)
 
 ### Implementation and Interface of the Adaptive Automation System 
 
