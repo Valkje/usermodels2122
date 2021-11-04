@@ -27,7 +27,7 @@ First for entire sessions
 
 ```{r}
 # Specify path and pattern
-path_to_folders <- ""
+path_to_folders <- "C:/Users/Chiel/Documents/CCS/User Models/cleaned_dat/"
 data_patterns <- c("_automated_downsampled_dat.RDS","_non_automated_downsampled_dat.RDS")
 condition_names <- c("aided","unaided")
 
@@ -123,8 +123,7 @@ summary(m1.1)
 
 plot_dat <- plot(m1.1)
 
-plot_smooth(m1.1,view="Time",plot_all="condition",cond = list("Gaze_X"=960,
-                                                            "Gaze_Y"=540))
+plot_smooth(m1.1,view="Time",plot_all="condition",cond = list("Gaze_X"=960, "Gaze_Y"=540), xlab = "Time (ms)", ylab = "Pupil size (arbitrary)", main = "Partial effect of time on pupil size", ylim=c(-550, -200), legend_plot_all = "topright")
 
 # Model checks (based on Model criticism in Van Rij, 2019)
 hist(m1.1$residuals,
@@ -151,8 +150,7 @@ summary(m1.2)
 
 plot_dat <- plot(m1.2)
 
-plot_smooth(m1.2,view="Time",plot_all="condition",cond = list("Gaze_X"=960,
-                                                               "Gaze_Y"=540))
+plot_smooth(m1.2,view="Time",plot_all="condition",cond = list("Gaze_X"=960, "Gaze_Y"=540))
 # Model checks
 hist(m1.2$residuals,
      xlab = "Residuals")
@@ -224,7 +222,7 @@ modes (cruise and full).
 
 ```{r}
 # Specify path and pattern
-path_to_folders <- ""
+path_to_folders <- "C:/Users/Chiel/Documents/CCS/User Models/cleaned_dat/"
 data_patterns <- c("_automated_question_downsampled_dat.RDS","_non_automated_question_downsampled_dat.RDS")
 condition_names <- c("aided","unaided")
 
@@ -298,7 +296,7 @@ avgDat <- ddply(merged_dat,c("Time","condition"),summarise,
 
 plot(0,0,type="n",ylim=c(-100,200),xlim=c(0,15000),
      ylab="Average change in pupil size",
-     xlab = "Time (in ms)")
+     xlab = "Time (ms)")
 
 colrs <- c("red","blue")
 col_index <- 1
@@ -327,8 +325,10 @@ summary(m2.1)
 plot(m2.1)
 
 
-plot_smooth(m2.1,view="Time",plot_all="condition",cond = list("Gaze_X"=960,
-                                                            "Gaze_Y"=540))
+plot_smooth(m2.1,view="Time",plot_all="condition",cond = list("Gaze_X"=960, "Gaze_Y"=540),
+            xlab = "Time (ms)", ylab = "Pupil size (arbitrary)", main = "Partial effect of time on pupil size following a question",
+            ylim=c(-150, 50), legend_plot_all = "topright")
+
 
 # Model checks
 hist(m2.1$residuals,
@@ -403,7 +403,7 @@ Now for automated only we model the 10 seconds following an increase in automati
 
 ```{r}
 # Specify path and pattern
-path_to_folders <- ""
+path_to_folders <- "C:/Users/Chiel/Documents/CCS/User Models/cleaned_dat/"
 data_patterns <- c("_automated_change_downsampled_dat.RDS")
 condition_names <- c("aided")
 
@@ -491,8 +491,8 @@ m3.1 <- bam(Pupil ~ s(Time) +
           te(Gaze_X,Gaze_Y),data=merged_dat)
 summary(m3.1)
 plot(m3.1)
-plot_smooth(m3.1,view="Time",cond = list("Gaze_X"=960,
-                                       "Gaze_Y"=540))
+plot_smooth(m3.1,view="Time",cond = list("Gaze_X"=960, "Gaze_Y"=540),
+            xlab = "Time (ms)", ylab = "Pupil size (arbitrary)", main = "Partial effect of time on pupil size following an increase in automation", ylim=c(-80, 40))
 
 # Model checks
 hist(m3.1$residuals,
