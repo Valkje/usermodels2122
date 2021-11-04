@@ -213,6 +213,12 @@ extract_samples_before_after_msg <- function(data_from_final_clean,
   # Time-stamps are not manipulated here! This should be done by a follow up call
   # to align_msg() from the pupilpre package. Therefore, these columns are
   # also dropped.
+  # Also allows to check whether the samples extracted like this happened
+  # after some special event that was written to the tracker's messages if
+  # check_pre_msg is set to True. In that case if prior to the first time-point
+  # from which we collect samples no check_pre_msg_inval was sent and a 
+  # check_pre_msg_val was received previously, this collection of samples will
+  # be marked with val_check <- 1.
   
   # The aling_msg() function in pupilPre is  from VWPre
   # see: https://github.com/cran/VWPre/blob/master/R/formatting.R

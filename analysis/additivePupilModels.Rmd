@@ -115,105 +115,105 @@ abline(v=0,lty=2,col="red")
 ```{r}
 # build base model based on the predictors outlined in (Van Rij, 2019)
 # to compare conditions.
-m1 <- bam(Pupil ~ condition +
+m1.1 <- bam(Pupil ~ condition +
             s(Time, by=condition,k=10) +
             te(Gaze_X,Gaze_Y),  # control for gaze position (Van Rij, 2019)
           data=merged_dat)
-summary(m1)
+summary(m1.1)
 
-plot_dat <- plot(m1)
+plot_dat <- plot(m1.1)
 
-plot_smooth(m1,view="Time",plot_all="condition",cond = list("Gaze_X"=960,
+plot_smooth(m1.1,view="Time",plot_all="condition",cond = list("Gaze_X"=960,
                                                             "Gaze_Y"=540))
 
 # Model checks (based on Model criticism in Van Rij, 2019)
-hist(m1$residuals,
+hist(m1.1$residuals,
      xlab = "Residuals")
 
-plot(m1$fitted.values,
-     m1$residuals,
+plot(m1.1$fitted.values,
+     m1.1$residuals,
      xlab="Fitted",
      ylab="Residuals",
-     main="m1")
+     main="m1.1")
 
-acf(m1$residuals)
+acf(m1.1$residuals)
 
 # Drastic between-subject variation:
 # Here we use non-linear random effects to model per subject deviations from
 # the relationship between the pupil size and time (see Van Rij et al. 2019)
 # for an overview about random non-linear effects see: Pedersen et al., 2019
-m1.25 <- bam(Pupil ~ condition +
+m1.2 <- bam(Pupil ~ condition +
             s(Time, by=condition,k=10) +
             te(Gaze_X,Gaze_Y) +  # control for gaze position
             s(Time,subject_c,bs="fs"), # m=1, so penalty on first derivative (Wood,2017) seems to diverge.
           data=merged_dat)
-summary(m1.25)
+summary(m1.2)
 
-plot_dat <- plot(m1.25)
+plot_dat <- plot(m1.2)
 
-plot_smooth(m1.25,view="Time",plot_all="condition",cond = list("Gaze_X"=960,
+plot_smooth(m1.2,view="Time",plot_all="condition",cond = list("Gaze_X"=960,
                                                                "Gaze_Y"=540))
 # Model checks
-hist(m1.25$residuals,
+hist(m1.2$residuals,
      xlab = "Residuals")
 
-plot(m1.25$fitted.values,
-     m1.25$residuals,
+plot(m1.2$fitted.values,
+     m1.2$residuals,
      xlab="Fitted",
      ylab="Residuals",
-     main="m1.25")
+     main="m1.2")
 
-acf(m1.25$residuals)
+acf(m1.2$residuals)
 
 # Even simpler random effects lead to really wide CI bands:
-m1.35 <- bam(Pupil ~ condition +
+m1.3 <- bam(Pupil ~ condition +
             s(Time, by=condition,k=10) +
             te(Gaze_X,Gaze_Y) +  # control for gaze position
             s(subject_c,bs="re") +
             s(subject_c,condition,bs="re"),
           data=merged_dat)
-summary(m1.35)
+summary(m1.3)
 
-plot_dat <- plot(m1.35)
+plot_dat <- plot(m1.3)
 
-plot_smooth(m1.35,view="Time",plot_all="condition",cond = list("Gaze_X"=960,
+plot_smooth(m1.3,view="Time",plot_all="condition",cond = list("Gaze_X"=960,
                                                                "Gaze_Y"=540))
 
 # Model checks
-hist(m1.35$residuals,
+hist(m1.3$residuals,
      xlab = "Residuals")
 
-plot(m1.35$fitted.values,
-     m1.35$residuals,
+plot(m1.3$fitted.values,
+     m1.3$residuals,
      xlab="Fitted",
      ylab="Residuals",
-     main="m1.35")
+     main="m1.3")
 
-acf(m1.35$residuals)
+acf(m1.3$residuals)
 
 # How much does the smoothness assumption matter?
-m1.5 <- bam(Pupil ~ condition +
+m1.4 <- bam(Pupil ~ condition +
             s(Time, by=condition,k=100) +
             te(Gaze_X,Gaze_Y),  # control for gaze position
           data=merged_dat)
-summary(m1.5)
+summary(m1.4)
 
-plot_dat <- plot(m1.5)
+plot_dat <- plot(m1.4)
 
-plot_smooth(m1.5,view="Time",plot_all="condition",cond = list("Gaze_X"=960,
+plot_smooth(m1.4,view="Time",plot_all="condition",cond = list("Gaze_X"=960,
                                                               "Gaze_Y"=540))
 
 # Model checks
-hist(m1.5$residuals,
+hist(m1.4$residuals,
      xlab = "Residuals")
 
-plot(m1.5$fitted.values,
-     m1.5$residuals,
+plot(m1.4$fitted.values,
+     m1.4$residuals,
      xlab="Fitted",
      ylab="Residuals",
-     main="m1.5")
+     main="m1.4")
 
-acf(m1.5$residuals)
+acf(m1.4$residuals)
 ```
 
 ### Loading and merging data from all subjects
@@ -263,8 +263,10 @@ for(subj in subjects) {
     sub_dat <- sub_dat[((sub_dat$Time >= align_start) & (sub_dat$Time <= align_end)),]
     
     if(condition_names[condition_index] == "aided") {
-      # exclude on check
-      sub_dat <- sub_dat[sub_dat$val_check == 1,]
+      # if you want to exclude on check
+      # (e.g. only look at questions for aided where automation > 1 before the question)
+      # uncomment this.
+      # sub_dat <- sub_dat[sub_dat$val_check == 1,]
     } else {
       sub_dat$val_check <- 0
     }
@@ -316,83 +318,83 @@ abline(v=0,lty=2,col="red")
 ```{r}
 # again build base model
 
-m2 <- bam(Pupil ~ condition +
+m2.1 <- bam(Pupil ~ condition +
             s(Time, by=condition,k=20) +
             te(Gaze_X,Gaze_Y),  
           data=merged_dat)
-summary(m2)
+summary(m2.1)
 
-plot(m2)
+plot(m2.1)
 
 
-plot_smooth(m2,view="Time",plot_all="condition",cond = list("Gaze_X"=960,
+plot_smooth(m2.1,view="Time",plot_all="condition",cond = list("Gaze_X"=960,
                                                             "Gaze_Y"=540))
 
 # Model checks
-hist(m2$residuals,
+hist(m2.1$residuals,
      xlab = "Residuals")
 
-plot(m2$fitted.values,
-     m2$residuals,
+plot(m2.1$fitted.values,
+     m2.1$residuals,
      xlab="Fitted",
      ylab="Residuals",
-     main="m2")
+     main="m2.1")
 
-acf(m2$residuals)
+acf(m2.1$residuals)
 
 # Again drastic between subject variation:
-m2.25 <- bam(Pupil ~ condition +
+m2.2 <- bam(Pupil ~ condition +
             s(Time, by=condition,k=20) +
             te(Gaze_X,Gaze_Y) +  
             s(Time,subject_c,bs="fs",m=1),
           data=merged_dat)
-summary(m2.25)
+summary(m2.2)
 
-plot(m2.25)
+plot(m2.2)
 
 
-plot_smooth(m2.25,view="Time",plot_all="condition",cond = list("Gaze_X"=960,
+plot_smooth(m2.2,view="Time",plot_all="condition",cond = list("Gaze_X"=960,
                                                             "Gaze_Y"=540))
 
 # Model checks
-hist(m2.25$residuals,
+hist(m2.2$residuals,
      xlab = "Residuals")
 
 plot(m2.25$fitted.values,
      m2.25$residuals,
      xlab="Fitted",
      ylab="Residuals",
-     main="m2.25")
+     main="m2.2")
 
-acf(m2.25$residuals)
+acf(m2.2$residuals)
 
 
 # Again for simpler REs:
-m2.35 <- bam(Pupil ~ condition +
+m2.3 <- bam(Pupil ~ condition +
             s(Time, by=condition,k=20) +
             te(Gaze_X,Gaze_Y) +  
             s(subject_c,bs="re") +
             s(subject_c,condition,bs="re"),
           data=merged_dat)
-summary(m2.35)
+summary(m2.3)
 
-plot(m2.35)
+plot(m2.3)
 
 
-plot_smooth(m2.35,view="Time",plot_all="condition",cond = list("Gaze_X"=960,
+plot_smooth(m2.3,view="Time",plot_all="condition",cond = list("Gaze_X"=960,
                                                             "Gaze_Y"=540))
 
 # Model checks
-hist(m2.35$residuals,
+hist(m2.3$residuals,
      xlab = "Residuals")
 
-plot(m2.35$fitted.values,
-     m2.35$residuals,
+plot(m2.3$fitted.values,
+     m2.3$residuals,
      xlab="Fitted",
      ylab="Residuals",
-     main="m2.35")
+     main="m2.3")
 
-acf(m2.35$residuals)
+acf(m2.3$residuals)
 ```
 
 ### Loading and merging data from all subjects
@@ -485,68 +487,68 @@ abline(v=0,lty=2,col="red")
 
 ```{r}
 # Base Model for after change:
-m3 <- bam(Pupil ~ s(Time) +
+m3.1 <- bam(Pupil ~ s(Time) +
           te(Gaze_X,Gaze_Y),data=merged_dat)
-summary(m3)
-plot(m3)
-plot_smooth(m3,view="Time",cond = list("Gaze_X"=960,
+summary(m3.1)
+plot(m3.1)
+plot_smooth(m3.1,view="Time",cond = list("Gaze_X"=960,
                                        "Gaze_Y"=540))
 
 # Model checks
-hist(m3$residuals,
+hist(m3.1$residuals,
      xlab = "Residuals")
 
-plot(m3$fitted.values,
-     m3$residuals,
+plot(m3.1$fitted.values,
+     m3.1$residuals,
      xlab="Fitted",
      ylab="Residuals",
-     main="m3")
+     main="m3.1")
 
-acf(m3$residuals)
+acf(m3.1$residuals)
 
 # Again random non-linear REs:
-m3.25 <- bam(Pupil ~ s(Time) +
+m3.2 <- bam(Pupil ~ s(Time) +
          te(Gaze_X,Gaze_Y) +
          s(Time,subject_c,bs="fs",m=1),data=merged_dat)
 
-summary(m3.25)
-plot(m3.25)
-plot_smooth(m3.25,view="Time",cond = list("Gaze_X"=960,
+summary(m3.2)
+plot(m3.2)
+plot_smooth(m3.2,view="Time",cond = list("Gaze_X"=960,
                                        "Gaze_Y"=540))
 
 # Model checks
-hist(m3.25$residuals,
+hist(m3.2$residuals,
      xlab = "Residuals")
 
-plot(m3.25$fitted.values,
-     m3.25$residuals,
+plot(m3.2$fitted.values,
+     m3.2$residuals,
      xlab="Fitted",
      ylab="Residuals",
-     main="m3.25")
+     main="m3.2")
 
-acf(m3.25$residuals)
+acf(m3.2$residuals)
 
 # Again simpler REs:
-m3.35 <- bam(Pupil ~ s(Time) +
+m3.3 <- bam(Pupil ~ s(Time) +
          te(Gaze_X,Gaze_Y) +
          s(subject_c,bs="re"),data=merged_dat)
 
-summary(m3.35)
-plot(m3.35)
-plot_smooth(m3.35,view="Time",cond = list("Gaze_X"=960,
+summary(m3.3)
+plot(m3.3)
+plot_smooth(m3.3,view="Time",cond = list("Gaze_X"=960,
                                        "Gaze_Y"=540))
 
 # Model checks
-hist(m3.35$residuals,
+hist(m3.3$residuals,
      xlab = "Residuals")
 
-plot(m3.35$fitted.values,
-     m3.35$residuals,
+plot(m3.3$fitted.values,
+     m3.3$residuals,
      xlab="Fitted",
      ylab="Residuals",
-     main="m3.35")
+     main="m3.3")
 
-acf(m3.35$residuals)
+acf(m3.3$residuals)
 ```
 
 ## References
