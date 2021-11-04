@@ -6,24 +6,18 @@ class MovingRMSE():
 
     def __init__(self):
         """
-        * Calculates the cumulative variance
-        * of differences. Differences are directly calculated
-        * in the update method.
+        * Calculates the cumulative root mean square error.
         * 
-        * Based on: https://en.wikipedia.org/wiki/Variance
+        * Based on: https://en.wikipedia.org/wiki/Mean_squared_error
+        * and see: https://en.wikipedia.org/wiki/Root-mean-square_deviation for RMSE definition
         * and see: https://en.wikipedia.org/wiki/Moving_average for definition of cumulative
+        * note, that the MSE is essentially a variance: https://en.wikipedia.org/wiki/Variance
         * 
-        * This provides us with an efficient tool to essentially calculate the
-        * root mean squared error between the long-term
-        * moving average of the pupil size (our "prediction") and the short-term
-        * trend (our "observation") at any time-point: 
-        * 
-        * See: https://en.wikipedia.org/wiki/Mean_squared_error (Predictor MSE formula, we just take the root)
-        * See: https://en.wikipedia.org/wiki/Root-mean-square_deviation
-        *
-        * Note that we do not use raw observations as described in the wiki article but essentially
-        * replace them with predictions from the short-term trend as well.
+        * As discussed in the MSE article and our wiki, the RMSE/MSE is usually calculated
+        * between a prediction and some observation. Note that we replace raw observations with
+        * the short-term trend as described in our wiki.
         * This makes the system less sensitive to outliers in the pupil size.
+        *
         * In earlier versions we also experimented with a simple moving variance here
         * (updated for a window like the averages). But the resulting decision boundaries
         * were too sensitive.
@@ -46,6 +40,7 @@ class MovingRMSE():
         * 1) Calculate power of difference
         * 2) Update moving Numerator
         * 4) Update currentValue
+
         Of course we also need to keep track of the current "sample size".
         """
         difference = y_hat - y
@@ -57,7 +52,7 @@ class MovingRMSE():
         # Adjust size accordingly
         self.size += 1
 
-        # this is the cumulative variance/mse at any point
+        # this is the cumulative mse at any point
         # see: https://en.wikipedia.org/wiki/Mean_squared_error for formula
         """
         Save-guard for division by 0
@@ -71,6 +66,6 @@ class MovingRMSE():
         # self.history.append(self.currentValue) #[Deprecated] we handled plotting in main
     
     def getCurrentValue(self):
-        # For our decision boundary we need the root mean standard deviation
+        # For our decision we want the root MSE
         # so we take the root here.
         return math.sqrt(self.currentValue)
