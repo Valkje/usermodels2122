@@ -131,7 +131,7 @@ In our implementation we further prevent this system from scheduling a change in
 
 The figure below shows how the system's output (short-term average in red, long-term average in solid blue, weighted RMSE thresholds in dashed blue) would look like at any time point, based on the parameters used for our experiment (window_size_short_term=600,window_size_long_term=15000,weight=1.15):
 
-![AAS_sensitive](https://github.com/Valkje/usermodels2122/blob/main/docs/images/adaptive_system_sens.png)
+![AAS_sensitive](https://github.com/Valkje/usermodels2122/blob/main/docs/images/adaptive_system_sens_short.png)
 
 ### Implementation and Interface of the Adaptive Automation System 
 
