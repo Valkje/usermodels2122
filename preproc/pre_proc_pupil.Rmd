@@ -186,15 +186,20 @@ questionDatCleaned <- final_sample
 
 # Reset message to only Question asked for regular expression to work.
 questionDatCleaned$SAMPLE_MESSAGE <- as.character(questionDatCleaned$SAMPLE_MESSAGE)
-questionDatCleaned$SAMPLE_MESSAGE[startsWith(questionDatCleaned$SAMPLE_MESSAGE,"NEXT BLOCK,QUESTION")] <- "QUESTION ASKED 1"
+questionDatCleaned$SAMPLE_MESSAGE[startsWith(questionDatCleaned$SAMPLE_MESSAGE,"NEXT BLOCK,QUESTION ASKED 1")] <- "QUESTION ASKED 1"
+questionDatCleaned$SAMPLE_MESSAGE[startsWith(questionDatCleaned$SAMPLE_MESSAGE,"ERROR MESSAGES LOST 1,QUESTION ASKED 1")] <- "QUESTION ASKED 1"
 questionDatCleaned$SAMPLE_MESSAGE <- as.factor(questionDatCleaned$SAMPLE_MESSAGE)
 
+# Also mark for each question whether an AUTOMATION_INCREASE was received before
 questionDatCleaned <- extract_samples_before_after_msg(questionDatCleaned,
                                                        "QUESTION ASKED",
                                                        0,
                                                        7500,
                                                        split_msg_by_block=T,
-                                                       split_msg_decision=10
+                                                       split_msg_decision=10,
+                                                       check_pre_msg=T,
+                                                       check_pre_msg_val="AUTOMATION_INCREASE",
+                                                       check_pre_msg_inval="AUTOMATION_DECREASE"
                                                        )
 
 # Re-align
