@@ -18,7 +18,7 @@ source("./src/preprocessing_helper_functions.R")
 
 ## Purpose of this file
 
-We received a very good comment during the presentation of our comment that
+We received a very good comment during the presentation of our project that
 our baseline calculations might obscure constant differences in the pupil size
 following a multiplication problem between the two conditions. Thus we here
 calculate an updated model that baselines each question with the average taken
