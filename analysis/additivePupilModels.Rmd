@@ -551,7 +551,110 @@ plot(m3.3$fitted.values,
 acf(m3.3$residuals)
 ```
 
-## References
+
+### Investigate when the system was active
+
+The code below generates the plot shown in the presentation.
+
+```{r}
+# Specify path to raw .asc files in automated block below
+path_to_files <- ""
+all_files <- list.files(path_to_files)
+changesBoth <- NULL
+
+# Define "conditions"
+messages <- c("AUTOMATION_INCREASE","AUTOMATION_INCREASE full")
+conditions <- c("IncreaseBoth","IncreaseFull")
+
+for(index_change in 1:length(messages)) {
+  
+  merged_dat <- NULL
+
+  for(file in all_files){
+    if(startsWith(file,"UM")){
+      print(file)
+      label <- file
+      recorded_eye <- "Left"
+      
+      sample_cl <- asc_to_ppl_pre(paste0(path_to_files,file),
+                                     label,
+                                     recorded_eye)
+      
+      # Align to experimental begin as signaled by AUTOMATION_DECREASE none,EXPERIMENT STARTED msg
+      sample_cl <- align_msg(sample_cl,Msg="^AUTOMATION_DECREASE none,EXPERIMENT STARTED")
+      
+      # Create time series object (we don't need to adjust so this can just be copied)
+      sample_cl$Time <- sample_cl$Align
+      
+      # Create eye-agnostic data columns
+      sample_cl <- ppl_select_recorded_eye(sample_cl,Recording = "L")
+      
+      # Again check for message recording errors
+      sample_cl$SAMPLE_MESSAGE <- as.character(sample_cl$SAMPLE_MESSAGE)
+      sample_cl$SAMPLE_MESSAGE[startsWith(sample_cl$SAMPLE_MESSAGE,
+                                          "NEXT BLOCK,QUESTION ASKED 1")] <- "QUESTION ASKED 1"
+      sample_cl$SAMPLE_MESSAGE[startsWith(sample_cl$SAMPLE_MESSAGE,
+                                          "ERROR MESSAGES LOST 1,QUESTION ASKED 1")] <- "QUESTION ASKED 1"
+      sample_cl$SAMPLE_MESSAGE[startsWith(sample_cl$SAMPLE_MESSAGE,
+                                          "NEXT BLOCK,EXPERIMENT ENDED")] <- "NEXT BLOCK"
+      sample_cl$SAMPLE_MESSAGE <- as.factor(sample_cl$SAMPLE_MESSAGE)
+      
+      # For each increase in automation check whether it was preceded by a
+      # "question asked 1" message and not recorded after a "next block"
+      # message (then it was scheduled in the less difficult blocks)
+      increasesCheck <- extract_samples_before_after_msg(sample_cl,
+                                                         messages[index_change],
+                                                         0,
+                                                         5000,
+                                                         check_pre_msg=T,
+                                                         check_pre_msg_val="QUESTION ASKED 1",
+                                                         check_pre_msg_inval="NEXT BLOCK"
+                                                         )
+      # Late automation increases might not have 5000 samples to be filled,
+      # drop the corresponding NA rows.
+      increasesCheck <- increasesCheck[!is.na(increasesCheck$Subject),]
+      droplevels(increasesCheck)
+      merged_dat <- rbind(merged_dat,increasesCheck)
+      
+    }
+  }
+  
+  # Aggregate for each subject!
+  changes <- ddply(merged_dat,c("Subject"),summarise,
+                  totalChecks = unique(total_checks),
+                  validChecks = unique(valid_checks),
+                  ratio = unique(valid_checks)/unique(total_checks))
+  
+  # Set condition (change this in accordance with the message checked in the loop)
+  changes$condition <- conditions[index_change]
+  changesBoth <- rbind(changesBoth,changes)
+  
+  # this is the total ratio but we used the per subject ratios for the plots
+  print(sum(changes$validChecks)/sum(changes$totalChecks))
+  
+}
+
+# Based on plot code by Chiel for secondary task performance analysis
+library(plotfunctions)
+meanSE <- ddply(changesBoth,c("condition"), summarize,
+                meanAccuracy = mean(ratio),
+                seAccuracy = se(ratio))
+
+meanSe <- meanSE[order(meanSE$condition, decreasing = F),]
+table1 <- cbind(meanSe[meanSe$condition=="IncreaseBoth",]$meanAccuracy,
+                meanSe[meanSe$condition=="IncreaseFull",]$meanAccuracy)
+
+colnames(table1) <- c("Increases to cruise or full automation", "Increases to full automation")
+
+bp <- barplot(table1, ylim=c(0,1), xlab = "Condition", ylab = "Percentage",
+              col = "lightgrey", font.lab=2,
+              main= "Percentage of automation increases in algebra block")
+errorBars(bp, meanSe$meanAccuracy, meanSe$seAccuracy)
+
+abline(h=0.5,lty=2,col="red")
+```
+
+### References
 
 Faraway, J. (2016). Extending the Linear Model with R: Generalized Linear, Mixed Effects and Nonparametric Regression Models, Second Edition. https://doi.org/10.1201/9781315382722
 

@@ -123,7 +123,7 @@ if(T){
 plot(final_sample$Time,final_sample$Pupil,ylab = "Pupil",xlab = "Time",type="l")
 ```
 
-# Aligning data for analysis
+## Aligning data for analysis
 
 The next steps were dependent on what we wanted to investigate:
 
@@ -244,7 +244,7 @@ Finally: changes in pupil following a an automation change.
 Important: This only works for the automated session data, since the AAS
 did not write any messages during the un-aided session!
 
-Here we can be creative, for now I only collect 1 to 2. If you want to
+Here we included any increase in automation. If you want to
 collect for decrease or increase just adjust the AUTOMATION_INCREASE messages
 in line 243 and 249 accordingly.
 

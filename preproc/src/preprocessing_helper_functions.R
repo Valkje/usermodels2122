@@ -251,6 +251,8 @@ extract_samples_before_after_msg <- function(data_from_final_clean,
   
   # Collect all parsed messages in case a check_pre_msg should be performed
   message_history <- c()
+  total_checks <- 0
+  valid_checks <- 0
   
   # Extract data following a message starting with re_msg_for_split:
   for(row_index in 1:nrow(data_from_final_clean)){
@@ -287,6 +289,7 @@ extract_samples_before_after_msg <- function(data_from_final_clean,
         # Optionally perform a check_pre_msg check
         if(check_pre_msg) {
           val_check <- 0
+          total_checks <- total_checks + 1
           # Did we already encounter previous messages?
           if(length(message_history) > 0) {
             # Now iterate over messages backwards
@@ -295,6 +298,7 @@ extract_samples_before_after_msg <- function(data_from_final_clean,
             for(prev_msg in rev_msg_history) {
               if(startsWith(prev_msg,check_pre_msg_val)) {
                 cat("Does meet check because of previous: ",prev_msg,"\n")
+                valid_checks <- valid_checks + 1
                 val_check <- 1
                 break
               } else if(startsWith(prev_msg,check_pre_msg_inval)) {
@@ -324,6 +328,9 @@ extract_samples_before_after_msg <- function(data_from_final_clean,
     }
   }
   
+  # Assign check columns
+  extracted_dat$valid_checks <- valid_checks
+  extracted_dat$total_checks <- total_checks
   # Set event data and sample messages to factor again
   extracted_dat$Event <- as.factor(extracted_dat$Event)
   extracted_dat$SAMPLE_MESSAGE <- factor(extracted_dat$SAMPLE_MESSAGE)
