@@ -37,7 +37,7 @@ We have implemented three different levels of automation:
 
 To test the hypotheses, our experimental setup needs to account for multiple aspects: the participants, experiment design, and the type of follow-up analyses. For this experiment, we aim at having two experimental within-subjects conditions (aided vs. unaided): in the aided condition the adaptive automation system will be enabled, while in the unaided condition the driver remains in full control for the entire session. Additionally, we need to manipulate the load on the driver in both conditions to test whether our adaptive automation system takes over control in appropriate moments and how the increase in automation will impact the driver. To manipulate the load on the driver we will let the participants complete a secondary task: Solving multiplication problems. These problems will be presented to the participants with a text-to-speech synthesizer, so participants will still be able to watch the road, which allows us to continue to monitor changes in the size of the pupil. Participants can respond to the problems using their voice, and we will record their responses manually.
 
-To create concrete switches between light and heavy mental workload, within each aided/unaided condition, periods in which the participant will be asked to solve multiplication problems are alternated with periods in which the participant is not asked to solve problems. More specifically, the experiment schedule looks as follows:
+To create concrete switches between light and heavy mental workload, within each aided/unaided condition, periods in which the participant will be asked to solve multiplication problems are alternated with periods in which the participant is not asked to solve problems. More specifically, the experiment schedule (See also the figure below) looks as follows:
 
 1. 5-minute introduction session where the experimental information is presented
 
@@ -56,6 +56,8 @@ To create concrete switches between light and heavy mental workload, within each
     2. 2.5-minute with algebra problems
     3. 2.5-minute without algebra problems
     4. 2.5-minute with algebra problems
+
+![experiment_set-up](https://user-images.githubusercontent.com/45287198/140524662-eb206c18-ebba-466b-8222-14e60d9d38b3.png)
 
 During the 2.5-minute algebra problem session the participant will be presented with 10 different multiplication problems. That means that there are 15-second periods for each question. The problem is vocalized (by the program) at the start of this period, the participant has the rest of the period to vocalize his/her answer.
 
