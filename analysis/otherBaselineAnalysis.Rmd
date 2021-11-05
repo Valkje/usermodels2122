@@ -1,0 +1,146 @@
+---
+title: "Different baseline analysis"
+author: "Adaptive automation team"
+date: "11/5/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(eyelinker)
+library(PupilPre)
+library(plyr)
+library(dplyr)
+library(mgcv)
+library(itsadug)
+source("./src/preprocessing_helper_functions.R")
+```
+
+## Purpose of this file
+
+We received a very good comment during the presentation of our comment that
+our baseline calculations might obscure constant differences in the pupil size
+following a multiplication problem between the two conditions. Thus we here
+calculate an updated model that baselines each question with the average taken
+over the entire experiment (both sessions) from the driver to which the question
+can be associated.
+
+```{r}
+# Specify path to cleaned files containing folder for each subject
+path_to_files <- ""
+# Specify all users
+users <- c("UM1","UM2","UM3","UM4","UM5","UM6","UM7","UM8")
+
+combinedData <- NULL
+
+# Define conditions
+conditions <- c("automated","non_automated")
+
+for(condition in conditions) {
+
+  for(user in users){
+    label <- paste0(user,"_",condition)
+    
+    recorded_eye <- "Left"
+    
+    sample_cl <- readRDS(paste0(path_to_files,user,"/",label,"_final_cleaned.RDS"))
+    
+    # Again check for message recording errors
+    sample_cl$SAMPLE_MESSAGE <- as.character(sample_cl$SAMPLE_MESSAGE)
+    sample_cl$SAMPLE_MESSAGE[startsWith(sample_cl$SAMPLE_MESSAGE,
+                                        "NEXT BLOCK,QUESTION ASKED 1")] <- "QUESTION ASKED 1"
+    sample_cl$SAMPLE_MESSAGE[startsWith(sample_cl$SAMPLE_MESSAGE,
+                                        "ERROR MESSAGES LOST 1,QUESTION ASKED 1")] <- "QUESTION ASKED 1"
+    sample_cl$SAMPLE_MESSAGE[startsWith(sample_cl$SAMPLE_MESSAGE,
+                                        "NEXT BLOCK,EXPERIMENT ENDED")] <- "NEXT BLOCK"
+    sample_cl$SAMPLE_MESSAGE <- as.factor(sample_cl$SAMPLE_MESSAGE)
+    
+    # collect all question
+    questionDatCleaned <- extract_samples_before_after_msg(sample_cl,
+                                                     "QUESTION ASKED",
+                                                     0,
+                                                     7500,
+                                                     split_msg_by_block=T,
+                                                     split_msg_decision=10
+                                                     )
+    # Fix alignment
+    questionDatCleaned <- align_msg(questionDatCleaned,Msg="^QUESTION ASKED")
+    questionDatCleaned$Time <- questionDatCleaned$Align
+    
+    # Manual baseline
+    dat_automated <- readRDS(paste0(path_to_files,user,"/",user,"_automated_final_cleaned.RDS"))
+    dat_non_automated <- readRDS(paste0(path_to_files,user,"/",user,"_non_automated_final_cleaned.RDS"))
+    
+    pupil_automated <- dat_automated$Pupil
+    pupil_non_automated <- dat_non_automated$Pupil
+    pupil_entire_exp <- c(as.numeric(pupil_automated),as.numeric(pupil_non_automated))
+    
+    # print total baseline
+    print(mean(pupil_entire_exp,na.rm=T))
+    questionDatCleaned$Pupil <- questionDatCleaned$Pupil - mean(pupil_entire_exp,
+                                                                na.rm=T)
+    
+    # Downsample
+    question_downsampled_data <- downsample(questionDatCleaned,
+                             SamplingRate = 500,
+                             NewRate = 50)
+    
+    if(condition == "automated") {
+      question_downsampled_data$condition <- "aided"
+    } else {
+      question_downsampled_data$condition <- "unaided"
+    }
+    
+    
+    if(length(colnames(question_downsampled_data)) != length(colnames(combinedData))
+       && user != "UM1") {
+      
+      cat(label, " had too many columns.\n")
+      # This happens in case the wrapper function (safe_apply_manual_clean) had to intervene
+      question_downsampled_data <- question_downsampled_data[,
+                                                             !(colnames(question_downsampled_data)
+                                                               %in% c("PupilClean","PupilPrevious"))]
+    }
+    
+    combinedData <- rbind(combinedData,question_downsampled_data)
+    
+  }
+  
+}
+combinedData$condition <- as.factor(combinedData$condition)
+```
+
+Now fit the same model fitted earlier:
+```{r}
+# Again - nothing significant can be concluded in any case because
+# all regression assumptions are basically violated.
+m2.1 <- bam(Pupil ~ condition +
+            s(Time, by=condition,k=20) +
+            te(Gaze_X,Gaze_Y),  
+          data=combinedData)
+summary(m2.1)
+
+plot(m2.1)
+
+
+plot_smooth(m2.1,view="Time",
+            plot_all="condition",
+            cond = list("Gaze_X"=960, "Gaze_Y"=540),
+            xlab = "Time (ms)",
+            ylab = "Pupil size (arbitrary)",
+            main = "Partial effect of time on pupil size following a question",
+            legend_plot_all = "topright")
+
+
+# Model checks
+hist(m2.1$residuals,
+     xlab = "Residuals")
+
+plot(m2.1$fitted.values,
+     m2.1$residuals,
+     xlab="Fitted",
+     ylab="Residuals",
+     main="m2.1")
+
+acf(m2.1$residuals)
+```

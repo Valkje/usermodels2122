@@ -34,6 +34,8 @@ condition_names <- c("aided","unaided")
 # collect subjects
 subjects <- list.files(path_to_folders)[startsWith(list.files(path_to_folders),"UM")]
 
+# Pick these as probably start and end indices, some subjects might have
+# a couple samples more or less but this should cover everyone.
 align_start <- -500
 align_end <- 600000
 
@@ -216,9 +218,7 @@ acf(m1.4$residuals)
 
 ### Loading and merging data from all subjects
 
-Now for 15 seconds following a question. For "aided" only questions are
-included for which the driver was in any of the two automation
-modes (cruise and full).
+Now for 15 seconds following a question.
 
 ```{r}
 # Specify path and pattern
@@ -229,10 +229,11 @@ condition_names <- c("aided","unaided")
 # collect subjects
 subjects <- list.files(path_to_folders)[startsWith(list.files(path_to_folders),"UM")]
 
-align_start <- -500
-align_end <- 600000
+align_start <- 0
+align_end <- 7500
 
-# Check alignments
+# Check alignments (here this is just sanity check, if this went wrong
+# then our alignment procedure during the pupil-preprocessing failed.)
 for(subj in subjects) {
   for(data_pattern in data_patterns) {
     sub_dat <- readRDS(paste0(path_to_folders,subj,"/",subj,data_pattern))
@@ -249,6 +250,14 @@ for(subj in subjects) {
   
 }
 
+if(align_start != 0){
+  stop("There was probably a problem earlier during the alignment steps")
+}
+
+if(align_end != 7500){
+  stop("There was probably a problem earlier during the alignment steps")
+}
+
 
 # Merge data
 merged_dat <- NULL
@@ -257,8 +266,6 @@ for(subj in subjects) {
   for(data_pattern in data_patterns) {
     sub_dat <- readRDS(paste0(path_to_folders,subj,"/",subj,data_pattern))
     cat(subj,data_pattern,"\n")
-
-    sub_dat <- sub_dat[((sub_dat$Time >= align_start) & (sub_dat$Time <= align_end)),]
     
     if(condition_names[condition_index] == "aided") {
       # if you want to exclude on check
@@ -410,10 +417,10 @@ condition_names <- c("aided")
 # collect subjects
 subjects <- list.files(path_to_folders)[startsWith(list.files(path_to_folders),"UM")]
 
-align_start <- -500
-align_end <- 600000
+align_start <- 0
+align_end <- 5000
 
-# Check alignments
+# Check alignments (again just a sanity check)
 for(subj in subjects) {
   for(data_pattern in data_patterns) {
     sub_dat <- readRDS(paste0(path_to_folders,subj,"/",subj,data_pattern))
@@ -430,6 +437,14 @@ for(subj in subjects) {
   
 }
 
+if(align_start != 0){
+  stop("There was probably a problem earlier during the alignment steps")
+}
+
+if(align_end != 5000){
+  stop("There was probably a problem earlier during the alignment steps")
+}
+
 
 # Merge data
 merged_dat <- NULL
@@ -438,8 +453,6 @@ for(subj in subjects) {
   for(data_pattern in data_patterns) {
     sub_dat <- readRDS(paste0(path_to_folders,subj,"/",subj,data_pattern))
     cat(subj,data_pattern,"\n")
-
-    sub_dat <- sub_dat[((sub_dat$Time >= align_start) & (sub_dat$Time <= align_end)),]
     
     # Assign condition
     sub_dat$condition <- condition_names[condition_index]
