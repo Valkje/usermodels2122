@@ -109,21 +109,24 @@ Since we wanted to work with averages we opted to compute a cumulative estimate 
  
 The algorithm below details how we combine all of these individual parts to reach an automation decision (see also AdaptiveAutomationSystem.java and main.py files):
 
-- Define initial values for weight, window_size_short_term, window_size_long_term
-- set automation_level to "no automation"
+```python
+define initial values for weight, window_size_short_term, window_size_long_term
+automation_level = level("no automation")
 
-- while recording:
-    - get newest pupil size
-    - if newest pupil size is not zero:
-        - update short_term_trend
-        - update long_term_trend
-        - calculate difference between short_term_trend and long_term_trend
-        - update RMSE with difference
+while recording:
+    newest_pupil_size = pupil.get_size()
+    if newest_pupil_size != 0:
+        short_term_trend.update(newest_pupil_size)
+        long_term_trend.update(newest_pupil_size)
+        
+        difference = short_term_trend - long_term_trend
+        RMSE.update(difference)
     
-    - if short_term_trend >= long_term_trend + weight * RMSE and automation_level is not "full automation":
-        - schedule automation increase
-    - if short_term_trend <= long_term_trend and automation_level is not "no automation":
-        - schedule automation decrease
+    if short_term_trend >= long_term_trend + weight * RMSE and automation_level != "full automation":
+        automation_level.increase()
+    if short_term_trend <= long_term_trend and automation_level != "no automation":
+        automation_level.decrease()
+```
 
 This routine implements the desired functionality, that an increase in automation should be scheduled when the short-term trend deviates **too extremely** from the long-term trend. **Too extremely** is here operationalized as the weighted RMSE and checked by means of a conditional statement: (i.e., if short_term_trend >= long_term_trend + weight * RMSE). Additionally, this routine proposes a decrease in automation as soon as the short term trend returns to the long term trend. Initially, we experimented with other rules for the decrease as well, including for example the simple negation of the aforementioned conditional statement. However, we personally felt that in that case the system was proposing changes to the automation mode too rapidly. That is why we opted to wait until the short-term trend returns to the long-term trend before proposing a decrease in automation.
 
