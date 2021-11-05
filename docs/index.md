@@ -13,7 +13,7 @@
 
 ## Introduction
 
-This project concerns itself with the adaptive automation of a simulated driving task. Relying on an existing driving model implemented in ACT-R, we will research and develop a real-time adaptive automation system that will determine when the model should take over partial or full control of the driving task and when control should be handed back to the human driver. The adaptive automation system should attempt to maintain a stable driver mental workload, increasing the level of automation when the driver's mental workload becomes too high and decreasing the level of automation again when the driver's mental workload has decreased sufficiently. The applicability of adaptive automation as a method for controlling excessive mental workload is that by taking away (sub)tasks we redistribute (or reduce) the workload imposed on the driver, thereby reducing mental workload (Vidulich and Chang (2012)). The advantage of an adaptive automation system over a non-adaptive automation system is that by maintaining a sufficiently high level of mental workload we can prevent error due to poor situation awareness, which could result in a driver not properly responding to unexpected events.
+This project concerns itself with the adaptive automation of a simulated driving task. Relying on an existing driving model implemented in ACT-R, we will research and develop a real-time adaptive automation system that will determine when the model should take over partial or full control of the driving task and when control should be handed back to the human driver. The adaptive automation system should attempt to maintain a stable driver mental workload, increasing the level of automation when the driver's mental workload becomes too high and decreasing the level of automation again when the driver's mental workload has decreased sufficiently. The applicability of adaptive automation as a method for controlling excessive mental workload is that by taking away (sub)tasks we redistribute (or reduce) the workload imposed on the driver, thereby reducing mental workload (Vidulich and Chang ,2012). The advantage of an adaptive automation system over a non-adaptive automation system is that by maintaining a sufficiently high level of mental workload we can prevent error due to poor situation awareness, which could result in a driver not properly responding to unexpected events.
 
 ## Hypotheses
 
@@ -152,20 +152,20 @@ When a change in automation is scheduled by the adaptive automation system, the 
 
 ## References
 
-Papantoniou, P., Papadimitriou, E., & Yannis, G. (2017). Review of driving performance parameters critical for distracted driving research. Transportation Research Procedia, 25, 1796–1805.
+Hoeks, B., & Levelt, W. J. (1993). Pupillary dilation as a measure of attention: A quantitative system analysis. Behavior Research Methods, Instruments, & Computers, 25(1), 16-26.
 
-On-Road Automated Driving (ORAD) committee (2018). Taxonomy and Definition for Terms Related to Driving Automation System for On-Road Motor Vehicles. Available from https://doi.org/10.4271/J3016_201609
-
-Hoeks, B., Levelt, W. (1993) Pupillary dilation as a measure of attention: A quantitative system analysis
-
-Mindakis, G., Lohan, K. (2018) Using Pupil Diameter to Measure Cognitive Load
-
-Savino M. R. (2009) Standardized Names and Definitions for Driving Performance Measures
-
-Kahneman, D. (1973) Attention and Effort
-
-Vidulich, M.A. and Tsang, P.S. (2012). Mental Workload and Situation Awareness. In Handbook of Human Factors and Ergonomics, G. Salvendy (Ed.). https://doi.org/10.1002/9781118131350.ch8
+Kahneman, D. (1973). Attention and effort. Englewood Cliffs, NJ: Prentice-Hall.
 
 Katidioti, I., Borst, J. P., Bierens de Haan, D. J., Pepping, T., van Vugt, M. K., & Taatgen, N. A. (2016). Interrupted by Your Pupil: An Interruption Management System Based on Pupil Dilation. International Journal of Human–Computer Interaction, 32(10), 791–801. https://doi.org/10.1080/10447318.2016.1198525
 
-Mehrang, S. (2016). Outlier Detection in Weight Time Series of Connected Scales: A Comparative Study.
+Mehrang, S. (2016). Outlier Detection in Weight Time Series of Connected Scales: A Comparative Study (Master's thesis).
+
+Minadakis, G., & Lohan, K. (2018). Using Pupil Diameter to Measure Cognitive Load. arXiv preprint arXiv:1812.07653.
+
+On-Road Automated Driving (ORAD) committee (2018). Taxonomy and Definition for Terms Related to Driving Automation System for On-Road Motor Vehicles. Available from https://doi.org/10.4271/J3016_201609
+
+Papantoniou, P., Papadimitriou, E., & Yannis, G. (2017). Review of driving performance parameters critical for distracted driving research. Transportation Research Procedia, 25, 1796–1805.
+
+Savino, M. R. (2009). Standardized names and definitions for driving performance measures (Doctoral dissertation, Tufts University).
+
+Vidulich, M.A. and Tsang, P.S. (2012). Mental Workload and Situation Awareness. In Handbook of Human Factors and Ergonomics, G. Salvendy (Ed.). https://doi.org/10.1002/9781118131350.ch8
