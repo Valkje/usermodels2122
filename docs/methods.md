@@ -19,7 +19,6 @@ The mental workload on the driver was manipulated with a secondary task in both 
 
 ![experiment set-up](images/experiment_set-up.png "Experiment set-up")
 
-To prevent any effect of specific multiplication problems on pupil size and/or driving performance, two different lists of twenty multiplication problems were created; one for each session. The order in which the lists were presented was counterbalanced across subjects. Similarly, to prevent any effects of learning or practice, we also counterbalanced the order of the aided/unaided conditions across participants. This yielded 2*2=4 different experiment run configurations, as detailed in Table X.
 
 | Session 1 (automation condition) | Session 2 (automation condition) | Session 1 (multiplication list) | Session 2 (multiplication list) |
 |----------------------------------|----------------------------------|---------------------------------|---------------------------------|
